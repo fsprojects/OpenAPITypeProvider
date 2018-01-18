@@ -1,0 +1,7 @@
+source https://api.nuget.org/v3/index.json
+framework: auto-detect
+
+nuget FSharp.Core
+
+// build
+nuget FAKE
