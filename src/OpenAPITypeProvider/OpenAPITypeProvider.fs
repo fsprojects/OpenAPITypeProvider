@@ -22,48 +22,82 @@ type Info = {
     Version : string
 }
 
-type Schema = {
-    Type : string
-    // TODO: OTHERS
+type Discriminator = {
+    PropertyName : string
+    Mapping : Map<string, Schema>
+}
+and 
+    Schema = {
+        Type : string
+        // TODO: OTHERS
+        Items : Schema option
+        Properties : Schema option
+        AllOf : Schema list
+        OneOf : Schema list
+        AnyOf : Schema list
+        Discriminator : Discriminator
+    }
+
+type MediaType  = {
+    Schema: Schema
+    //Example:  TBD LATER (maybe :))
+    //Examples: TBD LATER (maybe :))
+    //Encoding: TBD LATER (maybe :))
 }
 
 type Parameter = {
     Name : string
     In : string
     Description : string option
-    Required : bool option
-    Deprecated : bool option
-    AllowEmptyValue : bool option
-    
-    //Style: OMITTED
-    //Explode: OMITTED
-    //AllowReserved: OMITTED
-    
+    Required : bool // false
+    Deprecated : bool // false
+    AllowEmptyValue : bool //false
     Schema : Schema
+    Content : Map<string, MediaType>
+    //Style:            TBD LATER (maybe :))
+    //Explode:          TBD LATER (maybe :))
+    //AllowReserved:    TBD LATER (maybe :))
+    //Example:          TBD LATER (maybe :))
+    //Examples:         TBD LATER (maybe :))
+}
 
-    //Example: OMITTED
-    //Examples: OMITTED
+type Header = { // follow structure of Parameter
+    Description : string option
+    Required : bool // false
+    Deprecated : bool // false
+    AllowEmptyValue : bool //false
+    Schema : Schema
+}
 
-    //Content : Map<string, MediaType> : OMITTED
+type RequestBody = {
+    Description : string option
+    Content: Map<string, MediaType>
+    Required: bool
+}
+
+type Response = {
+    Description : string
+    Headers : Map<string, Header>
+    Content : Map<string, MediaType>
+    //Links : TBD LATER (maybe :))
 }
 
 type Operation = {
     Tags : string list
     Summary: string option
     Description : string option
-    //ExternalDocs : OMMITED
     OperationId : string option
     Parameters : Parameter list
     RequestBody : RequestBody option
-    Responses : Response list
-    //Callbacks : OMMITED
+    Responses : Map<string, Response>
     Deprecated : bool
-    Security : Security option
-    //Servers : TBD
+    //ExternalDocs :    TBD LATER (maybe :))
+    //Callbacks :       TBD LATER (maybe :))
+    //Security :        TBD LATER (maybe :))
+    //Servers :         TBD LATER (maybe :))
 }
 
 type Path = {
-    //``$ref`` : string option // Probably will not be necessary
     Summary : string option
     Description : string option
     Get : Operation option
@@ -74,13 +108,13 @@ type Path = {
     Head : Operation option
     Patch : Operation option
     Trace : Operation option
-    //Servers : TBD
     Parameters : Parameter list
+    //Servers : TBD LATER (maybe :))
 }
 
 type OpenAPI = {
     SpecificationVersion : string
     Info : Info
-    //Servers : TBD
     Paths : Path list
+    //Servers : TBD LATER (maybe :))
 }
