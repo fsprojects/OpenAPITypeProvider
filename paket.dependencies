@@ -4,5 +4,10 @@ framework: auto-detect
 nuget FSharp.Core
 nuget YamlDotNet
 
+// tests
+nuget NUnit
+nuget NUnit3TestAdapter
+nuget Microsoft.NET.Test.Sdk
+
 // build
 nuget FAKE

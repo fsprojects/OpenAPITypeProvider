@@ -1,4 +1,4 @@
-namespace OpenAPI
+namespace OpenAPITypeProvider.Specification
 
 open System
 
@@ -47,7 +47,7 @@ type Discriminator = {
 }
 and 
     Schema =
-        | Array of items:Schema list
+        | Array of items:Schema
         | Object of props:Map<string, Schema> * required:string list * Discriminator option
         | Boolean
         | Integer of format:IntFormat

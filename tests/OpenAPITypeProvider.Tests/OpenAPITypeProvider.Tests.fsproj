@@ -5,12 +5,11 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Specification.fs" />
-    <Compile Include="Parser/Core.fs" />
-    <Compile Include="Parser/Contact.fs" />
-    <Compile Include="Parser/License.fs" />
-    <Compile Include="Parser/Info.fs" />
-    <Compile Include="OpenAPITypeProvider.fs" />
+    <Compile Include="Parser.fs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />
+  </ItemGroup>
+
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -3,4 +3,11 @@ NUGET
   remote: https://api.nuget.org/v3/index.json
     FAKE (4.64.4)
     FSharp.Core (4.2.3)
+    Microsoft.CodeCoverage (1.0.3)
+    Microsoft.NET.Test.Sdk (15.5)
+      Microsoft.CodeCoverage (>= 1.0.3)
+      Microsoft.TestPlatform.TestHost (>= 15.5)
+    Microsoft.TestPlatform.TestHost (15.5)
+    NUnit (3.9)
+    NUnit3TestAdapter (3.9)
     YamlDotNet (4.2.3)

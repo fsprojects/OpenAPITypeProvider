@@ -7,7 +7,7 @@ open Fake
 open Fake.DotNetCli
 
 let appSrc = "src/OpenAPITypeProvider"
-let testsSrc = "tests/OpenAPITypeProvider"
+let testsSrc = "tests/OpenAPITypeProvider.Tests"
 
 Target "BuildApp" (fun _ ->
     Fake.DotNetCli.Build (fun p -> { p with Project = appSrc; Configuration = "Debug";})
@@ -23,7 +23,7 @@ Target "Publish" (fun _ ->
 
 Target "Clean" (fun _ -> DeleteDir "deploy" )
 
-"Clean" ==> "RunTests" ==> "Publish"
+"RunTests" ==> "Clean" ==> "Publish"
 
 // start build
 RunTargetOrDefault "BuildApp"
