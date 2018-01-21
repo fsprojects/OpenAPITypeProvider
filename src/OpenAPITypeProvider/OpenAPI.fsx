@@ -22,21 +22,40 @@ type Info = {
     Version : string
 }
 
+type IntFormat =
+    | Int32
+    | Int64
+    with static member Default = Int32
+
+type NumberFormat =
+    | Float
+    | Double
+    with static member Default = Float
+
+type StringFormat =
+    | String
+    | Byte
+    | Binary
+    | Date
+    | DateTime
+    | Password
+    with static member Default = String
+
 type Discriminator = {
     PropertyName : string
     Mapping : Map<string, Schema>
 }
 and 
-    Schema = {
-        Type : string
-        // TODO: OTHERS
-        Items : Schema option
-        Properties : Schema option
-        AllOf : Schema list
-        OneOf : Schema list
-        AnyOf : Schema list
-        Discriminator : Discriminator
-    }
+    Schema =
+        | Array of items:Schema list
+        | Object of props:Map<string, Schema> * required:string list * Discriminator option
+        | Boolean
+        | Integer of format:IntFormat
+        | Number of format:NumberFormat
+        | String of format:StringFormat
+        | AllOf of refSchema:Schema * customSchema:Schema
+        | OneOf of refSchemas:Schema list * Discriminator option
+        | AnyOf of refSchemas:Schema list * Discriminator option
 
 type MediaType  = {
     Schema: Schema
@@ -97,6 +116,7 @@ type Operation = {
     //Servers :         TBD LATER (maybe :))
 }
 
+// can be referenced via $ref
 type Path = {
     Summary : string option
     Description : string option
