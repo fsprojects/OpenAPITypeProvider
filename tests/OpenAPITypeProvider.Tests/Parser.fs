@@ -9,7 +9,7 @@ open OpenAPITypeProvider.Specification
 
 
 let parseSample parseFn name =
-    let yamlFile = "Samples/" + name |> File.ReadAllText
+    let yamlFile = Path.Combine([|AppDomain.CurrentDomain.BaseDirectory; "Samples"; name |]) |> File.ReadAllText
     let reader = new StringReader(yamlFile)
     let yaml = YamlStream()
     yaml.Load(reader)
@@ -41,3 +41,14 @@ let ``Parses contact``() =
 let ``Parses info``() = 
     let actual = "Info.yaml" |> parseSample Info.parse
     Assert.AreEqual(infoSample, actual)
+
+let schemaArraySample =
+    IntFormat.Int32
+    |> Schema.Integer
+    |> Schema.Array
+
+[<Test>]
+let ``Parses array schema``() = 
+    let name,schema = "Schema-Array.yaml" |> parseSample Schema.parse
+    Assert.AreEqual("SomeNumbers", name)
+    Assert.AreEqual(schemaArraySample, schema)

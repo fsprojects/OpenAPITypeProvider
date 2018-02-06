@@ -10,6 +10,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />
   </ItemGroup>
+  <ItemGroup>
+<Content Include="Samples/**" CopyToOutputDirectory="PreserveNewest" />
 
+  </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

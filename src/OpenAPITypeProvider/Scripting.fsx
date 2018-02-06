@@ -9,7 +9,7 @@ open YamlDotNet.RepresentationModel
 open System.IO
 
 #load "OpenAPI.fsx"
-open OpenAPI
+open Specification
 
 let yamlFile = "sample.yaml" |> File.ReadAllText
 let reader = new StringReader(yamlFile)

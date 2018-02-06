@@ -1,0 +1,4 @@
+SomeNumbers:
+  type: array
+  items:
+    type: integer
