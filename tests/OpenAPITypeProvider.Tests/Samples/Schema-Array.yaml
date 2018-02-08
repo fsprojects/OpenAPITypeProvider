@@ -1,4 +1,4 @@
-SomeNumbers:
+ArrayInt:
   type: array
   items:
     type: integer

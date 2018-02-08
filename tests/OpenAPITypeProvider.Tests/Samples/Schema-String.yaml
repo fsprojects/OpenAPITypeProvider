@@ -1,0 +1,18 @@
+String:
+  type: string
+
+Binary:
+  type: string
+  format: binary
+
+Date:
+  type: string
+  format: date
+
+DateTime:
+  type: string
+  format: date-time
+
+Password:
+  type: string
+  format: password

@@ -1,0 +1,7 @@
+Int:
+  type: integer
+
+Int64:
+  type: integer
+  format: int64
+    

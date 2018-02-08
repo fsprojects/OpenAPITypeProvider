@@ -7,7 +7,6 @@ open YamlDotNet.RepresentationModel
 open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
 
-
 let parseSample parseFn name =
     let yamlFile = Path.Combine([|AppDomain.CurrentDomain.BaseDirectory; "Samples"; name |]) |> File.ReadAllText
     let reader = new StringReader(yamlFile)
@@ -42,24 +41,59 @@ let ``Parses info``() =
     let actual = "Info.yaml" |> parseSample Info.parse
     Assert.AreEqual(infoSample, actual)
 
-let schemaArraySample =
-    IntFormat.Int32
-    |> Schema.Integer
-    |> Schema.Array
 
 [<Test>]
 let ``Parses array schema``() = 
-    let name,schema = "Schema-Array.yaml" |> parseSample Schema.parse
-    Assert.AreEqual("SomeNumbers", name)
-    Assert.AreEqual(schemaArraySample, schema)
+    let schemas = "Schema-Array.yaml" |> parseSample Schema.parse
+    let expected = IntFormat.Int32 |> Schema.Integer |> Schema.Array
+    let actual = schemas.["ArrayInt"]
+    Assert.AreEqual(expected, actual)
 
-let schemaArrayInt64Sample =
-    IntFormat.Int64
-    |> Schema.Integer
-    |> Schema.Array
 
 [<Test>]
-let ``Parses array schema (Int64)``() = 
-    let name,schema = "Schema-Array-Int64.yaml" |> parseSample Schema.parse
-    Assert.AreEqual("SomeNumbers", name)
-    Assert.AreEqual(schemaArrayInt64Sample, schema)
+let ``Parses int schema``() = 
+    let schemas = "Schema-Int.yaml" |> parseSample Schema.parse
+    let expected = IntFormat.Int32 |> Schema.Integer
+    let actual = schemas.["Int"]
+    Assert.AreEqual(expected, actual)
+
+let ``Parses int schema (Int64)``() = 
+    let schemas = "Schema-Int.yaml" |> parseSample Schema.parse
+    let expected = IntFormat.Int64 |> Schema.Integer
+    let actual = schemas.["Int64"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses string schema``() = 
+    let schemas = "Schema-String.yaml" |> parseSample Schema.parse
+    let expected = StringFormat.String |> Schema.String
+    let actual = schemas.["String"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses string schema (Binary)``() = 
+    let schemas = "Schema-String.yaml" |> parseSample Schema.parse
+    let expected = StringFormat.Binary |> Schema.String
+    let actual = schemas.["Binary"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses string schema (Date)``() = 
+    let schemas = "Schema-String.yaml" |> parseSample Schema.parse
+    let expected = StringFormat.Date |> Schema.String
+    let actual = schemas.["Date"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses string schema (DateTime)``() = 
+    let schemas = "Schema-String.yaml" |> parseSample Schema.parse
+    let expected = StringFormat.DateTime |> Schema.String
+    let actual = schemas.["DateTime"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses string schema (Password)``() = 
+    let schemas = "Schema-String.yaml" |> parseSample Schema.parse
+    let expected = StringFormat.Password |> Schema.String
+    let actual = schemas.["Password"]
+    Assert.AreEqual(expected, actual)

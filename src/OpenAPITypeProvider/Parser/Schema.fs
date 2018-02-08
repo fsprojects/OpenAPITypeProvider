@@ -10,11 +10,19 @@ let private intFormatFromString = function
     | "int64" -> IntFormat.Int64
     | _ -> IntFormat.Default
 
-let private parseIntFormat node =
+let private stringFormatFromString = function
+    | "binary" -> StringFormat.Binary
+    | "byte" -> StringFormat.Byte
+    | "date" -> StringFormat.Date
+    | "date-time" -> StringFormat.DateTime
+    | "password" -> StringFormat.Password
+    | _ -> StringFormat.Default
+
+let private tryParseFormat fn node =
     node 
     |> tryScalarValue "format"
     |> (fun x -> defaultArg x String.Empty)
-    |> intFormatFromString
+    |> fn
 
 let rec private parseSchema (node:YamlMappingNode) =
     let typ = node |> scalarValue "type" 
@@ -22,11 +30,14 @@ let rec private parseSchema (node:YamlMappingNode) =
     | "array" -> 
         let items = node |> findByName "items" |> toMappingNode
         items |> parseSchema |> Schema.Array
-    | "integer" ->
-        node |> parseIntFormat |> Schema.Integer
+    | "integer" -> node |> tryParseFormat intFormatFromString |> Schema.Integer
+    | "string" -> node |> tryParseFormat stringFormatFromString |> Schema.String
 
 let parse (node:YamlMappingNode) = 
-    let x = node.Children |> Seq.head
-    let name = x.Key.ToString()
-    let schema = x.Value |> toMappingNode |> parseSchema
-    name, schema
+    node.Children 
+    |> Seq.map (fun x ->
+        let name = x.Key.ToString()
+        let schema = x.Value |> toMappingNode |> parseSchema
+        name, schema
+    )
+    |> Map
