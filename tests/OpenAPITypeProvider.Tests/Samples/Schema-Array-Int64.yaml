@@ -1,0 +1,5 @@
+SomeNumbers:
+  type: array
+  items:
+    type: integer
+    format: int64

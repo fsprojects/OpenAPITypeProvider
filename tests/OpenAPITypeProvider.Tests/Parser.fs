@@ -52,3 +52,14 @@ let ``Parses array schema``() =
     let name,schema = "Schema-Array.yaml" |> parseSample Schema.parse
     Assert.AreEqual("SomeNumbers", name)
     Assert.AreEqual(schemaArraySample, schema)
+
+let schemaArrayInt64Sample =
+    IntFormat.Int64
+    |> Schema.Integer
+    |> Schema.Array
+
+[<Test>]
+let ``Parses array schema (Int64)``() = 
+    let name,schema = "Schema-Array-Int64.yaml" |> parseSample Schema.parse
+    Assert.AreEqual("SomeNumbers", name)
+    Assert.AreEqual(schemaArrayInt64Sample, schema)
