@@ -97,3 +97,31 @@ let ``Parses string schema (Password)``() =
     let expected = StringFormat.Password |> Schema.String
     let actual = schemas.["Password"]
     Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses boolean schema``() = 
+    let schemas = "Schema-Boolean.yaml" |> parseSample Schema.parse
+    let expected = Schema.Boolean
+    let actual = schemas.["Bool"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses number schema``() = 
+    let schemas = "Schema-Number.yaml" |> parseSample Schema.parse
+    let expected = NumberFormat.Default |> Schema.Number
+    let actual = schemas.["Num"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses number schema (Float)``() = 
+    let schemas = "Schema-Number.yaml" |> parseSample Schema.parse
+    let expected = NumberFormat.Float |> Schema.Number
+    let actual = schemas.["NumFloat"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses number schema (Double)``() = 
+    let schemas = "Schema-Number.yaml" |> parseSample Schema.parse
+    let expected = NumberFormat.Double |> Schema.Number
+    let actual = schemas.["NumDouble"]
+    Assert.AreEqual(expected, actual)

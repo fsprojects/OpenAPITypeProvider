@@ -10,6 +10,11 @@ let private intFormatFromString = function
     | "int64" -> IntFormat.Int64
     | _ -> IntFormat.Default
 
+let private numberFormatFromString = function
+    | "float" -> NumberFormat.Float
+    | "double" -> NumberFormat.Double
+    | _ -> NumberFormat.Default
+
 let private stringFormatFromString = function
     | "binary" -> StringFormat.Binary
     | "byte" -> StringFormat.Byte
@@ -32,6 +37,8 @@ let rec private parseSchema (node:YamlMappingNode) =
         items |> parseSchema |> Schema.Array
     | "integer" -> node |> tryParseFormat intFormatFromString |> Schema.Integer
     | "string" -> node |> tryParseFormat stringFormatFromString |> Schema.String
+    | "boolean" -> Schema.Boolean
+    | "number" -> node |> tryParseFormat numberFormatFromString |> Schema.Number
 
 let parse (node:YamlMappingNode) = 
     node.Children 

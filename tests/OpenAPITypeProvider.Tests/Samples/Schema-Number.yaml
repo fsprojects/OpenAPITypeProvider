@@ -1,0 +1,10 @@
+Num:
+  type: number
+
+NumFloat:
+  type: number
+  format: float
+
+NumDouble:
+  type: number
+  format: double
