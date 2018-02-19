@@ -125,3 +125,15 @@ let ``Parses number schema (Double)``() =
     let expected = NumberFormat.Double |> Schema.Number
     let actual = schemas.["NumDouble"]
     Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses object schema``() = 
+    let schemas = "Schema-Object.yaml" |> parseSample Schema.parse
+    let props =
+        [
+            "name", Schema.String (StringFormat.Default)
+            "age", Schema.Integer (IntFormat.Default)
+        ] |> Map
+    let expected = Schema.Object(props, ["name"], None)
+    let actual = schemas.["Basic"]
+    Assert.AreEqual(expected, actual)

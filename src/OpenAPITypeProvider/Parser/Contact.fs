@@ -7,7 +7,7 @@ open YamlDotNet.RepresentationModel
 
 let parse (node:YamlMappingNode) = 
     {
-        Name = node |> tryScalarValue "name"
-        Url = node |> tryScalarValueM "url" Uri
-        Email = node |> tryScalarValue "email"
+        Name = node |> tryFindScalarValue "name"
+        Url = node |> tryFindScalarValueM "url" Uri
+        Email = node |> tryFindScalarValue "email"
     }

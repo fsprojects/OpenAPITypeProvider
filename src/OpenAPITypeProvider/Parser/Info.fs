@@ -7,10 +7,10 @@ open YamlDotNet.RepresentationModel
 
 let parse (node:YamlMappingNode) = 
     {
-        Title = node |> scalarValue "title"
-        Description = node |> tryScalarValue "description"
-        TermsOfService = node |> tryScalarValueM "termsOfService" Uri
-        Contact = node |> tryMapNode "contact" Contact.parse
-        License = node |> tryMapNode "license" License.parse
-        Version = node |> scalarValue "version"
+        Title = node |> findScalarValue "title"
+        Description = node |> tryFindScalarValue "description"
+        TermsOfService = node |> tryFindScalarValueM "termsOfService" Uri
+        Contact = node |> tryFindByNameM "contact" (toMappingNode >> Contact.parse)
+        License = node |> tryFindByNameM "license" (toMappingNode >> License.parse)
+        Version = node |> findScalarValue "version"
     } : Info

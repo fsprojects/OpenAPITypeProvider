@@ -25,12 +25,16 @@ let private stringFormatFromString = function
 
 let private tryParseFormat fn node =
     node 
-    |> tryScalarValue "format"
+    |> tryFindScalarValue "format"
     |> (fun x -> defaultArg x String.Empty)
     |> fn
 
+let optionToList = function
+    | Some v -> v |> Seq.toList
+    | None -> []
+
 let rec private parseSchema (node:YamlMappingNode) =
-    let typ = node |> scalarValue "type" 
+    let typ = node |> findScalarValue "type" 
     match typ with
     | "array" -> 
         let items = node |> findByName "items" |> toMappingNode
@@ -39,6 +43,18 @@ let rec private parseSchema (node:YamlMappingNode) =
     | "string" -> node |> tryParseFormat stringFormatFromString |> Schema.String
     | "boolean" -> Schema.Boolean
     | "number" -> node |> tryParseFormat numberFormatFromString |> Schema.Number
+    | "object" ->
+        let props = 
+            node 
+            |> findByName "properties" 
+            |> toMappingNode 
+            |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema)
+        let required = 
+            node |> tryFindByName "required" 
+            |> Option.map seqValue
+            |> Option.map (List.map (fun x -> x.ToString()))
+            |> optionToList
+        Schema.Object(props, required, None)
 
 let parse (node:YamlMappingNode) = 
     node.Children 

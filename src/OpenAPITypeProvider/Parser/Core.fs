@@ -2,29 +2,40 @@ module OpenAPITypeProvider.Parser.Core
 
 open YamlDotNet.RepresentationModel
 
+// finders
 let findByName name (node:YamlMappingNode) =
     node.Children 
     |> Seq.find (fun x -> x.Key.ToString() = name) 
     |> (fun x -> x.Value)
 
+let findByNameM name mapFn = findByName name >> mapFn
+
 let tryFindByName name (node:YamlMappingNode) =
     node.Children 
     |> Seq.tryFind (fun x -> x.Key.ToString() = name)
-    |> Option.bind (fun x -> x.Value |> Some)
+    |> Option.map (fun x -> x.Value)
 
+let tryFindByNameM name mapFn = tryFindByName name >> Option.map mapFn
+
+// value extractors
 let value (node:YamlNode) = node :?> YamlScalarNode |> (fun x -> x.Value)
-let scalarValue name = findByName name >> value
-let scalarValueM name mapFn = findByName name >> value >> mapFn
-let tryScalarValue name = tryFindByName name >> Option.bind (value >> Some)
-let tryScalarValueM name mapFn = tryScalarValue name >> Option.bind (mapFn >> Some)
-let toMappingNode (node:YamlNode) = node :?> YamlMappingNode
-let toNamedMap = 
-    toMappingNode 
-    >> (fun x -> x.Children)
-    >> Seq.map (|KeyValue|)
-    >> Seq.map (fun (k,v) -> k.ToString(), v)
-    >> Map.ofSeq
+let seqValue (node:YamlNode) = node :?> YamlSequenceNode |> (fun x -> x.Children) |> Seq.toList
 
-let mapNode name mapFn = findByName name >> toMappingNode >> mapFn
-let tryMapNode name mapFn = tryFindByName name >> Option.bind (toMappingNode >> mapFn >> Some)
-let mapNodeChildren name mapFn = findByName name >> toMappingNode >> toNamedMap >> Map.map mapFn
+// finders with extractors
+let findScalarValue name = findByName name >> value
+let findScalarValueM name mapFn = findByName name >> value >> mapFn
+let tryFindScalarValue name = tryFindByName name >> Option.map value
+let tryFindScalarValueM name mapFn = tryFindScalarValue name >> Option.map mapFn
+
+// change type
+let toMappingNode (node:YamlNode) = node :?> YamlMappingNode
+
+// let mapNode name mapFn = findByName name >> toMappingNode >> mapFn
+// let tryMapNode name mapFn = tryFindByName name >> Option.map (toMappingNode >> mapFn)
+
+let toNamedMap (node:YamlMappingNode) = 
+    node.Children
+    |> Seq.map (|KeyValue|)
+    |> Seq.map (fun (k,v) -> k.ToString(), v)
+    |> Map.ofSeq
+let toNamedMapM mapFn = toNamedMap >> Map.map mapFn

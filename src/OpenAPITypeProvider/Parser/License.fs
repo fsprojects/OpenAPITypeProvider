@@ -6,6 +6,6 @@ open Core
 open YamlDotNet.RepresentationModel
 
 let parse (node:YamlMappingNode) = {
-    Name = node |> scalarValue "name"
-    Url = node |> tryScalarValueM "url" Uri
+    Name = node |> findScalarValue "name"
+    Url = node |> tryFindScalarValueM "url" Uri
 }
