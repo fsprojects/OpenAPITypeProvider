@@ -53,7 +53,7 @@ let rec private parseSchema (node:YamlMappingNode) =
             |> Option.map seqValue
             |> Option.map (List.map (fun x -> x.ToString()))
             |> optionToList
-        Schema.Object(props, required, None)
+        Schema.Object(props, required)
 
 let parse (node:YamlMappingNode) = 
     node |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema)

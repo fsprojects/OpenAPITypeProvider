@@ -41,21 +41,16 @@ type StringFormat =
     | Password
     with static member Default = String
 
-type Discriminator = {
-    PropertyName : string
-    Mapping : Map<string, Schema>
-}
-and 
-    Schema =
-        | Array of items:Schema
-        | Object of props:Map<string, Schema> * required:string list * Discriminator option
-        | Boolean
-        | Integer of format:IntFormat
-        | Number of format:NumberFormat
-        | String of format:StringFormat
-        | AllOf of refSchema:Schema * customSchema:Schema
-        | OneOf of refSchemas:Schema list * Discriminator option
-        | AnyOf of refSchemas:Schema list * Discriminator option
+type Schema =
+    | Array of items:Schema
+    | Object of props:Map<string, Schema> * required:string list
+    | Boolean
+    | Integer of format:IntFormat
+    | Number of format:NumberFormat
+    | String of format:StringFormat
+    | AllOf of refSchema:Schema * customSchema:Schema
+    // AnyOf: TBD LATER (maybe :))
+    // OneOf: TBD LATER (maybe :))
 
 type MediaType  = {
     Schema: Schema
