@@ -134,6 +134,23 @@ let ``Parses object schema``() =
             "name", Schema.String (StringFormat.Default)
             "age", Schema.Integer (IntFormat.Default)
         ] |> Map
-    let expected = Schema.Object(props, ["name"], None)
+    let expected = Schema.Object(props, ["name"; "age"], None)
     let actual = schemas.["Basic"]
+    Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses object schema (Nested object)``() = 
+    let schemas = "Schema-Object.yaml" |> parseSample Schema.parse
+    let subObj = 
+        Schema.Object 
+            (
+                (["age", Schema.Integer (IntFormat.Default)] |> Map),
+                [], None)
+    let props =
+        [
+            "name", Schema.String (StringFormat.Default)            
+            "subObj", subObj
+        ] |> Map
+    let expected = Schema.Object(props, ["subObj"], None)
+    let actual = schemas.["ObjectInObject"]
     Assert.AreEqual(expected, actual)

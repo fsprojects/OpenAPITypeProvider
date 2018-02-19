@@ -46,8 +46,7 @@ let rec private parseSchema (node:YamlMappingNode) =
     | "object" ->
         let props = 
             node 
-            |> findByName "properties" 
-            |> toMappingNode 
+            |> findByNameM "properties" toMappingNode
             |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema)
         let required = 
             node |> tryFindByName "required" 
@@ -57,10 +56,4 @@ let rec private parseSchema (node:YamlMappingNode) =
         Schema.Object(props, required, None)
 
 let parse (node:YamlMappingNode) = 
-    node.Children 
-    |> Seq.map (fun x ->
-        let name = x.Key.ToString()
-        let schema = x.Value |> toMappingNode |> parseSchema
-        name, schema
-    )
-    |> Map
+    node |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema)

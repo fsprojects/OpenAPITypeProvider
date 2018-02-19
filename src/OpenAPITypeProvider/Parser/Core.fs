@@ -30,9 +30,7 @@ let tryFindScalarValueM name mapFn = tryFindScalarValue name >> Option.map mapFn
 // change type
 let toMappingNode (node:YamlNode) = node :?> YamlMappingNode
 
-// let mapNode name mapFn = findByName name >> toMappingNode >> mapFn
-// let tryMapNode name mapFn = tryFindByName name >> Option.map (toMappingNode >> mapFn)
-
+// key-value mappings
 let toNamedMap (node:YamlMappingNode) = 
     node.Children
     |> Seq.map (|KeyValue|)

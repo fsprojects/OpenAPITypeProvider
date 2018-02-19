@@ -7,3 +7,18 @@ Basic:
       type: integer
   required:
     - name
+    - age
+
+ObjectInObject:
+  type: object
+  properties:
+    name:
+      type: string
+    subObj:
+      type: object
+      properties:
+        age:
+          type: integer
+        
+  required:
+    - subObj
