@@ -1,3 +1,14 @@
+Mixed:
+  allOf:
+    - type: object
+      properties:
+        name:
+          type: string
+    - type: object
+      properties:
+        age:
+          type: integer
+
 Basic:
   type: object
   properties:
@@ -6,7 +17,7 @@ Basic:
 
 Extended:
   allOf:
-    - $ref: '#/components/schemas/Basic'
+    - $ref: '#/Basic'
     - type: object
       properties:
         age:

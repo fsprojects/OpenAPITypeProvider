@@ -50,7 +50,7 @@ let private (|Ref|_|) (node:YamlMappingNode) = node |> tryFindScalarValue "$ref"
 let private mergeSchemaPair (schema1:Schema) (schema2:Schema) = 
     match schema1, schema2 with
     | Schema.Object (p1, r1), Schema.Object (p2, r2) ->
-        let required = r1 @ r2
+        let required = (r1 @ r2) |> List.distinct
         let props = Map(Seq.concat [ (Map.toSeq p1) ; (Map.toSeq p2) ])
         Schema.Object (props, required)
     | _ -> failwith "Both schemas must be Object type"
@@ -59,35 +59,6 @@ let private mergeSchemas (schemas:Schema list) =
     match schemas with
     | [] -> failwith "Schema list should not be empty"
     | list -> list |> List.reduce mergeSchemaPair
-
-let rec private parseSchema (findSchemaFn:string -> Schema) (node:YamlMappingNode) =
-    let parseSchema = parseSchema findSchemaFn
-    match node with
-    | Ref r -> r |> findSchemaFn
-    | AllOf n -> n |> List.map (toMappingNode >> parseSchema) |> mergeSchemas
-    | Array ->
-        let items = node |> findByName "items" |> toMappingNode
-        items |> parseSchema |> Schema.Array
-    | Integer -> node |> tryParseFormat intFormatFromString |> Schema.Integer
-    | String -> node |> tryParseFormat stringFormatFromString |> Schema.String
-    | Boolean -> Schema.Boolean
-    | Number -> node |> tryParseFormat numberFormatFromString |> Schema.Number
-    | Object ->
-        let props = 
-            node 
-            |> findByNameM "properties" toMappingNode
-            |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema)
-        let required = 
-            node |> tryFindByName "required" 
-            |> Option.map seqValue
-            |> Option.map (List.map (fun x -> x.ToString()))
-            |> optionToList
-        Schema.Object(props, required)
-
-// let private containsRef (node:YamlMappingNode) =
-//     let foldFn acc item =
-//         if not acc then item.ToString().Contains("$ref") else acc
-//     node.AllNodes |> Seq.fold foldFn false
 
 let findByRef (rootNode:YamlMappingNode) (refString:string) =
     let parts = refString.Split([|'/'|]) |> Array.filter (fun x -> x <> "#")
@@ -98,15 +69,38 @@ let findByRef (rootNode:YamlMappingNode) (refString:string) =
         |> (fun x -> x.Value |> toMappingNode)
     parts |> Array.fold foldFn rootNode
 
-let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) = 
-    let rec prs =
-        
-
-    let searchFn root = findByName root >> parseSchema (findByName root >>)
+let rec private parseSchema (rootNode:YamlMappingNode) (node:YamlMappingNode) =
     
-    let refs,clean = 
-        node 
-        |> toNamedMapM (fun _ v -> v |> toMappingNode)
-        |> Map.partition (fun _ v -> containsRef v)
-    let schemas = clean |> Map.map (fun _ v -> v |> parseSchema (fun _ -> failwith "Nope"))
-    node |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema)
+    let parseDirect node =
+        match node with
+        | AllOf n -> n |> List.map (toMappingNode >> parseSchema rootNode) |> mergeSchemas
+        | Array ->
+            let items = node |> findByName "items" |> toMappingNode
+            items |> parseSchema rootNode |> Schema.Array
+        | Integer -> node |> tryParseFormat intFormatFromString |> Schema.Integer
+        | String -> node |> tryParseFormat stringFormatFromString |> Schema.String
+        | Boolean -> Schema.Boolean
+        | Number -> node |> tryParseFormat numberFormatFromString |> Schema.Number
+        | Object ->
+            let props = 
+                node 
+                |> findByNameM "properties" toMappingNode
+                |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema rootNode)
+            let required = 
+                node |> tryFindByName "required" 
+                |> Option.map seqValue
+                |> Option.map (List.map (fun x -> x.ToString()))
+                |> optionToList
+            Schema.Object(props, required)
+
+    let parseRef refString =
+        refString 
+        |> findByRef rootNode
+        |> parseSchema rootNode
+    
+    match node with
+    | Ref r -> r |> parseRef
+    | _ -> node |> parseDirect
+
+let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) = 
+    node |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema rootNode)
