@@ -3,6 +3,7 @@ framework: auto-detect
 
 nuget FSharp.Core
 nuget YamlDotNet
+nuget FSharp.TypeProviders.StarterPack
 
 // tests
 nuget NUnit

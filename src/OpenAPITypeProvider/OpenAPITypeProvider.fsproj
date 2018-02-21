@@ -5,6 +5,24 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AssemblyReader.fs">
+      <Paket>True</Paket>
+    </Compile>
+    <Compile Include="AssemblyReaderReflection.fs">
+      <Paket>True</Paket>
+    </Compile>
+    <Compile Include="ProvidedTypes.fsi">
+      <Paket>True</Paket>
+    </Compile>
+    <Compile Include="ProvidedTypes.fs">
+      <Paket>True</Paket>
+    </Compile>
+    <Compile Include="ProvidedTypesContext.fs">
+      <Paket>True</Paket>
+    </Compile>
+    <Compile Include="ProvidedTypesTesting.fs">
+      <Paket>True</Paket>
+    </Compile>
     <Compile Include="Specification.fs" />
     <Compile Include="Parser/Core.fs" />
     <Compile Include="Parser/Contact.fs" />
