@@ -154,3 +154,15 @@ let ``Parses object schema (Nested object)``() =
     let expected = Schema.Object(props, ["subObj"])
     let actual = schemas.["ObjectInObject"]
     Assert.AreEqual(expected, actual)
+
+[<Test>]
+let ``Parses allOf schema``() = 
+    let schemas = "Schema-AllOf.yaml" |> parseSample Schema.parse
+    let props =
+        [
+            "name", Schema.String (StringFormat.Default)
+            "age", Schema.Integer (IntFormat.Default)
+        ] |> Map
+    let expected = Schema.Object(props, ["name"; "age"])
+    let actual = schemas.["Extended"]
+    Assert.AreEqual(expected, actual)

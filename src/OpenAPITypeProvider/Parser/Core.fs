@@ -36,4 +36,5 @@ let toNamedMap (node:YamlMappingNode) =
     |> Seq.map (|KeyValue|)
     |> Seq.map (fun (k,v) -> k.ToString(), v)
     |> Map.ofSeq
+
 let toNamedMapM mapFn = toNamedMap >> Map.map mapFn

@@ -48,7 +48,7 @@ type Schema =
     | Integer of format:IntFormat
     | Number of format:NumberFormat
     | String of format:StringFormat
-    | AllOf of refSchema:Schema * customSchema:Schema
+    | AllOf of schemaList:Schema list
     // AnyOf: TBD LATER (maybe :))
     // OneOf: TBD LATER (maybe :))
 

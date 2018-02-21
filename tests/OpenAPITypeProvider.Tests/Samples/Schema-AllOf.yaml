@@ -1,0 +1,13 @@
+Basic:
+  type: object
+  properties:
+    name:
+      type: string
+
+Extended:
+  allOf:
+    - $ref: '#/components/schemas/Basic'
+    - type: object
+      properties:
+        age:
+          type: integer
