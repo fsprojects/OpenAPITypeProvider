@@ -29,6 +29,8 @@
     <Compile Include="Parser/License.fs" />
     <Compile Include="Parser/Info.fs" />
     <Compile Include="Parser/Schema.fs" />
+    <Compile Include="Parser/Header.fs" />
+    <Compile Include="Parser/Components.fs" />
     <Compile Include="OpenAPITypeProvider.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

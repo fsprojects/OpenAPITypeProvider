@@ -60,7 +60,7 @@ let private mergeSchemas (schemas:Schema list) =
     | [] -> failwith "Schema list should not be empty"
     | list -> list |> List.reduce mergeSchemaPair
 
-let findByRef (rootNode:YamlMappingNode) (refString:string) =
+let private findByRef (rootNode:YamlMappingNode) (refString:string) =
     let parts = refString.Split([|'/'|]) |> Array.filter (fun x -> x <> "#")
     let foldFn (node:YamlMappingNode) (name:string) =
         node.Children 
@@ -69,7 +69,7 @@ let findByRef (rootNode:YamlMappingNode) (refString:string) =
         |> (fun x -> x.Value |> toMappingNode)
     parts |> Array.fold foldFn rootNode
 
-let rec private parseSchema (rootNode:YamlMappingNode) (node:YamlMappingNode) =
+let rec parseSchema (rootNode:YamlMappingNode) (node:YamlMappingNode) =
     
     let parseDirect node =
         match node with

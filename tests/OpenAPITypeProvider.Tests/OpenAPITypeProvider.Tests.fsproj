@@ -5,7 +5,9 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Parser.fs" />
+    <Compile Include="Parser\Schema.fs" />
+    <Compile Include="Parser\Info.fs" />
+    <Compile Include="Parser\Header.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />

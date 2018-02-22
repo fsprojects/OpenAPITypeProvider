@@ -1,0 +1,6 @@
+description: Hello
+required: true
+deprecated: true
+allowEmptyValue: true
+schema:
+  type: integer

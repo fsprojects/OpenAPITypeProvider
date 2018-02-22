@@ -77,7 +77,7 @@ type Parameter = {
 
 type Header = { // follow structure of Parameter
     Description : string option
-    Required : bool // false
+    Required : bool// false
     Deprecated : bool // false
     AllowEmptyValue : bool //false
     Schema : Schema
