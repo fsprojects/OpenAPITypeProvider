@@ -1,0 +1,13 @@
+description: Hello
+content: 
+  'application/json':
+    schema:
+      type: integer
+headers:
+  myHeader:
+    description: Hello
+    required: true
+    deprecated: true
+    allowEmptyValue: true
+    schema:
+      type: integer

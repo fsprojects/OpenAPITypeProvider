@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Tests.Parser.Header
+module OpenAPITypeProvider.Tests.Parser.Response
 
 open System
 open System.IO
@@ -15,14 +15,12 @@ let parseSample parseFn name =
     yaml.Documents.[0].RootNode :?> YamlMappingNode |> (fun n -> parseFn n n)
 
 let sample = {
-    Description = Some "Hello"
-    Required = true
-    Deprecated = true
-    AllowEmptyValue = true
-    Schema = Schema.Integer(IntFormat.Default)
+    Description = "Hello"
+    Headers = ["myHeader", Header.sample ] |> Map
+    Content = ["application/json", { Schema = Schema.Integer(IntFormat.Default) }] |> Map
 }
 
 [<Test>]
-let ``Parses header``() = 
-    let actual = "Header.yaml" |> parseSample Header.parse
+let ``Parses response``() = 
+    let actual = "Response.yaml" |> parseSample Response.parse
     Assert.AreEqual(sample, actual)
