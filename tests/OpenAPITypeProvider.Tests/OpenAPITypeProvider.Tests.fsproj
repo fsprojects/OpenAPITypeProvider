@@ -8,6 +8,7 @@
     <Compile Include="Parser\Schema.fs" />
     <Compile Include="Parser\Info.fs" />
     <Compile Include="Parser\Header.fs" />
+    <Compile Include="Parser\RequestBody.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />

@@ -1,0 +1,5 @@
+description: Hello
+content: 
+  'application/json':
+    schema:
+      type: integer

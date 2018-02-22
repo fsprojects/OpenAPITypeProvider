@@ -38,3 +38,7 @@ let toNamedMap (node:YamlMappingNode) =
     |> Map.ofSeq
 
 let toNamedMapM mapFn = toNamedMap >> Map.map mapFn
+
+let someBoolOr value = function
+    | Some v -> v |> System.Boolean.Parse
+    | None -> value
