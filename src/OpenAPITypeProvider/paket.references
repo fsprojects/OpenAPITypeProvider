@@ -1,3 +1,4 @@
 FSharp.Core
 YamlDotNet
 FSharp.TypeProviders.StarterPack
+Newtonsoft.Json

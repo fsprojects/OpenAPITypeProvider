@@ -1,14 +1,13 @@
 RESTRICTION: == net461
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FAKE (4.64.4)
-    FSharp.Core (4.2.3)
+    FAKE (4.64.6)
+    FSharp.Core (4.3.4)
     FSharp.TypeProviders.StarterPack (2.1)
     Microsoft.CodeCoverage (1.0.3)
-    Microsoft.NET.Test.Sdk (15.5)
+    Microsoft.NET.Test.Sdk (15.6)
       Microsoft.CodeCoverage (>= 1.0.3)
-      Microsoft.TestPlatform.TestHost (>= 15.5)
-    Microsoft.TestPlatform.TestHost (15.5)
+    Newtonsoft.Json (11.0.1)
     NUnit (3.9)
     NUnit3TestAdapter (3.9)
-    YamlDotNet (4.2.3)
+    YamlDotNet (4.3.1)
