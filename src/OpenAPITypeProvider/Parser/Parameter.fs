@@ -15,7 +15,10 @@ let rec parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
             Deprecated = node |> tryFindScalarValue "deprecated" |> someBoolOr false
             AllowEmptyValue = node |> tryFindScalarValue "allowEmptyValue" |> someBoolOr false
             Schema = node |> findSchema (toMappingNode >> Schema.parse rootNode)
-            Content = node |> findByName "content" |> toMappingNode |> toNamedMapM (MediaType.parse rootNode)
+            Content = 
+                node |> tryFindByName "content" 
+                |> Option.map (toMappingNode >> toNamedMapM (MediaType.parse rootNode))
+                |> someOrEmptyMap
         } : Parameter
     
     let parseRef refString =

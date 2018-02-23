@@ -72,7 +72,7 @@ let rec parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
         | String -> node |> tryParseFormat stringFormatFromString |> Schema.String
         | Boolean -> Schema.Boolean
         | Number -> node |> tryParseFormat numberFormatFromString |> Schema.Number
-        | Object ->
+        | _ ->
             let props = 
                 node 
                 |> findByNameM "properties" toMappingNode

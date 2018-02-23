@@ -5,10 +5,6 @@ open OpenAPITypeProvider.Specification
 open Core
 open YamlDotNet.RepresentationModel
 
-let private someOrEmptyMap = function
-    | Some v -> v
-    | None -> Map.empty
-
 let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) = 
     {
         Schemas = 

@@ -4,14 +4,6 @@ open OpenAPITypeProvider.Specification
 open Core
 open YamlDotNet.RepresentationModel
 
-let private someOrEmptyList = function
-    | Some x -> x
-    | None -> List.Empty
-
-let private someOrEmptyMap = function
-    | Some v -> v
-    | None -> Map.empty
-
 let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) = 
     {
         Tags =

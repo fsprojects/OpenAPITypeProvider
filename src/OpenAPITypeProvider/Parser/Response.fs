@@ -10,11 +10,13 @@ let rec parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
         {
             Description = node |> findScalarValue "description"
             Headers = 
-                node |> findByNameM "headers" toMappingNode
-                |> toMappingNode |> toNamedMapM (Header.parse rootNode)
+                node |> tryFindByName "headers" 
+                |> Option.map (toMappingNode >> toNamedMapM (Header.parse rootNode))
+                |> someOrEmptyMap
             Content = 
-                node |> findByNameM "content" toMappingNode 
-                |> toMappingNode |> toNamedMapM (MediaType.parse rootNode)
+                node |> tryFindByName "content"
+                |> Option.map (toMappingNode >> toNamedMapM (MediaType.parse rootNode))
+                |> someOrEmptyMap
         } : Response
 
     let parseRef refString =

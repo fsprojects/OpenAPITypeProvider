@@ -43,6 +43,14 @@ let someBoolOr value = function
     | Some v -> v |> System.Boolean.Parse
     | None -> value
 
+let someOrEmptyMap = function
+    | Some v -> v
+    | None -> Map.empty
+
+let someOrEmptyList = function
+    | Some x -> x
+    | None -> List.Empty
+
 let (|Ref|_|) (node:YamlMappingNode) = node |> tryFindScalarValue "$ref"
 
 let findByRef (rootNode:YamlMappingNode) (refString:string) =
