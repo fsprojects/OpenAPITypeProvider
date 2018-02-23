@@ -4,6 +4,7 @@ direct:
     'application/json':
       schema:
         type: integer
+    'application/xml': {}
   headers:
     myHeader:
       description: Hello

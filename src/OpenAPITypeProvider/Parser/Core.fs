@@ -53,3 +53,8 @@ let findByRef (rootNode:YamlMappingNode) (refString:string) =
         |> Seq.head
         |> (fun x -> x.Value |> toMappingNode)
     parts |> Array.fold foldFn rootNode
+
+let findSchema mapFn node =
+    match node |> tryFindByName "schema" with
+    | Some x -> x |> mapFn
+    | None -> OpenAPITypeProvider.Specification.Schema.Empty
