@@ -1,18 +1,10 @@
 module OpenAPITypeProvider.Tests.Parser.Info
 
 open System
-open System.IO
 open NUnit.Framework
-open YamlDotNet.RepresentationModel
 open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
-
-let parseSample parseFn name =
-    let yamlFile = Path.Combine([|AppDomain.CurrentDomain.BaseDirectory; "Samples"; name |]) |> File.ReadAllText
-    let reader = new StringReader(yamlFile)
-    let yaml = YamlStream()
-    yaml.Load(reader)
-    yaml.Documents.[0].RootNode :?> YamlMappingNode |> parseFn
+open OpenAPITypeProvider.Tests
 
 let licenseSample = { Name = "MIT"; Url = Some <| Uri("http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT") }
 let contactSample = { Name = Some "Swagger API Team"; Email = Some "foo@example.com"; Url = Some <| Uri("http://madskristensen.net") }
@@ -28,15 +20,15 @@ let infoSample = {
 
 [<Test>]
 let ``Parses license``() = 
-    let actual = "License.yaml" |> parseSample License.parse
+    let actual = "License.yaml" |> SampleLoader.parse License.parse
     Assert.AreEqual(licenseSample, actual)
 
 [<Test>]
 let ``Parses contact``() = 
-    let actual = "Contact.yaml" |> parseSample Contact.parse
+    let actual = "Contact.yaml" |> SampleLoader.parse Contact.parse
     Assert.AreEqual(contactSample, actual)
 
 [<Test>]
 let ``Parses info``() = 
-    let actual = "Info.yaml" |> parseSample Info.parse
+    let actual = "Info.yaml" |> SampleLoader.parse Info.parse
     Assert.AreEqual(infoSample, actual)

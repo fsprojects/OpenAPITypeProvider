@@ -10,5 +10,5 @@ let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
         Required = node |> tryFindScalarValue "required" |> someBoolOr false
         Content = 
             node |> findByNameM "content" toMappingNode 
-            |> toNamedMapM (fun _ v -> v |> toMappingNode |> MediaType.parse rootNode) 
+            |> toMappingNode |> toNamedMapM (MediaType.parse rootNode)
     } : RequestBody

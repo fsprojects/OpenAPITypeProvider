@@ -1,18 +1,11 @@
 module OpenAPITypeProvider.Tests.Parser.Response
 
 open System
-open System.IO
 open NUnit.Framework
-open YamlDotNet.RepresentationModel
 open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
+open OpenAPITypeProvider.Tests
 
-let parseSample parseFn name =
-    let yamlFile = Path.Combine([|AppDomain.CurrentDomain.BaseDirectory; "Samples"; name |]) |> File.ReadAllText
-    let reader = new StringReader(yamlFile)
-    let yaml = YamlStream()
-    yaml.Load(reader)
-    yaml.Documents.[0].RootNode :?> YamlMappingNode |> (fun n -> parseFn n n)
 
 let sample = {
     Description = "Hello"
@@ -22,5 +15,5 @@ let sample = {
 
 [<Test>]
 let ``Parses response``() = 
-    let actual = "Response.yaml" |> parseSample Response.parse
+    let actual = "Response.yaml" |> SampleLoader.parseWithRoot Response.parse
     Assert.AreEqual(sample, actual)

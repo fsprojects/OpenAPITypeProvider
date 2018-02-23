@@ -11,5 +11,5 @@ let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
         Required = node |> tryFindScalarValue "required" |> someBoolOr false
         Deprecated = node |> tryFindScalarValue "deprecated" |> someBoolOr false
         AllowEmptyValue = node |> tryFindScalarValue "allowEmptyValue" |> someBoolOr false
-        Schema = node |> findByNameM "schema" (toMappingNode >> Schema.parseSchema rootNode)
+        Schema = node |> findByNameM "schema" (toMappingNode >> Schema.parse rootNode)
     } : Header

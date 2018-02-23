@@ -6,5 +6,5 @@ open YamlDotNet.RepresentationModel
 
 let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) = 
     {
-        Schema = node |> findByNameM "schema" (toMappingNode >> Schema.parseSchema rootNode)
+        Schema = node |> findByNameM "schema" (toMappingNode >> Schema.parse rootNode)
     } : MediaType

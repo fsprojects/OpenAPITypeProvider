@@ -35,6 +35,7 @@
     <Compile Include="Parser/Response.fs" />
     <Compile Include="Parser/Parameter.fs" />
     <Compile Include="Parser/Components.fs" />
+    <Compile Include="Parser/Operation.fs" />
     <Compile Include="OpenAPITypeProvider.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

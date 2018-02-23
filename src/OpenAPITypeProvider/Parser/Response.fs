@@ -9,8 +9,8 @@ let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
         Description = node |> findScalarValue "description"
         Headers = 
             node |> findByNameM "headers" toMappingNode
-            |> toNamedMapM (fun _ v -> v |> toMappingNode |> Header.parse rootNode) 
+            |> toMappingNode |> toNamedMapM (Header.parse rootNode)
         Content = 
             node |> findByNameM "content" toMappingNode 
-            |> toNamedMapM (fun _ v -> v |> toMappingNode |> MediaType.parse rootNode) 
+            |> toMappingNode |> toNamedMapM (MediaType.parse rootNode)
     } : Response

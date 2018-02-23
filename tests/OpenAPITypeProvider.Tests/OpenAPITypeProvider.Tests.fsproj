@@ -5,6 +5,7 @@
     <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="SampleLoader.fs" />
     <Compile Include="Parser\Schema.fs" />
     <Compile Include="Parser\Info.fs" />
     <Compile Include="Parser\Header.fs" />

@@ -69,14 +69,14 @@ let private findByRef (rootNode:YamlMappingNode) (refString:string) =
         |> (fun x -> x.Value |> toMappingNode)
     parts |> Array.fold foldFn rootNode
 
-let rec parseSchema (rootNode:YamlMappingNode) (node:YamlMappingNode) =
+let rec parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
     
     let parseDirect node =
         match node with
-        | AllOf n -> n |> List.map (toMappingNode >> parseSchema rootNode) |> mergeSchemas
+        | AllOf n -> n |> List.map (toMappingNode >> parse rootNode) |> mergeSchemas
         | Array ->
             let items = node |> findByName "items" |> toMappingNode
-            items |> parseSchema rootNode |> Schema.Array
+            items |> parse rootNode |> Schema.Array
         | Integer -> node |> tryParseFormat intFormatFromString |> Schema.Integer
         | String -> node |> tryParseFormat stringFormatFromString |> Schema.String
         | Boolean -> Schema.Boolean
@@ -85,7 +85,7 @@ let rec parseSchema (rootNode:YamlMappingNode) (node:YamlMappingNode) =
             let props = 
                 node 
                 |> findByNameM "properties" toMappingNode
-                |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema rootNode)
+                |> toMappingNode |> toNamedMapM (parse rootNode)
             let required = 
                 node |> tryFindByName "required" 
                 |> Option.map seqValue
@@ -96,11 +96,8 @@ let rec parseSchema (rootNode:YamlMappingNode) (node:YamlMappingNode) =
     let parseRef refString =
         refString 
         |> findByRef rootNode
-        |> parseSchema rootNode
+        |> parse rootNode
     
     match node with
     | Ref r -> r |> parseRef
     | _ -> node |> parseDirect
-
-let parse (rootNode:YamlMappingNode) (node:YamlMappingNode) = 
-    node |> toNamedMapM (fun _ v -> v |> toMappingNode |> parseSchema rootNode)
