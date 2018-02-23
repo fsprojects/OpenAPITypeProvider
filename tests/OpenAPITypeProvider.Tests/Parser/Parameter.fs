@@ -18,6 +18,11 @@ let sample = {
 }
 
 [<Test>]
-let ``Parses parameter``() = 
-    let actual = "Parameter.yaml" |> SampleLoader.parseWithRoot Parameter.parse
-    Assert.AreEqual(sample, actual)
+let ``Parses parameter (direct)``() = 
+    let actual = "Parameter.yaml" |> SampleLoader.parseMapWithRoot Parameter.parse
+    Assert.AreEqual(sample, actual.["direct"])
+
+[<Test>]
+let ``Parses parameter (ref)``() = 
+    let actual = "Parameter.yaml" |> SampleLoader.parseMapWithRoot Parameter.parse
+    Assert.AreEqual(sample, actual.["referenced"])

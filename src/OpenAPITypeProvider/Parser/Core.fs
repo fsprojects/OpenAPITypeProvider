@@ -43,3 +43,13 @@ let someBoolOr value = function
     | Some v -> v |> System.Boolean.Parse
     | None -> value
 
+let (|Ref|_|) (node:YamlMappingNode) = node |> tryFindScalarValue "$ref"
+
+let findByRef (rootNode:YamlMappingNode) (refString:string) =
+    let parts = refString.Split([|'/'|]) |> Array.filter (fun x -> x <> "#")
+    let foldFn (node:YamlMappingNode) (name:string) =
+        node.Children 
+        |> Seq.filter (fun x -> x.Key.ToString() = name)
+        |> Seq.head
+        |> (fun x -> x.Value |> toMappingNode)
+    parts |> Array.fold foldFn rootNode

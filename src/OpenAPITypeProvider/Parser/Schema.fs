@@ -45,7 +45,6 @@ let private (|Boolean|_|) (node:YamlMappingNode) = node |> isNodeType "boolean"
 let private (|Number|_|) (node:YamlMappingNode) = node |> isNodeType "number"
 let private (|Object|_|) (node:YamlMappingNode) = node |> isNodeType "object"
 let private (|AllOf|_|) (node:YamlMappingNode) = node |> tryFindByName "allOf" |> Option.map seqValue
-let private (|Ref|_|) (node:YamlMappingNode) = node |> tryFindScalarValue "$ref"
 
 let private mergeSchemaPair (schema1:Schema) (schema2:Schema) = 
     match schema1, schema2 with
@@ -60,14 +59,6 @@ let private mergeSchemas (schemas:Schema list) =
     | [] -> failwith "Schema list should not be empty"
     | list -> list |> List.reduce mergeSchemaPair
 
-let private findByRef (rootNode:YamlMappingNode) (refString:string) =
-    let parts = refString.Split([|'/'|]) |> Array.filter (fun x -> x <> "#")
-    let foldFn (node:YamlMappingNode) (name:string) =
-        node.Children 
-        |> Seq.filter (fun x -> x.Key.ToString() = name)
-        |> Seq.head
-        |> (fun x -> x.Value |> toMappingNode)
-    parts |> Array.fold foldFn rootNode
 
 let rec parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
     

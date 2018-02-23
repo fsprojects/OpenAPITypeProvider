@@ -14,6 +14,11 @@ let sample = {
 }
 
 [<Test>]
-let ``Parses response``() = 
-    let actual = "Response.yaml" |> SampleLoader.parseWithRoot Response.parse
-    Assert.AreEqual(sample, actual)
+let ``Parses response (direct)``() = 
+    let responses = "Response.yaml" |> SampleLoader.parseMapWithRoot Response.parse
+    Assert.AreEqual(sample, responses.["direct"])
+
+[<Test>]
+let ``Parses response (ref)``() = 
+    let responses = "Response.yaml" |> SampleLoader.parseMapWithRoot Response.parse
+    Assert.AreEqual(sample, responses.["referenced"])

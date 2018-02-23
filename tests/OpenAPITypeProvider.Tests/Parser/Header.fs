@@ -14,6 +14,11 @@ let sample = {
 }
 
 [<Test>]
-let ``Parses header``() = 
-    let actual = "Header.yaml" |> SampleLoader.parseWithRoot Header.parse
-    Assert.AreEqual(sample, actual)
+let ``Parses header (direct)``() = 
+    let actual = "Header.yaml" |> SampleLoader.parseMapWithRoot Header.parse
+    Assert.AreEqual(sample, actual.["direct"])
+
+[<Test>]
+let ``Parses header (ref)``() = 
+    let actual = "Header.yaml" |> SampleLoader.parseMapWithRoot Header.parse
+    Assert.AreEqual(sample, actual.["referenced"])
