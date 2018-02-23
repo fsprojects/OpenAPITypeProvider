@@ -33,6 +33,7 @@
     <Compile Include="Parser/MediaType.fs" />
     <Compile Include="Parser/RequestBody.fs" />
     <Compile Include="Parser/Response.fs" />
+    <Compile Include="Parser/Parameter.fs" />
     <Compile Include="Parser/Components.fs" />
     <Compile Include="OpenAPITypeProvider.fs" />
   </ItemGroup>

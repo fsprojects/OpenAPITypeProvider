@@ -1,0 +1,12 @@
+name: Hello
+in: In value
+description: Some desc
+required: true
+deprecated: true
+allowEmptyValue: true
+schema:
+  type: string
+content: 
+  'application/json':
+    schema:
+      type: integer
