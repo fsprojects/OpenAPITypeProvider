@@ -1,11 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "OpenAPITypeProvider", "src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj", "{B7471B59-C366-4AA6-8D62-A66E8DAC0570}"
-EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "OpenAPITypeProvider.Tests", "tests\OpenAPITypeProvider.Tests\OpenAPITypeProvider.Tests.fsproj", "{634FB89C-543A-4F6C-A1DD-83F55929EBEA}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OpenAPITypeProvider", "src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj", "{5D66B595-291E-41E8-B29C-7079B581C7C8}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ConsoleApplication1", "tests\ConsoleApplication1\ConsoleApplication1.fsproj", "{00AC4389-5DF9-4B16-8402-B35594A567F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C0AA899C-24BE-4AA1-99E6-63DB0E29036A}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +20,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B7471B59-C366-4AA6-8D62-A66E8DAC0570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7471B59-C366-4AA6-8D62-A66E8DAC0570}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7471B59-C366-4AA6-8D62-A66E8DAC0570}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7471B59-C366-4AA6-8D62-A66E8DAC0570}.Release|Any CPU.Build.0 = Release|Any CPU
 		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00AC4389-5DF9-4B16-8402-B35594A567F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00AC4389-5DF9-4B16-8402-B35594A567F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00AC4389-5DF9-4B16-8402-B35594A567F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00AC4389-5DF9-4B16-8402-B35594A567F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

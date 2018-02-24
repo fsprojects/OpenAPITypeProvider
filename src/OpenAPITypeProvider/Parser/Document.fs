@@ -7,6 +7,7 @@ open System.IO
 open Newtonsoft.Json
 open Newtonsoft.Json.Converters
 open System.Dynamic
+open System
 
 let parse (rootNode:YamlMappingNode) = {
     SpecificationVersion = rootNode |> findScalarValue "openapi"
@@ -21,7 +22,9 @@ let parseFromYaml content =
     yaml.Load(reader)
     yaml.Documents.[0].RootNode |> toMappingNode |> parse
 
-let loadFromYamlFile file = file |> File.ReadAllText |> parseFromYaml
+let readFile p = p |> File.ReadAllText
+
+let loadFromYamlFile file = file |> readFile |> parseFromYaml
 
 let convertJsonToYaml json =
     let expConverter = new ExpandoObjectConverter();
@@ -31,4 +34,4 @@ let convertJsonToYaml json =
 
 let parseFromJson content = content |> convertJsonToYaml |> parseFromYaml
 
-let loadFromJsonFile file = file |> File.ReadAllText |> parseFromJson
+let loadFromJsonFile file = file |> readFile |> parseFromJson

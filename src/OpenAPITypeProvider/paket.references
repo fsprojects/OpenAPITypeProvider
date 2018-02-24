@@ -1,4 +1,6 @@
 FSharp.Core
 YamlDotNet
-FSharp.TypeProviders.StarterPack
+File: ProvidedTypes.fsi
+File: ProvidedTypes.fs
+File: ProvidedTypesTesting.fs
 Newtonsoft.Json

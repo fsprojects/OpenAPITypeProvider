@@ -3,7 +3,6 @@ NUGET
   remote: https://api.nuget.org/v3/index.json
     FAKE (4.64.6)
     FSharp.Core (4.3.4)
-    FSharp.TypeProviders.StarterPack (2.1)
     Microsoft.CodeCoverage (1.0.3)
     Microsoft.NET.Test.Sdk (15.6)
       Microsoft.CodeCoverage (>= 1.0.3)
@@ -11,3 +10,8 @@ NUGET
     NUnit (3.9)
     NUnit3TestAdapter (3.9)
     YamlDotNet (4.3.1)
+GITHUB
+  remote: fsprojects/FSharp.TypeProviders.SDK
+    src/ProvidedTypes.fs (a23cf5dcd4309cc528bbd4662c5971fe163a0bab)
+    src/ProvidedTypes.fsi (a23cf5dcd4309cc528bbd4662c5971fe163a0bab)
+    src/ProvidedTypesTesting.fs (a23cf5dcd4309cc528bbd4662c5971fe163a0bab)
