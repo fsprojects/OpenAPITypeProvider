@@ -7,7 +7,7 @@ type Provider = OpenAPIV3Provider< @"C:\Dzoukr\Personal\dzoukr\OpenAPITypeProvid
 
 let x = Provider()
 
-x.Info.TermsOfService
+x.Components.Schemas.NewPet.someArray
 
 
 //Provider.MyProperty

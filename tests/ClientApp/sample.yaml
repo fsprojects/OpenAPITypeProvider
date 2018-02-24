@@ -141,7 +141,11 @@ components:
         name:
           type: string
         tag:
-          type: string    
+          type: string
+        someArray:
+          type: array
+          items:
+            type: string    
 
     Error:
       required:

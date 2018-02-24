@@ -48,7 +48,6 @@ type Schema =
     | Integer of format:IntFormat
     | Number of format:NumberFormat
     | String of format:StringFormat
-    | AllOf of schemaList:Schema list
     with
         static member Empty = Object(Map.empty, List.empty)
     // AnyOf: TBD LATER (maybe :))

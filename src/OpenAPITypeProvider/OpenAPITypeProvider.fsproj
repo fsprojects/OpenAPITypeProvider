@@ -37,6 +37,8 @@
     <Compile Include="Types\Contact.fs" />
     <Compile Include="Types\License.fs" />
     <Compile Include="Types\Info.fs" />
+    <Compile Include="Types\Schema.fs" />
+    <Compile Include="Types\Components.fs" />
     <Compile Include="Types\Document.fs" />
     <None Include="paket.references" />
     <Compile Include="OpenAPITypeProvider.fs" />

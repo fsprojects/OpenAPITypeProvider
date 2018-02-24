@@ -22,5 +22,9 @@ let createType asm ns typeName (filePath:string) =
     
     // info object
     Info.createType asm ns api.Info |> addAsProperty "Info" "Info object" docType
+    
+    // components object
+    if api.Components.IsSome then
+        Components.createType asm ns api.Components.Value |> addAsProperty "Components" "Components object" docType
 
     docType
