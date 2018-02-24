@@ -1,7 +1,7 @@
 source https://api.nuget.org/v3/index.json
 framework: auto-detect
 
-nuget FSharp.Core
+nuget FSharp.Core 4.2.3
 nuget YamlDotNet
 nuget Newtonsoft.Json
 
