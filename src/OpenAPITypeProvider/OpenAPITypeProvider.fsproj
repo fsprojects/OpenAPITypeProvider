@@ -34,6 +34,9 @@
     <Compile Include="Parser\Path.fs" />
     <Compile Include="Parser\Document.fs" />
     <Compile Include="Types\Helpers.fs" />
+    <Compile Include="Types\Contact.fs" />
+    <Compile Include="Types\License.fs" />
+    <Compile Include="Types\Info.fs" />
     <Compile Include="Types\Document.fs" />
     <None Include="paket.references" />
     <Compile Include="OpenAPITypeProvider.fs" />

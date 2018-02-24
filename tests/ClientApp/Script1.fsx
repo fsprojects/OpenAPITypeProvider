@@ -1,5 +1,4 @@
-﻿
-#r @"../../src/OpenAPITypeProvider/bin/Debug/OpenAPITypeProvider.dll"
+﻿#r @"../../src/OpenAPITypeProvider/bin/Debug/net461/OpenAPITypeProvider.dll"
 
 
 open OpenAPIProvider
@@ -7,7 +6,8 @@ open OpenAPIProvider
 type Provider = OpenAPIV3Provider< @"C:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\ClientApp\sample.yaml">
 
 let x = Provider()
-x.Version
+
+x.Info.TermsOfService
 
 
 //Provider.MyProperty

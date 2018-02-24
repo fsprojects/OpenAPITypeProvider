@@ -10,3 +10,13 @@ let inline makeProperty< ^T> getterCode propName = ProvidedProperty(propName, ty
 let inline makeMethod< ^T> parameters invokeCode methodName = ProvidedMethod(methodName, parameters, typeof< ^T>, invokeCode)
 let inline makeParameter< ^T> paramName = ProvidedParameter(paramName, typeof< ^T>)
 let inline addXmlDocDelayed comment providedMember = (^a : (member AddXmlDocDelayed : (unit -> string) -> unit) providedMember, (fun () -> comment))
+let inline addEmptyConstructor comment (t:ProvidedTypeDefinition) = 
+    makeConstructor [] (fun _ -> <@@ () @@>)
+    |>! addXmlDocDelayed comment
+    |> t.AddMember
+
+let inline addAsProperty name comment (t:ProvidedTypeDefinition) (prop:ProvidedTypeDefinition)  = 
+    prop |> t.AddMember
+    ProvidedProperty(name, prop, (fun _ -> <@@ obj() @@>))
+    |>! addXmlDocDelayed comment
+    |> t.AddMember
