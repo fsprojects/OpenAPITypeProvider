@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fsi">
@@ -19,6 +19,7 @@
     </Compile>
     <Compile Include="Specification.fs" />
     <Compile Include="IO.fs" />
+    <Compile Include="Names.fs" />
     <Compile Include="Parser\Core.fs" />
     <Compile Include="Parser\Contact.fs" />
     <Compile Include="Parser\License.fs" />

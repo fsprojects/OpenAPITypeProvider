@@ -36,11 +36,11 @@ let createType asm ns (info:Info) =
     // info object
     if info.Contact.IsSome then
         Contact.createType asm ns info.Contact.Value
-        |> addAsProperty "Contact" "Contact object" typ
+        |> addAsProperty "Contact" typ
     
     // license object
     if info.License.IsSome then
         License.createType asm ns info.License.Value
-        |> addAsProperty "License" "License object" typ
+        |> addAsProperty "License" typ
 
     typ

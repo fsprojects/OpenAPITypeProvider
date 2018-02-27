@@ -16,5 +16,5 @@ let createType asm ns (components:Components) =
     |> Map.iter (fun name schema -> 
         Schema.getMembers asm ns schemas name schema |> schemas.AddMember
     )
-    schemas |> addAsProperty "Schemas" "Schemas" typ
+    schemas |> addAsProperty "Schemas" typ
     typ

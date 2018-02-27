@@ -2,6 +2,7 @@ module OpenAPITypeProvider.Types.Schema
 
 open ProviderImplementation.ProvidedTypes
 open System.Reflection
+open OpenAPITypeProvider
 open OpenAPITypeProvider.Types.Helpers
 open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
@@ -38,14 +39,28 @@ let some (typ:Type) arg =
     Microsoft.FSharp.Quotations.Expr.Call(meth, [arg])
 
 let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
+    let name = Names.pascalName name
     match schema with
     | Boolean -> schema |> getType |> makeTypedProperty (fun _ -> <@@ () @@>) name :> MemberInfo
     | Object (props, required) ->
         let ob = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
+
+        let p = 
+            props 
+            |> Map.toList 
+            |> List.map (fun (n, v) -> (Names.pascalName n), (getType v)) 
+            |> List.map (fun (n,v) -> makeTypedParameter n v)
+        
+        let ctor = makeConstructor p (fun _ -> <@@ () @@>)
+        ob.AddMember(ctor)
+        
+        let mth = ProvidedMethod("Parse", [ProvidedParameter("Json", typeof<string>)], ob, (fun _ -> <@@ () @@>), isStatic = true)
+        ob.AddMember(mth)
+
         props 
         |> Map.map (getMembers asm ns parent) 
         |> Map.iter (fun _ mem -> ob.AddMember(mem))
-        ob |> addAsProperty name "TODO" parent
+        ob |> addAsProperty name parent
         ob :> MemberInfo    
     | Integer _ -> schema |> getType |> makeTypedProperty (fun _ -> <@@ () @@>) name :> MemberInfo
     | Number _ -> schema |> getType |> makeTypedProperty (fun _ -> <@@ () @@>) name :> MemberInfo

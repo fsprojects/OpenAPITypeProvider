@@ -21,10 +21,10 @@ let createType asm ns typeName (filePath:string) =
     |> docType.AddMember
     
     // info object
-    Info.createType asm ns api.Info |> addAsProperty "Info" "Info object" docType
+    Info.createType asm ns api.Info |> addAsProperty "Info" docType
     
     // components object
     if api.Components.IsSome then
-        Components.createType asm ns api.Components.Value |> addAsProperty "Components" "Components object" docType
+        Components.createType asm ns api.Components.Value |> addAsProperty "Components" docType
 
     docType
