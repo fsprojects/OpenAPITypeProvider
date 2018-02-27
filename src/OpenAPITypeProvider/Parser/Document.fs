@@ -7,7 +7,6 @@ open System.IO
 open Newtonsoft.Json
 open Newtonsoft.Json.Converters
 open System.Dynamic
-open System
 
 let parse (rootNode:YamlMappingNode) = {
     SpecificationVersion = rootNode |> findScalarValue "openapi"

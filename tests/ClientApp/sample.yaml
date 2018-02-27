@@ -147,6 +147,9 @@ components:
           items:
             type: string    
 
+    JustIntValue:
+      type: integer
+
     Error:
       required:
         - code

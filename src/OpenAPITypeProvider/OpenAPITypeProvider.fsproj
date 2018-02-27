@@ -4,6 +4,10 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors></WarningsAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fsi">
       <Paket>True</Paket>
@@ -34,7 +38,6 @@
     <Compile Include="Parser\Operation.fs" />
     <Compile Include="Parser\Path.fs" />
     <Compile Include="Parser\Document.fs" />
-    <Compile Include="Types\Helpers.fs" />
     <Compile Include="Types\Contact.fs" />
     <Compile Include="Types\License.fs" />
     <Compile Include="Types\Info.fs" />

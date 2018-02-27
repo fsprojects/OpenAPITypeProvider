@@ -1,30 +1,29 @@
 module OpenAPITypeProvider.Types.Document
 
 open ProviderImplementation.ProvidedTypes
-open Microsoft.FSharp.Core.CompilerServices
-open System.Reflection
-open OpenAPITypeProvider.Types.Helpers
 open OpenAPITypeProvider.Parser
 
 let createType asm ns typeName (filePath:string) =
-    let docType = ProvidedTypeDefinition(asm, ns, typeName, None, hideObjectMethods = true, nonNullable = true)
+    let typ = ProvidedTypeDefinition(asm, ns, typeName, None, hideObjectMethods = true, nonNullable = true)
     
     let api = filePath |> Document.loadFromYamlFile
 
-    // constructor
-    docType |> addEmptyConstructor "Creates new OpenAPI Type Provider"
+    // ctor
+    ProvidedConstructor([], fun _ -> <@@ () @@>) |> typ.AddMember
 
     // version    
-    let versionValue = api.SpecificationVersion
-    makeProperty<string> (fun _ -> <@@ versionValue @@>) "Version"
-    |>! addXmlDocDelayed "Open API Version"
-    |> docType.AddMember
-    
+    let version = api.SpecificationVersion
+    ProvidedProperty("Version", typeof<string>, (fun _ -> <@@ version @@>)) |> typ.AddMember
+
     // info object
-    Info.createType asm ns api.Info |> addAsProperty "Info" docType
+    let info = Info.createType asm ns api.Info
+    info |> typ.AddMember
+    ProvidedProperty("Info", info, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
     
     // components object
     if api.Components.IsSome then
-        Components.createType asm ns api.Components.Value |> addAsProperty "Components" docType
+        let components = Components.createType asm ns api.Components.Value
+        components |> typ.AddMember
+        ProvidedProperty("Components", components, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
 
-    docType
+    typ

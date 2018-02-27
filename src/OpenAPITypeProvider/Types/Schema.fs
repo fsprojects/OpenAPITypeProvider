@@ -3,8 +3,6 @@ module OpenAPITypeProvider.Types.Schema
 open ProviderImplementation.ProvidedTypes
 open System.Reflection
 open OpenAPITypeProvider
-open OpenAPITypeProvider.Types.Helpers
-open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
 open System
 
@@ -29,9 +27,7 @@ let rec getType = function
     | String format -> format |> getStringType
     | Array schema -> 
         let typ = schema |> getType
-        ProvidedTypeBuilder.MakeGenericType (typedefof<Option<_>>, [typ])
-        //let obj = Array.CreateInstance(typ, 1)
-        //obj.GetType()
+        ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
 
 let some (typ:Type) arg =
     let unionType = typedefof<option<_>>.MakeGenericType typ
@@ -41,31 +37,42 @@ let some (typ:Type) arg =
 let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
     let name = Names.pascalName name
     match schema with
-    | Boolean -> schema |> getType |> makeTypedProperty (fun _ -> <@@ () @@>) name :> MemberInfo
+    | Boolean -> 
+        let typ = schema |> getType
+        ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
     | Object (props, required) ->
-        let ob = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
+        let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
 
         let p = 
             props 
             |> Map.toList 
-            |> List.map (fun (n, v) -> (Names.pascalName n), (getType v)) 
-            |> List.map (fun (n,v) -> makeTypedParameter n v)
+            |> List.map (fun (n,v) -> (Names.pascalName n), (getType v)) 
+            |> List.map (fun (n,v) -> ProvidedParameter(n, v))
         
-        let ctor = makeConstructor p (fun _ -> <@@ () @@>)
-        ob.AddMember(ctor)
+        let ctor = ProvidedConstructor(p, (fun _ -> <@@ () @@>))
+        typ.AddMember(ctor)
         
-        let mth = ProvidedMethod("Parse", [ProvidedParameter("Json", typeof<string>)], ob, (fun _ -> <@@ () @@>), isStatic = true)
-        ob.AddMember(mth)
+        let mth = ProvidedMethod("Parse", [ProvidedParameter("Json", typeof<string>)], typ, (fun _ -> <@@ () @@>), isStatic = true)
+        typ.AddMember(mth)
 
         props 
         |> Map.map (getMembers asm ns parent) 
-        |> Map.iter (fun _ mem -> ob.AddMember(mem))
-        ob |> addAsProperty name parent
-        ob :> MemberInfo    
-    | Integer _ -> schema |> getType |> makeTypedProperty (fun _ -> <@@ () @@>) name :> MemberInfo
-    | Number _ -> schema |> getType |> makeTypedProperty (fun _ -> <@@ () @@>) name :> MemberInfo
-    | String _ -> schema |> getType |> makeTypedProperty (fun _ -> <@@ () @@>) name :> MemberInfo
+        |> Map.iter (fun _ mem -> typ.AddMember(mem))
+        
+        typ |> parent.AddMember
+        ProvidedProperty(name, typ, (fun _ -> <@@ typ @@>)) |> parent.AddMember
+        typ :> MemberInfo    
+    | Integer _ -> 
+        let typ = schema |> getType 
+        ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
+    | Number _ ->
+        let typ = schema |> getType 
+        ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
+    | String _ ->
+        let typ = schema |> getType 
+        ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
     | Array _ -> 
-        let v = some typeof<string> (Microsoft.FSharp.Quotations.Expr.Value("x"))
+        //let v = some typeof<string> (Microsoft.FSharp.Quotations.Expr.Value("x"))
         //let values = Option<string>.Some("x")
-        schema |> getType |> makeTypedProperty (fun _ -> v ) name :> MemberInfo    
+        let typ = schema |> getType 
+        ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
