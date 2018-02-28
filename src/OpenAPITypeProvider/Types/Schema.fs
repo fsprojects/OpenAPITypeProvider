@@ -34,6 +34,26 @@ let some (typ:Type) arg =
     let meth = unionType.GetMethod("Some")
     Microsoft.FSharp.Quotations.Expr.Call(meth, [arg])
 
+let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
+    let name = Names.pascalName name
+    match schema with
+    | _ ->
+        let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
+        // add property value
+        ProvidedProperty("Value", typeof<string>, (fun _ -> <@@ "TODO" @@>)) |> typ.AddMember
+        
+        // add static method Parse
+        let mth = ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun _ -> <@@ () @@>), isStatic = true)
+        typ.AddMember(mth)
+
+
+        // add to parent
+        typ |> parent.AddMember
+        //ProvidedProperty(name, typ, (fun _ -> <@@ obj() @@>)) |> parent.AddMember
+        //typ :> MemberInfo    
+
+
+
 let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
     let name = Names.pascalName name
     match schema with
@@ -52,7 +72,7 @@ let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
         let ctor = ProvidedConstructor(p, (fun _ -> <@@ () @@>))
         typ.AddMember(ctor)
         
-        let mth = ProvidedMethod("Parse", [ProvidedParameter("Json", typeof<string>)], typ, (fun _ -> <@@ () @@>), isStatic = true)
+        let mth = ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun _ -> <@@ () @@>), isStatic = true)
         typ.AddMember(mth)
 
         props 

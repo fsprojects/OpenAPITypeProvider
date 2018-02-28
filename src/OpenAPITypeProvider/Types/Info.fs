@@ -29,12 +29,12 @@ let createType asm ns (info:Info) =
     if info.Contact.IsSome then
         let contact = Contact.createType asm ns info.Contact.Value
         contact |> typ.AddMember
-        ProvidedProperty("Contact", contact, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
+        ProvidedProperty("Contact", contact, fun _ -> <@@ obj() @@>) |> typ.AddMember
     
     // license object
     if info.License.IsSome then
         let license = License.createType asm ns info.License.Value
         license |> typ.AddMember
-        ProvidedProperty("License", license, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
+        ProvidedProperty("License", license, fun _ -> <@@ obj() @@>) |> typ.AddMember
 
     typ
