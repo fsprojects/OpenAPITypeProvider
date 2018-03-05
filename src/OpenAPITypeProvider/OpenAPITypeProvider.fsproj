@@ -38,6 +38,7 @@
     <Compile Include="Parser\Operation.fs" />
     <Compile Include="Parser\Path.fs" />
     <Compile Include="Parser\Document.fs" />
+    <Compile Include="JsonParser\JsonParser.fs" />
     <Compile Include="Types\Contact.fs" />
     <Compile Include="Types\License.fs" />
     <Compile Include="Types\Info.fs" />
