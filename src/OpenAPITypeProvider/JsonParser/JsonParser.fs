@@ -4,8 +4,15 @@ open System
 open OpenAPITypeProvider.Specification
 open Newtonsoft.Json.Linq
 
-let parseForSchema (schema:Schema) (json:JToken) =
+let checkRequiredProperties (req:string list) (jObject:JObject) =
+    let propertyExist name = jObject.Properties() |> Seq.exists (fun x -> x.Name = name)
+    req |> List.iter (fun p ->
+        if propertyExist p |> not then failwith (sprintf "Property %s is required by schema, but no present in JObject" p)
+    )
+
+let rec parseForSchema (schema:Schema) (json:JToken) =
     match schema with
+    | Boolean -> json.Value<bool>() |> box
     | Integer Int32 -> json.Value<int32>() |> box
     | Integer Int64 -> json.Value<int64>() |> box
     | Number NumberFormat.Double -> json.Value<double>() |> box
@@ -16,9 +23,12 @@ let parseForSchema (schema:Schema) (json:JToken) =
     | String StringFormat.Byte -> json.Value<byte>() |> box
     | String StringFormat.DateTime
     | String StringFormat.Date -> json.Value<DateTime>() |> box
-
-// let parseJToken (json:JToken) (schema:Schema) =
-//     match schema with
-//     | Integer format ->
-//         match format with
-//         | IntFormat.Int32 -> json.Value() :?> int
+    | Array itemsSchema ->
+        let jArray = json :?> JArray
+        [| for x in jArray do yield parseForSchema itemsSchema x |] |> box
+    | Object (props, required) ->
+        let jObject = json :?> JObject
+        jObject |> checkRequiredProperties required
+        props |> Map.map (fun name schema -> 
+            parseForSchema schema (jObject.[name])
+        ) :> obj
