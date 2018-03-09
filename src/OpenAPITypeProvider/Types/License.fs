@@ -1,7 +1,7 @@
 module OpenAPITypeProvider.Types.License
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Specification
+open OpenAPIProvider.Specification
 
 let createType asm ns (license:License) =
     let typ = ProvidedTypeDefinition(asm, ns, "License", None, hideObjectMethods = true, nonNullable = true)

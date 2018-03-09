@@ -1,7 +1,7 @@
-module OpenAPITypeProvider.JsonParser.JsonParser
+module OpenAPIProvider.JsonParser.JsonParser
 
 open System
-open OpenAPITypeProvider.Specification
+open OpenAPIProvider.Specification
 open Newtonsoft.Json.Linq
 
 let checkRequiredProperties (req:string list) (jObject:JObject) =
@@ -25,7 +25,7 @@ let rec parseForSchema (schema:Schema) (json:JToken) =
     | String StringFormat.Date -> json.Value<DateTime>() |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
-        [| for x in jArray do yield parseForSchema itemsSchema x |] |> box
+        [ for x in jArray do yield parseForSchema itemsSchema x ] |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
         jObject |> checkRequiredProperties required

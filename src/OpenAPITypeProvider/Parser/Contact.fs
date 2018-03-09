@@ -1,7 +1,7 @@
 module OpenAPITypeProvider.Parser.Contact
 
 open System
-open OpenAPITypeProvider.Specification
+open OpenAPIProvider.Specification
 open Core
 open YamlDotNet.RepresentationModel
 

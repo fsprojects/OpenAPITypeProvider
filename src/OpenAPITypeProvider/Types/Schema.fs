@@ -3,7 +3,8 @@ module OpenAPITypeProvider.Types.Schema
 open ProviderImplementation.ProvidedTypes
 open System.Reflection
 open OpenAPITypeProvider
-open OpenAPITypeProvider.Specification
+open OpenAPIProvider
+open OpenAPIProvider.Specification
 open System
 
 let getIntType = function
@@ -34,11 +35,41 @@ let some (typ:Type) arg =
     let meth = unionType.GetMethod("Some")
     Microsoft.FSharp.Quotations.Expr.Call(meth, [arg])
 
+
+
+  
+
+// type Json = {
+//     Token : JToken
+// }
+// with
+//     static member Parse s = 
+//         let value = JToken.Parse(s)
+//         {
+//             Token = value
+//         }
+
+
 let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
     let name = Names.pascalName name
     match schema with
+    | Integer intFormat ->
+        let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
+
+        let mth = ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
+            
+            <@@ 
+            let json = %%args.Head : string
+            //JsonValue(json, schema) 
+            //MyType()
+            ()
+            @@>), isStatic = true)
+        typ.AddMember(mth)
+        
+        typ |> parent.AddMember
     | _ ->
         let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
+        
         // add property value
         ProvidedProperty("Value", typeof<string>, (fun _ -> <@@ "TODO" @@>)) |> typ.AddMember
         

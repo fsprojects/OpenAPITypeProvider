@@ -3,7 +3,7 @@ module OpenAPITypeProvider.Tests.Parser.Info
 open System
 open NUnit.Framework
 open OpenAPITypeProvider.Parser
-open OpenAPITypeProvider.Specification
+open OpenAPIProvider.Specification
 open OpenAPITypeProvider.Tests
 
 let licenseSample = { Name = "MIT"; Url = Some <| Uri("http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT") }

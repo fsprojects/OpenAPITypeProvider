@@ -1,4 +1,4 @@
-namespace OpenAPITypeProvider.Specification
+namespace OpenAPIProvider.Specification
 
 open System
 

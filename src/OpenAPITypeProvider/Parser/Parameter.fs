@@ -1,6 +1,6 @@
 module OpenAPITypeProvider.Parser.Parameter
 
-open OpenAPITypeProvider.Specification
+open OpenAPIProvider.Specification
 open Core
 open YamlDotNet.RepresentationModel
 

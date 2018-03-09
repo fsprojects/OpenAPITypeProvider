@@ -2,7 +2,7 @@ module OpenAPITypeProvider.Types.Info
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Parser
-open OpenAPITypeProvider.Specification
+open OpenAPIProvider.Specification
 
 let createType asm ns (info:Info) =
     let typ = ProvidedTypeDefinition(asm, ns, "Info", None, hideObjectMethods = true, nonNullable = true)
