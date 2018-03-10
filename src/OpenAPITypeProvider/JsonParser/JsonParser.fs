@@ -1,7 +1,7 @@
-module OpenAPIProvider.JsonParser.JsonParser
+module OpenAPITypeProvider.JsonParser.JsonParser
 
 open System
-open OpenAPIProvider.Specification
+open OpenAPITypeProvider.Specification
 open Newtonsoft.Json.Linq
 
 let checkRequiredProperties (req:string list) (jObject:JObject) =

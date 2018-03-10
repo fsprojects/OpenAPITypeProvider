@@ -3,9 +3,9 @@ module OpenAPITypeProvider.Types.Schema
 open ProviderImplementation.ProvidedTypes
 open System.Reflection
 open OpenAPITypeProvider
-open OpenAPIProvider
-open OpenAPIProvider.Specification
+open OpenAPITypeProvider.Specification
 open System
+open OpenAPITypeProvider.JsonParser.JsonParser
 
 let getIntType = function
     | IntFormat.Int32 -> typeof<int>
@@ -35,46 +35,39 @@ let some (typ:Type) arg =
     let meth = unionType.GetMethod("Some")
     Microsoft.FSharp.Quotations.Expr.Call(meth, [arg])
 
+// type JsonValue (json,schema) =
+//     let value = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema schema
+//     member __.RawValue = value
+//     static member Parse (json, schema) = JsonValue(json, schema)
 
+type JsonValue = {
+    RawValue : obj
+}
 
-  
-
-// type Json = {
-//     Token : JToken
-// }
-// with
-//     static member Parse s = 
-//         let value = JToken.Parse(s)
-//         {
-//             Token = value
-//         }
-
+let generate schema json =
+    let value = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema schema
+    {
+        RawValue = value
+    } 
 
 let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
     let name = Names.pascalName name
     match schema with
-    | Integer intFormat ->
-        let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
-
-        let mth = ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
-            
-            <@@ 
-            let json = %%args.Head : string
-            //JsonValue(json, schema) 
-            //MyType()
-            ()
-            @@>), isStatic = true)
-        typ.AddMember(mth)
-        
-        typ |> parent.AddMember
     | _ ->
-        let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
-        
+        let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<JsonValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
         // add property value
         ProvidedProperty("Value", typeof<string>, (fun _ -> <@@ "TODO" @@>)) |> typ.AddMember
-        
+        let fn = generate schema
         // add static method Parse
-        let mth = ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun _ -> <@@ () @@>), isStatic = true)
+        let mth = ProvidedMethod("ParseTest", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
+            
+            
+            <@@ 
+                let json = %%args.Head : string
+                let v = fn json
+                v
+                //JsonValue(json, schema)
+            @@>), isStatic = true)
         typ.AddMember(mth)
 
 
@@ -92,7 +85,7 @@ let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
         let typ = schema |> getType
         ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
     | Object (props, required) ->
-        let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true)
+        let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true, isErased = true)
 
         let p = 
             props 

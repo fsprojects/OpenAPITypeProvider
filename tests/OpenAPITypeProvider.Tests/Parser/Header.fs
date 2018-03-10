@@ -2,7 +2,7 @@ module OpenAPITypeProvider.Tests.Parser.Header
 
 open NUnit.Framework
 open OpenAPITypeProvider.Parser
-open OpenAPIProvider.Specification
+open OpenAPITypeProvider.Specification
 open OpenAPITypeProvider.Tests
 
 let sample = {

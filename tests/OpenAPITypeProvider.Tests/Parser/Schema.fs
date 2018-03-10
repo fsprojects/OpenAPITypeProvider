@@ -2,7 +2,7 @@ module OpenAPITypeProvider.Tests.Parser.Schema
 
 open NUnit.Framework
 open OpenAPITypeProvider.Parser
-open OpenAPIProvider.Specification
+open OpenAPITypeProvider.Specification
 open OpenAPITypeProvider.Tests
 
 

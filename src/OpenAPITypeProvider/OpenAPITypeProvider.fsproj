@@ -2,7 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <!-- <TargetFramework>netstandard2.0</TargetFramework> -->
+    <TargetFramework>net461</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -39,7 +40,6 @@
     <Compile Include="Parser\Path.fs" />
     <Compile Include="Parser\Document.fs" />
     <Compile Include="JsonParser\JsonParser.fs" />
-    <Compile Include="JsonTypes.fs" />
     <Compile Include="Types\Contact.fs" />
     <Compile Include="Types\License.fs" />
     <Compile Include="Types\Info.fs" />

@@ -3,11 +3,8 @@ module OpenAPITypeProvider.Types.Document
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Parser
 
-type MyType() =
-    member __.Value = "AHOJ"
-
 let createType asm ns typeName (filePath:string) =
-    let typ = ProvidedTypeDefinition(asm, ns, typeName, Some typeof<MyType>, hideObjectMethods = true, nonNullable = true)
+    let typ = ProvidedTypeDefinition(asm, ns, typeName, None, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     let api = filePath |> Document.loadFromYamlFile
 
@@ -27,7 +24,7 @@ let createType asm ns typeName (filePath:string) =
     if api.Components.IsSome then
         
         // Schemas
-        let schemas = ProvidedTypeDefinition(asm, ns, "Schemas", None, hideObjectMethods = true, nonNullable = true)
+        let schemas = ProvidedTypeDefinition(asm, ns, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         api.Components.Value.Schemas
         |> Map.iter (fun name schema -> 

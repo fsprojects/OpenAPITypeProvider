@@ -65,4 +65,4 @@ let findByRef (rootNode:YamlMappingNode) (refString:string) =
 let findSchema mapFn node =
     match node |> tryFindByName "schema" with
     | Some x -> x |> mapFn
-    | None -> OpenAPIProvider.Specification.Schema.Empty
+    | None -> OpenAPITypeProvider.Specification.Schema.Empty

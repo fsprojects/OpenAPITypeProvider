@@ -2,10 +2,10 @@ module OpenAPITypeProvider.Types.Info
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Parser
-open OpenAPIProvider.Specification
+open OpenAPITypeProvider.Specification
 
 let createType asm ns (info:Info) =
-    let typ = ProvidedTypeDefinition(asm, ns, "Info", None, hideObjectMethods = true, nonNullable = true)
+    let typ = ProvidedTypeDefinition(asm, ns, "Info", None, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     // version
     let version = info.Version

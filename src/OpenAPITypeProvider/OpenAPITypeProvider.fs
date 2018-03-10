@@ -13,7 +13,7 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
    let ns = "OpenAPIProvider"
    let asm = Assembly.GetExecutingAssembly()
     
-   let tp = ProvidedTypeDefinition(asm, ns, "OpenAPIV3Provider",  None,  hideObjectMethods = true, nonNullable = true)
+   let tp = ProvidedTypeDefinition(asm, ns, "OpenAPIV3Provider", None,  hideObjectMethods = true, nonNullable = true, isErased = true)
     
    let createTypes typeName (args:obj[]) =
        let filePath = args.[0] :?> string
