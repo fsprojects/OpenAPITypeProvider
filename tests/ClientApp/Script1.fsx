@@ -9,6 +9,9 @@ type Provider = OpenAPIV3Provider< @"C:\Dzoukr\Personal\dzoukr\OpenAPITypeProvid
 let p = Provider()
 
 let x = Provider.Schemas.JustIntArray.Parse(""" [123] """)
-let y = Provider.Schemas.JustIntValue.Parse("123")
-y.Value
+
 x.Values
+x.ToJToken()
+//let y = Provider.Schemas.PlainStringValue.PlainStringValue.Parse(""" 'abc' """)
+
+

@@ -23,7 +23,7 @@ let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (sc
     | Schema.Number _
     | Schema.String _
         ->
-        let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+        let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<SimpleValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
         let schemaType = schema |> Inference.getType
         let strSchema = schema |> Serialization.serialize
 
@@ -35,6 +35,7 @@ let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (sc
             @@>), isStatic = true)
             |> typ.AddMember
         
+        // add Value(s) property
         let valueMethodName = 
             match schema with
             | Schema.Array _ -> "Values"
@@ -43,9 +44,19 @@ let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (sc
         ProvidedProperty(valueMethodName, schemaType, (fun args -> 
             let t = args.[0]
             <@@  
-                let simpleValue = ((%%t : obj ):?> SimpleValue)
-                simpleValue.Value
+                let simpleValue = (%%t : SimpleValue )
+                simpleValue.RawValue
             @@>)) |> typ.AddMember
+
+        // add ToJToken method
+        ProvidedMethod("Test", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
+            let t = args.[0]
+            <@@ 
+                let simpleValue = ((%%t : SimpleValue ):?> SimpleValue)
+                simpleValue.RawValue |> Newtonsoft.Json.Linq.JToken.FromObject
+            @@>))
+            |> typ.AddMember
+        
 
         // add to parent
         typ |> parent.AddMember
