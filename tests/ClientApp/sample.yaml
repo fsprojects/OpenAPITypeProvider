@@ -149,6 +149,19 @@ components:
 
     JustIntValue:
       type: integer
+    
+    PlainStringValue:
+      type: string
+
+    JustArray:
+      type: array
+      items:
+        type: string
+    
+    JustIntArray:
+      type: array
+      items:
+        type: integer
 
     Error:
       required:

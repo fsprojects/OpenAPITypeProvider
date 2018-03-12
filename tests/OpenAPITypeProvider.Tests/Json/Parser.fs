@@ -2,7 +2,7 @@ module OpenAPITypeProvider.Tests.JsonParser.JsonParser
 
 open System
 open NUnit.Framework
-open OpenAPITypeProvider.JsonParser.JsonParser
+open OpenAPITypeProvider.Json.Parser
 open OpenAPITypeProvider.Tests
 open Newtonsoft.Json.Linq
 open OpenAPITypeProvider.Specification
@@ -65,16 +65,16 @@ let ``Parses Number (Double) from JValue``() =
 
 [<Test>]
 let ``Parses Array (Float) from JArray``() = 
-    let jArray = "1.2" |> JValue |> JArray
+    let jArray = "[1.2]" |> JToken.Parse
     let schema = Schema.Array (Schema.Number NumberFormat.Float)
     let expected = [| 1.2f |]
     Assert.AreEqual(expected, (parseForSchema schema jArray))
 
 [<Test>]
 let ``Parses Array (Double) from JArray``() = 
-    let jArray = "1.2" |> JValue |> JArray
+    let jArray = "[1.2]" |> JToken.Parse
     let schema = Schema.Array (Schema.Number NumberFormat.Double)
-    let expected = [| 1.2 |]
+    let expected = [ 1.2 ]
     Assert.AreEqual(expected, (parseForSchema schema jArray))
 
 [<Test>]

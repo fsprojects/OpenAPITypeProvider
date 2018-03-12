@@ -14,7 +14,7 @@
     <Compile Include="Parser\Parameter.fs" />
     <Compile Include="Parser\Operation.fs" />
     <Compile Include="Parser\Document.fs" />
-    <Compile Include="JsonParser\JsonParser.fs" />
+    <Compile Include="Json\Parser.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />

@@ -1,14 +1,24 @@
-module OpenAPITypeProvider.JsonParser.JsonParser
+module OpenAPITypeProvider.Json.Parser
 
 open System
 open OpenAPITypeProvider.Specification
 open Newtonsoft.Json.Linq
+open OpenAPITypeProvider.Types
 
 let checkRequiredProperties (req:string list) (jObject:JObject) =
     let propertyExist name = jObject.Properties() |> Seq.exists (fun x -> x.Name = name)
     req |> List.iter (fun p ->
         if propertyExist p |> not then failwith (sprintf "Property %s is required by schema, but no present in JObject" p)
     )
+
+type ReflectiveListBuilder = 
+    static member BuildList<'a> (args: obj list) = 
+        [ for a in args do yield a :?> 'a ] 
+    static member BuildTypedList lType (args: obj list) = 
+        typeof<ReflectiveListBuilder>
+            .GetMethod("BuildList")
+            .MakeGenericMethod([|lType|])
+            .Invoke(null, [|args|])
 
 let rec parseForSchema (schema:Schema) (json:JToken) =
     match schema with
@@ -25,7 +35,9 @@ let rec parseForSchema (schema:Schema) (json:JToken) =
     | String StringFormat.Date -> json.Value<DateTime>() |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
-        [ for x in jArray do yield parseForSchema itemsSchema x ] |> box
+        let items = [ for x in jArray do yield parseForSchema itemsSchema x ]
+        let typ = itemsSchema |> Inference.getType
+        ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
         jObject |> checkRequiredProperties required
@@ -33,16 +45,3 @@ let rec parseForSchema (schema:Schema) (json:JToken) =
             parseForSchema schema (jObject.[name])
         ) :> obj
 
-type Wrapped(json, value) =
-    member x.Json = json
-    member x.Value = value
-
-type Loader() =
-    static member Load (str:string) =
-        Schema.Integer IntFormat.Int32
-
-type Builder() =
-    static member Build(json, schema) = 
-        let schema = Loader.Load schema
-        let value = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema schema
-        Wrapped(json, value)

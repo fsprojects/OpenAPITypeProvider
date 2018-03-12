@@ -37,8 +37,10 @@
     <Compile Include="Parser\Operation.fs" />
     <Compile Include="Parser\Path.fs" />
     <Compile Include="Parser\Document.fs" />
-    <Compile Include="JsonParser\JsonParser.fs" />
-    <Compile Include="JsonParser\Test.fs" />
+    <Compile Include="Json\Serialization.fs" />
+    <Compile Include="Types\Inference.fs" />
+    <Compile Include="Json\Parser.fs" />
+    <Compile Include="Json\Types.fs" />
     <Compile Include="Types\Contact.fs" />
     <Compile Include="Types\License.fs" />
     <Compile Include="Types\Info.fs" />
