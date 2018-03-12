@@ -2,12 +2,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <!-- <TargetFramework>netstandard2.0</TargetFramework> -->
-    <TargetFramework>net461</TargetFramework>
+    <!-- <TargetFramework>net461</TargetFramework> -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <DefineConstants>NETSTANDARD;NO_GENERATIVE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningsAsErrors></WarningsAsErrors>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fsi">
@@ -17,10 +19,6 @@
     <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fs">
       <Paket>True</Paket>
       <Link>paket-files/ProvidedTypes.fs</Link>
-    </Compile>
-    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypesTesting.fs">
-      <Paket>True</Paket>
-      <Link>paket-files/ProvidedTypesTesting.fs</Link>
     </Compile>
     <Compile Include="Specification.fs" />
     <Compile Include="IO.fs" />
@@ -40,6 +38,7 @@
     <Compile Include="Parser\Path.fs" />
     <Compile Include="Parser\Document.fs" />
     <Compile Include="JsonParser\JsonParser.fs" />
+    <Compile Include="JsonParser\Test.fs" />
     <Compile Include="Types\Contact.fs" />
     <Compile Include="Types\License.fs" />
     <Compile Include="Types\Info.fs" />
@@ -48,5 +47,6 @@
     <None Include="paket.references" />
     <Compile Include="OpenAPITypeProvider.fs" />
   </ItemGroup>
+  
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

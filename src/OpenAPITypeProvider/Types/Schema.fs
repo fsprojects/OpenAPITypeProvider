@@ -5,7 +5,6 @@ open System.Reflection
 open OpenAPITypeProvider
 open OpenAPITypeProvider.Specification
 open System
-open OpenAPITypeProvider.JsonParser.JsonParser
 
 let getIntType = function
     | IntFormat.Int32 -> typeof<int>
@@ -40,33 +39,40 @@ let some (typ:Type) arg =
 //     member __.RawValue = value
 //     static member Parse (json, schema) = JsonValue(json, schema)
 
-type JsonValue = {
-    RawValue : obj
-}
 
-let generate schema json =
-    let value = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema schema
-    {
-        RawValue = value
-    } 
+
+// type JsonValue = {
+//     RawValue : JToken
+// }
+
+// let generate schema json =
+//     let value = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema schema
+//     {
+//         RawValue = value
+//     } 
+
+
 
 let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
     let name = Names.pascalName name
     match schema with
     | _ ->
-        let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<JsonValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
+        let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<OpenAPITypeProvider.JsonParser.JsonParser.Wrapped>, hideObjectMethods = true, nonNullable = true, isErased = true)
         // add property value
-        ProvidedProperty("Value", typeof<string>, (fun _ -> <@@ "TODO" @@>)) |> typ.AddMember
-        let fn = generate schema
+        //ProvidedProperty("Value", typeof<string>, (fun _ -> <@@ "TODO" @@>)) |> typ.AddMember
+        
+        let strSchema = schema |> string
+
         // add static method Parse
         let mth = ProvidedMethod("ParseTest", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
             
             
+            //let value = x |> Newtonsoft.Json.Linq.JToken.Parse |> OpenAPITypeProvider.JsonParser.JsonParser.parseForSchema schema
+            
             <@@ 
                 let json = %%args.Head : string
-                let v = fn json
-                v
-                //JsonValue(json, schema)
+                let wrapped = OpenAPITypeProvider.JsonParser.JsonParser.Builder.Build(json, strSchema)
+                wrapped
             @@>), isStatic = true)
         typ.AddMember(mth)
 

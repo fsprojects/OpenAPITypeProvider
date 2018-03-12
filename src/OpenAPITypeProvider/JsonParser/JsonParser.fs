@@ -32,3 +32,17 @@ let rec parseForSchema (schema:Schema) (json:JToken) =
         props |> Map.map (fun name schema -> 
             parseForSchema schema (jObject.[name])
         ) :> obj
+
+type Wrapped(json, value) =
+    member x.Json = json
+    member x.Value = value
+
+type Loader() =
+    static member Load (str:string) =
+        Schema.Integer IntFormat.Int32
+
+type Builder() =
+    static member Build(json, schema) = 
+        let schema = Loader.Load schema
+        let value = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema schema
+        Wrapped(json, value)
