@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>156db77c-e27d-45c7-8ee6-23a64d0a7f1e</ProjectGuid>
+    <ProjectGuid>086410a9-7f1d-44c8-a5ae-efccef12aea4</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>ConsoleApp</RootNamespace>
     <AssemblyName>ConsoleApp</AssemblyName>
@@ -59,6 +59,7 @@
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
+    <None Include="Sample.yaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -68,16 +69,16 @@
       <HintPath>$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\$(TargetFSharpCoreVersion)\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OpenAPITypeProvider">
-      <HintPath>..\..\..\src\OpenAPITypeProvider\bin\Debug\netstandard2.0\OpenAPITypeProvider.dll</HintPath>
+      <HintPath>..\..\src\OpenAPITypeProvider\bin\Debug\OpenAPITypeProvider.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.ValueTuple">
-      <HintPath>..\packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <HintPath>packages\System.ValueTuple.4.3.1\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

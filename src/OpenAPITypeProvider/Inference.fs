@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Types.Inference
+﻿module OpenAPITypeProvider.Inference
 
 open System
 open ProviderImplementation.ProvidedTypes

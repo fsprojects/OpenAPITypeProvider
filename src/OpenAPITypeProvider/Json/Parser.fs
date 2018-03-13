@@ -3,7 +3,7 @@ module OpenAPITypeProvider.Json.Parser
 open System
 open OpenAPITypeProvider.Specification
 open Newtonsoft.Json.Linq
-open OpenAPITypeProvider.Types
+open OpenAPITypeProvider
 
 let checkRequiredProperties (req:string list) (jObject:JObject) =
     let propertyExist name = jObject.Properties() |> Seq.exists (fun x -> x.Name = name)

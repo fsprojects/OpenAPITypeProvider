@@ -3,14 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "OpenAPITypeProvider.Tests", "tests\OpenAPITypeProvider.Tests\OpenAPITypeProvider.Tests.fsproj", "{634FB89C-543A-4F6C-A1DD-83F55929EBEA}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "OpenAPITypeProvider", "src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj", "{5D66B595-291E-41E8-B29C-7079B581C7C8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C0AA899C-24BE-4AA1-99E6-63DB0E29036A}"
 	ProjectSection(SolutionItems) = preProject
 		paket.dependencies = paket.dependencies
 	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OpenAPITypeProvider", "src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj", "{8A05A5F6-D202-4521-AAD3-F0C88FD98CB6}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OpenAPITypeProvider.Tests", "tests\OpenAPITypeProvider.Tests\OpenAPITypeProvider.Tests.fsproj", "{155A0511-98F3-4EF2-993B-BDA0A5C5EDBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,14 +18,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{634FB89C-543A-4F6C-A1DD-83F55929EBEA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D66B595-291E-41E8-B29C-7079B581C7C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A05A5F6-D202-4521-AAD3-F0C88FD98CB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A05A5F6-D202-4521-AAD3-F0C88FD98CB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A05A5F6-D202-4521-AAD3-F0C88FD98CB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A05A5F6-D202-4521-AAD3-F0C88FD98CB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{155A0511-98F3-4EF2-993B-BDA0A5C5EDBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{155A0511-98F3-4EF2-993B-BDA0A5C5EDBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{155A0511-98F3-4EF2-993B-BDA0A5C5EDBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{155A0511-98F3-4EF2-993B-BDA0A5C5EDBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

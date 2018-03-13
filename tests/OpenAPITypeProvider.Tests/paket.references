@@ -4,3 +4,4 @@ NUnit3TestAdapter
 Microsoft.NET.Test.Sdk
 
 YamlDotNet
+Newtonsoft.Json
