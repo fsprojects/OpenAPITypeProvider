@@ -1,5 +1,5 @@
 FSharp.Core
 YamlDotNet
+Newtonsoft.Json
 File: ProvidedTypes.fsi
 File: ProvidedTypes.fs
-Newtonsoft.Json

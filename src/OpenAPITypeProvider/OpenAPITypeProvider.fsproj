@@ -4,7 +4,6 @@
     <OutputType>Library</OutputType>
     <!-- <TargetFramework>net461</TargetFramework> -->
     <TargetFramework>netstandard2.0</TargetFramework>
-    <DefineConstants>NETSTANDARD;NO_GENERATIVE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
