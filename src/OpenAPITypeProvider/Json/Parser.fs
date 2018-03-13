@@ -4,6 +4,7 @@ open System
 open OpenAPITypeProvider.Specification
 open Newtonsoft.Json.Linq
 open OpenAPITypeProvider
+open ProviderImplementation.ProvidedTypes
 
 let checkRequiredProperties (req:string list) (jObject:JObject) =
     let propertyExist name = jObject.Properties() |> Seq.exists (fun x -> x.Name = name)
@@ -20,7 +21,7 @@ type ReflectiveListBuilder =
             .MakeGenericMethod([|lType|])
             .Invoke(null, [|args|])
 
-let rec parseForSchema (schema:Schema) (json:JToken) =
+let rec parseForSchema (existingTypes:Map<Schema, ProvidedTypeDefinition>) (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
     | Integer Int32 -> json.Value<int32>() |> box
@@ -35,13 +36,13 @@ let rec parseForSchema (schema:Schema) (json:JToken) =
     | String StringFormat.Date -> json.Value<DateTime>() |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
-        let items = [ for x in jArray do yield parseForSchema itemsSchema x ]
-        let typ = itemsSchema |> Inference.getType
+        let items = [ for x in jArray do yield parseForSchema existingTypes itemsSchema x ]
+        let typ = itemsSchema |> Inference.getType existingTypes
         ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
         jObject |> checkRequiredProperties required
         props |> Map.map (fun name schema -> 
-            parseForSchema schema (jObject.[name])
+            parseForSchema existingTypes schema (jObject.[name])
         ) :> obj
 

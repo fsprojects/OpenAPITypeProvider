@@ -14,7 +14,7 @@ let some (typ:Type) arg =
     Microsoft.FSharp.Quotations.Expr.Call(meth, [arg])
 
 
-let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
+let rec getRootNonObjectTypes asm ns name (schema:Schema) =
     let name = Names.pascalName name
     match schema with
     | Schema.Boolean 
@@ -24,14 +24,14 @@ let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (sc
     | Schema.String _
         ->
         let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-        let schemaType = schema |> Inference.getType
+        let schemaType = schema |> Inference.getType Map.empty
         let strSchema = schema |> Serialization.serialize
 
         // add static method Parse
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
             <@@ 
                 let json = %%args.Head : string
-                SimpleValue(json, strSchema)
+                SimpleValue(json, strSchema, Map.empty)
             @@>), isStatic = true)
             |> typ.AddMember
         
@@ -57,10 +57,9 @@ let rec createRootNonObjectTypes asm ns (parent:ProvidedTypeDefinition) name (sc
             @@>))
             |> typ.AddMember
         
+        Some typ
 
-        // add to parent
-        typ |> parent.AddMember
-    | Object _ -> ()
+    | Object _ -> None
 
 
 // let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
