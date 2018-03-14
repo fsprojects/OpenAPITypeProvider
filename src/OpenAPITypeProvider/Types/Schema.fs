@@ -13,54 +13,58 @@ let some (typ:Type) arg =
     let meth = unionType.GetMethod("Some")
     Microsoft.FSharp.Quotations.Expr.Call(meth, [arg])
 
-
-let rec getRootNonObjectTypes asm ns name (schema:Schema) =
-    let name = Names.pascalName name
+let private onlyNonObject (schema:Schema) =
     match schema with
     | Schema.Boolean 
     | Schema.Array _
     | Schema.Integer _
     | Schema.Number _
-    | Schema.String _
-        ->
-        let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-        let schemaType = schema |> Inference.getType Map.empty
-        let strSchema = schema |> Serialization.serialize
+    | Schema.String _ -> Some schema
+    | Schema.Object _ -> None
 
-        // add static method Parse
-        ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
-            <@@ 
-                let json = %%args.Head : string
-                SimpleValue(json, strSchema, Map.empty)
-            @@>), isStatic = true)
-            |> typ.AddMember
+let private createRootNonObjectType asm ns name (schema:Schema) =
+    
+    let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let schemaType = schema |> Inference.getType Map.empty
+    let strSchema = schema |> Serialization.serialize
+
+    // add static method Parse
+    ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
+        <@@ 
+            let json = %%args.Head : string
+            SimpleValue(json, strSchema, Map.empty)
+        @@>), isStatic = true)
+        |> typ.AddMember
         
-        // add Value(s) property
-        let valueMethodName = 
-            match schema with
-            | Schema.Array _ -> "Values"
-            | _ -> "Value"
+    // add Value(s) property
+    let valueMethodName = 
+        match schema with
+        | Schema.Array _ -> "Values"
+        | _ -> "Value"
 
-        ProvidedProperty(valueMethodName, schemaType, (fun args -> 
-            let t = args.[0]
-            <@@  
-                let simpleValue = ((%%t : obj) :?> SimpleValue)
-                simpleValue.Value
-            @@>)) |> typ.AddMember
+    ProvidedProperty(valueMethodName, schemaType, (fun args -> 
+        let t = args.[0]
+        <@@  
+            let simpleValue = ((%%t : obj) :?> SimpleValue)
+            simpleValue.Value
+        @@>)) |> typ.AddMember
 
-        // add ToJToken method
-        ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
-            let t = args.[0]
-            <@@ 
-                let simpleValue = ((%%t : obj ):?> SimpleValue)
-                simpleValue.Value |> Newtonsoft.Json.Linq.JToken.FromObject
-            @@>))
-            |> typ.AddMember
-        
-        Some typ
+    // add ToJToken method
+    ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
+        let t = args.[0]
+        <@@ 
+            let simpleValue = ((%%t : obj ):?> SimpleValue)
+            simpleValue.Value |> Newtonsoft.Json.Linq.JToken.FromObject
+        @@>))
+        |> typ.AddMember
+    typ
 
-    | Object _ -> None
-
+let getRootNonObjectType asm ns name schema =
+    let name = Names.pascalName name
+    schema
+    |> onlyNonObject
+    |> Option.map (createRootNonObjectType asm ns name)
+    
 
 // let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
 //     let name = Names.pascalName name
