@@ -9,19 +9,26 @@ open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
-let some (typ:Type) arg =
-    let unionType = typedefof<option<_>>.MakeGenericType typ
-    let meth = unionType.GetMethod("Some")
-    Microsoft.FSharp.Quotations.Expr.Call(meth, [arg])
+let asOption (typ:Type) = typedefof<option<_>>.MakeGenericType typ
+    
 
-let private onlyNonObject (schema:Schema) =
+let private (|NonObjectSchema|_|) (schema:Schema) =
     match schema with
     | Schema.Boolean 
     | Schema.Array _
     | Schema.Integer _
     | Schema.Number _
-    | Schema.String _ -> Some schema
+    | Schema.String _ -> Some ()
     | Schema.Object _ -> None
+
+let private (|ObjectSchema|_|) (schema:Schema) =
+    match schema with
+    | Schema.Object (props, required) -> Some (props, required)
+    | Schema.Boolean 
+    | Schema.Array _
+    | Schema.Integer _
+    | Schema.Number _
+    | Schema.String _ -> None
 
 let private createRootNonObjectType asm ns name (schema:Schema) =
     
@@ -69,10 +76,56 @@ let private createRootNonObjectType asm ns name (schema:Schema) =
 
 let getRootNonObjectType asm ns name schema =
     let name = Names.pascalName name
-    schema
-    |> onlyNonObject
-    |> Option.map (createRootNonObjectType asm ns name)
+    match schema with
+    | NonObjectSchema -> schema |> createRootNonObjectType asm ns name |> Some
+    | _ -> None
     
+let rec createRootObjectType asm ns name (schema:Schema) =
+    let name = Names.pascalName name
+    match schema with
+    | ObjectSchema (props, required) ->
+        
+        let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+        
+        // constructor
+        let p = 
+            props 
+            |> Map.toList 
+            |> List.map (fun (n,v) -> (Names.pascalName n), (v |> Inference.getType Map.empty)) 
+            |> List.map (fun (n,v) -> ProvidedParameter(n, asOption v))
+        
+        ProvidedConstructor(p, (fun args -> 
+            let values =
+                Expr.NewArray(typeof<string * obj>,
+                    args
+                    |> Seq.toList
+                    |> List.mapi(fun i v -> Expr.NewTuple [ Expr.Value p.[i].Name ; Expr.Coerce(v, typeof<obj>) ] ))
+                
+            <@@  
+            let v = (%%values : (string * obj) array) |> Array.toList
+            ObjectValue(v)
+            @@>)) |> typ.AddMember
+
+        // properties
+        props 
+         |> Map.map (createRootObjectType asm ns) 
+         |> Map.iter (fun _ mem -> typ.AddMember(mem))
+
+        typ :> MemberInfo
+    | _ ->
+        let typ = schema |> Inference.getType Map.empty |> asOption
+        ProvidedProperty(name, typ, (fun args -> 
+            let t = args.[0]
+            <@@  
+            let objectValue = ((%%t : obj) :?> ObjectValue)
+            objectValue.GetValue(name)
+            @@>)) :> MemberInfo
+
+let getRootObjectType asm ns name schema =
+    let name = Names.pascalName name
+    match schema with
+    | ObjectSchema _ -> schema |> createRootObjectType asm ns name |> Some
+    | _ -> None
 
 // let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
 //     let name = Names.pascalName name

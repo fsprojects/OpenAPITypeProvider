@@ -26,12 +26,22 @@ let createType asm ns typeName (filePath:string) =
         // Schemas
         let schemas = ProvidedTypeDefinition(asm, ns, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
         
+        // Add object root types
+        api.Components.Value.Schemas
+        |> Map.map (Schema.getRootObjectType asm ns)
+        |> Map.filter (fun _ v -> v.IsSome)
+        |> Map.map (fun _ v -> v.Value)
+        |> Map.iter (fun _ v -> schemas.AddMember v)
+
+
         // Add non-object root types
         api.Components.Value.Schemas
         |> Map.map (Schema.getRootNonObjectType asm ns)
         |> Map.filter (fun _ v -> v.IsSome)
         |> Map.map (fun _ v -> v.Value)
         |> Map.iter (fun _ v -> schemas.AddMember v)
+
+
 
         schemas |> typ.AddMember
         ProvidedProperty("Schemas", schemas, isStatic = true) |> typ.AddMember
