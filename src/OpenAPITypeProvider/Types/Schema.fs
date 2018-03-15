@@ -7,6 +7,7 @@ open OpenAPITypeProvider.Specification
 open System
 open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types
+open Microsoft.FSharp.Quotations
 
 let some (typ:Type) arg =
     let unionType = typedefof<option<_>>.MakeGenericType typ
@@ -28,7 +29,14 @@ let private createRootNonObjectType asm ns name (schema:Schema) =
     let schemaType = schema |> Inference.getType Map.empty
     let strSchema = schema |> Serialization.serialize
 
-    // add static method Parse
+    // constructor
+    ProvidedConstructor([ProvidedParameter("value", schemaType)], (fun args ->
+        let value = Expr.Coerce(args.Head, typeof<obj>)
+        <@@
+            SimpleValue(%%value)
+        @@>)) |> typ.AddMember
+
+    // static method Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
         <@@ 
             let json = %%args.Head : string
@@ -36,7 +44,7 @@ let private createRootNonObjectType asm ns name (schema:Schema) =
         @@>), isStatic = true)
         |> typ.AddMember
         
-    // add Value(s) property
+    // Value(s) property
     let valueMethodName = 
         match schema with
         | Schema.Array _ -> "Values"
@@ -49,7 +57,7 @@ let private createRootNonObjectType asm ns name (schema:Schema) =
             simpleValue.Value
         @@>)) |> typ.AddMember
 
-    // add ToJToken method
+    // ToJToken method
     ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
         let t = args.[0]
         <@@ 
