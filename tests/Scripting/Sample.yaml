@@ -134,6 +134,19 @@ components:
             id:
               type: integer
               format: int64
+    NestedOne:
+      type: object
+      properties:
+        name:
+          type: string
+        subValue:
+          type: object
+          properties:
+            age:
+              type: integer
+      required:
+        - name
+        - subValue
 
     NewPet:
       required:

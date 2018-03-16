@@ -30,7 +30,7 @@ let private (|ObjectSchema|_|) (schema:Schema) =
     | Schema.Number _
     | Schema.String _ -> None
 
-let private createRootNonObjectType asm ns name (schema:Schema) =
+let private createNonObjectType asm ns name (schema:Schema) =
     
     let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     let schemaType = schema |> Inference.getType Map.empty
@@ -74,98 +74,72 @@ let private createRootNonObjectType asm ns name (schema:Schema) =
         |> typ.AddMember
     typ
 
-let getRootNonObjectType asm ns name schema =
+let getNonObjectType asm ns name schema =
     let name = Names.pascalName name
     match schema with
-    | NonObjectSchema -> schema |> createRootNonObjectType asm ns name |> Some
+    | NonObjectSchema -> schema |> createNonObjectType asm ns name |> Some
     | _ -> None
     
-let rec createRootObjectType asm ns name (schema:Schema) =
-    let name = Names.pascalName name
+let rec createObjectType asm ns (isOptional:bool) originalName (schema:Schema) =
+    let name = Names.pascalName originalName
     match schema with
     | ObjectSchema (props, required) ->
+        let strSchema = schema |> Serialization.serialize
+        let isOptional n = required |> List.contains n |> not
         
         let typ = ProvidedTypeDefinition(asm, ns, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         // constructor
-        let p = 
+        let getCtorParam (name,typ) =
+            if name |> isOptional then
+                ProvidedParameter(name, (typ |> asOption), false, null)
+            else ProvidedParameter(name, typ)
+
+        let ctorParams = 
             props 
             |> Map.toList 
-            |> List.map (fun (n,v) -> (Names.pascalName n), (v |> Inference.getType Map.empty)) 
-            |> List.map (fun (n,v) -> ProvidedParameter(n, asOption v))
+            |> List.map (fun (n,v) -> n, (v |> Inference.getType Map.empty))
+            |> List.sortBy (fun (n,_) -> isOptional n)
+            |> List.map getCtorParam 
         
-        ProvidedConstructor(p, (fun args -> 
+        ProvidedConstructor(ctorParams, (fun args -> 
             let values =
                 Expr.NewArray(typeof<string * obj>,
                     args
                     |> Seq.toList
-                    |> List.mapi(fun i v -> Expr.NewTuple [ Expr.Value p.[i].Name ; Expr.Coerce(v, typeof<obj>) ] ))
+                    |> List.mapi(fun i v -> Expr.NewTuple [ Expr.Value ctorParams.[i].Name ; Expr.Coerce(v, typeof<obj>) ] ))
                 
             <@@  
-            let v = (%%values : (string * obj) array) |> Array.toList
+            let v = (%%values : (string * obj) array) |> Array.toList 
             ObjectValue(v)
             @@>)) |> typ.AddMember
 
+
         // properties
         props 
-         |> Map.map (createRootObjectType asm ns) 
-         |> Map.iter (fun _ mem -> typ.AddMember(mem))
+        |> Map.map (fun n s -> createObjectType asm ns (isOptional n) n s) 
+        |> Map.iter (fun _ mem -> typ.AddMember(mem))
+
+        // static method Parse
+        ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
+            <@@ 
+                let json = %%args.Head : string
+                ObjectValue(json, strSchema, Map.empty)
+            @@>), isStatic = true)
+            |> typ.AddMember
 
         typ :> MemberInfo
+    
     | _ ->
-        let typ = schema |> Inference.getType Map.empty |> asOption
+        let typ = schema |> Inference.getType Map.empty |> (fun x -> if isOptional then x |> asOption else x)
         ProvidedProperty(name, typ, (fun args -> 
             let t = args.[0]
             <@@  
-            let objectValue = ((%%t : obj) :?> ObjectValue)
-            objectValue.GetValue(name)
+                let objectValue = ((%%t : obj) :?> ObjectValue)
+                objectValue.GetValue(originalName)
             @@>)) :> MemberInfo
 
-let getRootObjectType asm ns name schema =
-    let name = Names.pascalName name
+let getObjectType asm ns name schema =
     match schema with
-    | ObjectSchema _ -> schema |> createRootObjectType asm ns name |> Some
+    | ObjectSchema _ -> schema |> createObjectType asm ns false name |> Some
     | _ -> None
-
-// let rec getMembers asm ns (parent:ProvidedTypeDefinition) name (schema:Schema) =
-//     let name = Names.pascalName name
-//     match schema with
-//     | Boolean -> 
-//         let typ = schema |> getType
-//         ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
-//     | Object (props, required) ->
-//         let typ = ProvidedTypeDefinition(asm, ns, name, None, hideObjectMethods = true, nonNullable = true, isErased = true)
-
-//         let p = 
-//             props 
-//             |> Map.toList 
-//             |> List.map (fun (n,v) -> (Names.pascalName n), (getType v)) 
-//             |> List.map (fun (n,v) -> ProvidedParameter(n, v))
-        
-//         let ctor = ProvidedConstructor(p, (fun _ -> <@@ () @@>))
-//         typ.AddMember(ctor)
-        
-//         let mth = ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun _ -> <@@ () @@>), isStatic = true)
-//         typ.AddMember(mth)
-
-//         props 
-//         |> Map.map (getMembers asm ns parent) 
-//         |> Map.iter (fun _ mem -> typ.AddMember(mem))
-        
-//         typ |> parent.AddMember
-//         ProvidedProperty(name, typ, (fun _ -> <@@ typ @@>)) |> parent.AddMember
-//         typ :> MemberInfo    
-//     | Integer _ -> 
-//         let typ = schema |> getType 
-//         ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
-//     | Number _ ->
-//         let typ = schema |> getType 
-//         ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
-//     | String _ ->
-//         let typ = schema |> getType 
-//         ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo
-//     | Array _ -> 
-//         //let v = some typeof<string> (Microsoft.FSharp.Quotations.Expr.Value("x"))
-//         //let values = Option<string>.Some("x")
-//         let typ = schema |> getType 
-//         ProvidedProperty(name, typ, (fun _ -> <@@ () @@>)) :> MemberInfo

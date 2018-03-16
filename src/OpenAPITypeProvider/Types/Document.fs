@@ -28,7 +28,7 @@ let createType asm ns typeName (filePath:string) =
         
         // Add object root types
         api.Components.Value.Schemas
-        |> Map.map (Schema.getRootObjectType asm ns)
+        |> Map.map (Schema.getObjectType asm ns)
         |> Map.filter (fun _ v -> v.IsSome)
         |> Map.map (fun _ v -> v.Value)
         |> Map.iter (fun _ v -> schemas.AddMember v)
@@ -36,7 +36,7 @@ let createType asm ns typeName (filePath:string) =
 
         // Add non-object root types
         api.Components.Value.Schemas
-        |> Map.map (Schema.getRootNonObjectType asm ns)
+        |> Map.map (Schema.getNonObjectType asm ns)
         |> Map.filter (fun _ v -> v.IsSome)
         |> Map.map (fun _ v -> v.Value)
         |> Map.iter (fun _ v -> schemas.AddMember v)

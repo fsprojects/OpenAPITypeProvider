@@ -9,7 +9,7 @@ open ProviderImplementation.ProvidedTypes
 let checkRequiredProperties (req:string list) (jObject:JObject) =
     let propertyExist name = jObject.Properties() |> Seq.exists (fun x -> x.Name = name)
     req |> List.iter (fun p ->
-        if propertyExist p |> not then failwith (sprintf "Property %s is required by schema, but no present in JObject" p)
+        if propertyExist p |> not then failwith (sprintf "Property '%s' is required by schema definition, but not present in JSON" p)
     )
 
 type ReflectiveListBuilder = 
@@ -42,7 +42,10 @@ let rec parseForSchema (existingTypes:Map<Schema, ProvidedTypeDefinition>) (sche
     | Object (props, required) ->
         let jObject = json :?> JObject
         jObject |> checkRequiredProperties required
-        props |> Map.map (fun name schema -> 
+        props 
+        |> Map.map (fun name schema -> 
             parseForSchema existingTypes schema (jObject.[name])
-        ) :> obj
+        )
+        |> Map.toList
+        |> box
 
