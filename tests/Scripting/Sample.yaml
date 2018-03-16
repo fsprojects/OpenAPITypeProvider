@@ -148,6 +148,14 @@ components:
         - name
         - subValue
 
+    ObjectArray:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+
     NewPet:
       required:
         - name  
