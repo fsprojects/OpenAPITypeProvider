@@ -68,7 +68,7 @@ let private createNonObjectType asm ns name (schema:Schema) =
         let t = args.[0]
         <@@ 
             let simpleValue = ((%%t : obj ):?> SimpleValue)
-            simpleValue.Value |> Newtonsoft.Json.Linq.JToken.FromObject
+            simpleValue.ToJToken()
         @@>))
         |> typ.AddMember
     typ
@@ -118,14 +118,6 @@ let rec createObjectType asm ns (isOptional:bool) originalName (schema:Schema) e
         // properties
         let existingObjects = props |> Map.fold foldFn existingObjects
         
-        //let findType n s = 
-        //    match existingObjects |> Map |> Map.tryFind s with
-        //    | Some e -> e :> MemberInfo
-        //    | None -> 
-        //        match createObjectType asm ns (isOptional n) n s existingObjects with
-        //        | ValueType.Object o -> o :> MemberInfo
-        //        | ValueType.Property p -> p :> MemberInfo
-
         // constructor
         let getCtorParam (name,typ) =
             if name |> isOptional then
@@ -167,7 +159,7 @@ let rec createObjectType asm ns (isOptional:bool) originalName (schema:Schema) e
             let t = args.[0]
             <@@ 
                 let objectValue = ((%%t : obj ):?> ObjectValue)
-                objectValue.Data |> dict |> Newtonsoft.Json.Linq.JObject.FromObject
+                objectValue.ToJToken()
             @@>))
             |> typ.AddMember
 

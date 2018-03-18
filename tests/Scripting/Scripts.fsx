@@ -6,7 +6,6 @@ open OpenAPIProvider
 
 type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\Scripting\Sample.yaml">
 
-
 let json =
     """
     {
@@ -14,6 +13,11 @@ let json =
         "subValue": {"age":123456}
     }
     """
+
+let x = Provider.Schemas.SimpleArray.Parse("[2]")
+
+x.Values
+x.ToJToken() |> string
 
 let parsed = Provider.Schemas.NestedOne.Parse(json)
 parsed.Name

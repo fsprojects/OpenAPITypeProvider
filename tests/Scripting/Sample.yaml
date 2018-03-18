@@ -149,6 +149,10 @@ components:
       properties:
         name:
           type: string
+        numbers:
+          type: array
+          items:
+            type: string
         subValue:
           type: object
           properties:
@@ -158,13 +162,13 @@ components:
         - name
         - subValue
 
-    ObjectArray:
-      type: array
-      items:
-        type: object
-        properties:
-          name:
-            type: string
+    # ObjectArray:
+    #   type: array
+    #   items:
+    #     type: object
+    #     properties:
+    #       name:
+    #         type: string
 
     NewPet:
       required:

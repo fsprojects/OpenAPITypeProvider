@@ -79,22 +79,54 @@
     <Compile Include="Parser\Operation.fs" />
     <Compile Include="Parser\Document.fs" />
     <Compile Include="Json\Parser.fs" />
-    <None Include="Samples\Contact.yaml" />
-    <None Include="Samples\Document-Petstore.yaml" />
-    <None Include="Samples\Header.yaml" />
-    <None Include="Samples\Info.yaml" />
-    <None Include="Samples\License.yaml" />
-    <None Include="Samples\Operation.yaml" />
-    <None Include="Samples\Parameter.yaml" />
-    <None Include="Samples\RequestBody.yaml" />
-    <None Include="Samples\Response.yaml" />
-    <None Include="Samples\Schema-AllOf.yaml" />
-    <None Include="Samples\Schema-Array.yaml" />
-    <None Include="Samples\Schema-Boolean.yaml" />
-    <None Include="Samples\Schema-Int.yaml" />
-    <None Include="Samples\Schema-Number.yaml" />
-    <None Include="Samples\Schema-Object.yaml" />
-    <None Include="Samples\Schema-String.yaml" />
+    <None Include="Samples\Contact.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Document-Petstore.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Header.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Info.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\License.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Operation.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Parameter.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\RequestBody.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Response.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Schema-AllOf.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Schema-Array.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Schema-Boolean.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Schema-Int.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Schema-Number.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Schema-Object.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Samples\Schema-String.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Compile Include="SampleLoader.fs" />
     <None Include="paket.references" />
   </ItemGroup>

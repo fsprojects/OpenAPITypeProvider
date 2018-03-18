@@ -30,13 +30,11 @@ type OptionConverter() =
         else FSharpValue.MakeUnion(cases.[1], [|value|])
 
 // settings
-let private settings = JsonSerializerSettings()
-//settings.DateFormatString <- "yyyy-MM-ddTHH:mm:ss.fffZ"
-//settings.DateTimeZoneHandling <- DateTimeZoneHandling.Utc
+let settings = JsonSerializerSettings()
 settings.NullValueHandling <- NullValueHandling.Ignore
-//settings.ContractResolver <- CamelCasePropertyNamesContractResolver()
 settings.Converters.Add(OptionConverter())
-//settings.Converters.Add(Newtonsoft.Json.Converters.StringEnumConverter())
+
+let serializer = JsonSerializer.Create(settings)
 
 let serialize obj = JsonConvert.SerializeObject(obj, settings)
 let deserialize<'a> json = JsonConvert.DeserializeObject<'a>(json, settings)
