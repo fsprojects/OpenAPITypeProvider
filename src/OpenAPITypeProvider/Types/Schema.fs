@@ -88,10 +88,6 @@ type ObjectWrapper = {
 
 }
 
-// Nejdrive objekty
-// fce pro non-object typy
-//
-
 type ValueType =
     | Object of ProvidedTypeDefinition
     | Property of ProvidedProperty
@@ -109,7 +105,11 @@ let rec createObjectType asm ns (isOptional:bool) originalName (schema:Schema) e
             match createObjectType asm ns (isOptional n) n s acc with
             | ValueType.Object newType ->
                 typ.AddMember(newType)
-                ProvidedProperty(Names.pascalName n, newType, fun _ -> <@@ newType @@>) |> typ.AddMember
+                ProvidedProperty(Names.pascalName n, newType, fun args -> 
+                    <@@  
+                        let objectValue = ((%%args.[0] : obj) :?> ObjectValue)
+                        objectValue.GetValue(n) :?> ObjectValue
+                    @@>) |> typ.AddMember
                 (s, newType) :: acc
             | ValueType.Property prop ->
                 typ.AddMember(prop)
@@ -153,13 +153,13 @@ let rec createObjectType asm ns (isOptional:bool) originalName (schema:Schema) e
         
 
         // static method Parse
-        //let strSchema = schema |> Serialization.serialize
-        //ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
-        //    <@@ 
-        //        let json = %%args.Head : string
-        //        ObjectValue(json, strSchema, Map.empty)
-        //    @@>), isStatic = true)
-        //    |> typ.AddMember
+        let strSchema = schema |> Serialization.serialize
+        ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
+            <@@ 
+                let json = %%args.Head : string
+                ObjectValue(json, strSchema, Map.empty)
+            @@>), isStatic = true)
+            |> typ.AddMember
 
         typ |> ValueType.Object
     

@@ -3,20 +3,25 @@
 
 open OpenAPIProvider
 
-//type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\ConsoleApp\Sample.yaml">
 type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\Scripting\Sample.yaml">
 
-let y = Provider.Schemas.Error.Parse(""" {"code":36, "message":"AHOJ"} """)
-y.Code
-y.Message
+let json =
+    """
+    {
+        "name":"ABC",
+        "subValue": {"age":123456}
+    }
+    """
 
-let x = Provider.Schemas.NestedOne.Parse(""" { "name":"ahoj", "subValue":{"age":123}} """)
-x.Name
-x.SubValue
+let parsed = Provider.Schemas.NestedOne.Parse(json)
 
+let sub = new Provider.Schemas.NestedOne.SubValue(Some 36)
+sub.Age
 
+let y = new Provider.Schemas.NestedOne("abc", sub)
+y.Name
+y.SubValue.Age
 
+let ab = y.SubValue
+ab.Age
 
-let p = Provider()
-let x = Provider.Schemas.SimpleStringValue.Parse("'abc'")
-x.Value
