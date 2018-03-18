@@ -1,9 +1,11 @@
 #r @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\src\OpenAPITypeProvider\bin\Debug\Newtonsoft.Json.dll"
 #r @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\src\OpenAPITypeProvider\bin\Debug\OpenAPITypeProvider.dll"
 
+open System
 open OpenAPIProvider
 
 type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\Scripting\Sample.yaml">
+
 
 let json =
     """
@@ -14,6 +16,15 @@ let json =
     """
 
 let parsed = Provider.Schemas.NestedOne.Parse(json)
+parsed.Name
+parsed.SubValue.Age
+
+parsed.ToJToken() |> string
+
+let a = Provider.Schemas.MyObject.Parse(""" {"name":"Roman","age":123} """)
+a.Name
+a.Age
+a.ToJToken() |> string
 
 let sub = new Provider.Schemas.NestedOne.SubValue(Some 36)
 sub.Age

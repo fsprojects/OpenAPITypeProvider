@@ -108,7 +108,7 @@ let rec createObjectType asm ns (isOptional:bool) originalName (schema:Schema) e
                 ProvidedProperty(Names.pascalName n, newType, fun args -> 
                     <@@  
                         let objectValue = ((%%args.[0] : obj) :?> ObjectValue)
-                        objectValue.GetValue(n) :?> ObjectValue
+                        objectValue.GetValue(n)
                     @@>) |> typ.AddMember
                 (s, newType) :: acc
             | ValueType.Property prop ->
@@ -154,11 +154,21 @@ let rec createObjectType asm ns (isOptional:bool) originalName (schema:Schema) e
 
         // static method Parse
         let strSchema = schema |> Serialization.serialize
+        
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
             <@@ 
                 let json = %%args.Head : string
                 ObjectValue(json, strSchema, Map.empty)
             @@>), isStatic = true)
+            |> typ.AddMember
+
+        // ToJToken method
+        ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
+            let t = args.[0]
+            <@@ 
+                let objectValue = ((%%t : obj ):?> ObjectValue)
+                objectValue.Data |> dict |> Newtonsoft.Json.Linq.JObject.FromObject
+            @@>))
             |> typ.AddMember
 
         typ |> ValueType.Object

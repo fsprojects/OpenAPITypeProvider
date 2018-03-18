@@ -21,7 +21,12 @@ type ReflectiveListBuilder =
             .MakeGenericMethod([|lType|])
             .Invoke(null, [|args|])
 
-let rec parseForSchema (existingTypes:Map<Schema, ProvidedTypeDefinition>) (schema:Schema) (json:JToken) =
+let some (typ:Type) arg =
+        let unionType = typedefof<option<_>>.MakeGenericType typ
+        let meth = unionType.GetMethod("Some")
+        meth.Invoke(null, [|arg|])
+
+let rec parseForSchema createObj (existingTypes:Map<Schema, ProvidedTypeDefinition>) (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
     | Integer Int32 -> json.Value<int32>() |> box
@@ -36,7 +41,7 @@ let rec parseForSchema (existingTypes:Map<Schema, ProvidedTypeDefinition>) (sche
     | String StringFormat.Date -> json.Value<DateTime>() |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
-        let items = [ for x in jArray do yield parseForSchema existingTypes itemsSchema x ]
+        let items = [ for x in jArray do yield parseForSchema createObj existingTypes itemsSchema x ]
         let typ = itemsSchema |> Inference.getType existingTypes
         ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
@@ -44,8 +49,19 @@ let rec parseForSchema (existingTypes:Map<Schema, ProvidedTypeDefinition>) (sche
         jObject |> checkRequiredProperties required
         props 
         |> Map.map (fun name schema -> 
-            parseForSchema existingTypes schema (jObject.[name])
+            if required |> List.contains name then
+                parseForSchema createObj existingTypes schema (jObject.[name]) |> Some
+            else
+                if jObject.ContainsKey name then
+                    let typ = Inference.getType existingTypes schema
+                    parseForSchema createObj existingTypes schema (jObject.[name]) 
+                    |> some typ
+                    |> Some
+                else None
         )
+        |> Map.filter (fun _ v -> v.IsSome)
+        |> Map.map (fun _ v -> v.Value)
         |> Map.toList
+        |> createObj
         |> box
 

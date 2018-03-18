@@ -125,6 +125,16 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
+    MyObject:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+      required: [name]
+
+    
     Pet:
       allOf:
         - $ref: '#/components/schemas/NewPet'
