@@ -4,8 +4,8 @@ open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
 
-let createType asm ns (info:Info) =
-    let typ = ProvidedTypeDefinition(asm, ns, "Info", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+let createType ctx (info:Info) =
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Info", None, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     // version
     let version = info.Version
@@ -27,13 +27,13 @@ let createType asm ns (info:Info) =
 
     // info object
     if info.Contact.IsSome then
-        let contact = Contact.createType asm ns info.Contact.Value
+        let contact = Contact.createType ctx info.Contact.Value
         contact |> typ.AddMember
         ProvidedProperty("Contact", contact, fun _ -> <@@ obj() @@>) |> typ.AddMember
     
     // license object
     if info.License.IsSome then
-        let license = License.createType asm ns info.License.Value
+        let license = License.createType ctx info.License.Value
         license |> typ.AddMember
         ProvidedProperty("License", license, fun _ -> <@@ obj() @@>) |> typ.AddMember
 

@@ -19,8 +19,9 @@ let x = Provider.Schemas.SimpleArray.Parse("[2]")
 x.Values
 x.ToJToken() |> string
 
-let parsed = Provider.Schemas.NestedOne.Parse(json)
+let parsed = new Provider.Schemas.NestedOne("TEST", new Provider.Schemas.NestedOne.SubValue(Some 36),Some ["aaa"])
 parsed.Name
+parsed.Numbers
 parsed.SubValue.Age
 
 parsed.ToJToken() |> string

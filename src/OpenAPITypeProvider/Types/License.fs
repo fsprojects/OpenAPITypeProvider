@@ -3,8 +3,8 @@ module OpenAPITypeProvider.Types.License
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Specification
 
-let createType asm ns (license:License) =
-    let typ = ProvidedTypeDefinition(asm, ns, "License", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+let createType ctx (license:License) =
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "License", None, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     // name
     let name = license.Name

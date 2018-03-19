@@ -3,8 +3,8 @@ module OpenAPITypeProvider.Types.Contact
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Specification
 
-let createType asm ns (contact:Contact) =
-    let typ = ProvidedTypeDefinition(asm, ns, "Contact", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+let createType ctx (contact:Contact) =
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Contact", None, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     // name
     if contact.Name.IsSome then

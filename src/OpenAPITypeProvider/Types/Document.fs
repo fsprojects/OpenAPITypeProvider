@@ -3,8 +3,8 @@ module OpenAPITypeProvider.Types.Document
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Parser
 
-let createType asm ns typeName (filePath:string) =
-    let typ = ProvidedTypeDefinition(asm, ns, typeName, None, hideObjectMethods = true, nonNullable = true, isErased = true)
+let createType ctx typeName (filePath:string) =
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, typeName, None, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     let api = filePath |> Document.loadFromYamlFile
 
@@ -16,7 +16,7 @@ let createType asm ns typeName (filePath:string) =
     ProvidedProperty("Version", typeof<string>, (fun _ -> <@@ version @@>)) |> typ.AddMember
 
     // info object
-    let info = Info.createType asm ns api.Info
+    let info = Info.createType ctx api.Info
     info |> typ.AddMember
     ProvidedProperty("Info", info, fun _ -> <@@ obj() @@>) |> typ.AddMember
     
@@ -24,11 +24,11 @@ let createType asm ns typeName (filePath:string) =
     if api.Components.IsSome then
         
         // Schemas
-        let schemas = ProvidedTypeDefinition(asm, ns, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+        let schemas = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         // Add object root types
         api.Components.Value.Schemas
-        |> Map.map (Schema.getObjectType asm ns)
+        |> Map.map (Schema.Object.tryCreateType ctx)
         |> Map.filter (fun _ v -> v.IsSome)
         |> Map.map (fun _ v -> v.Value)
         |> Map.iter (fun _ v -> schemas.AddMember v)
@@ -36,7 +36,7 @@ let createType asm ns typeName (filePath:string) =
 
         // Add non-object root types
         api.Components.Value.Schemas
-        |> Map.map (Schema.getNonObjectType asm ns)
+        |> Map.map (Schema.NonObject.tryCreateType ctx)
         |> Map.filter (fun _ v -> v.IsSome)
         |> Map.map (fun _ v -> v.Value)
         |> Map.iter (fun _ v -> schemas.AddMember v)

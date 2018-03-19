@@ -125,6 +125,28 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
+    
+    # Empty: {}
+
+    # PaginatedList:
+    #   type: object
+    #   properties:
+    #     data:
+    #       type: array
+    #       items:
+    #         type: object
+    #     page:
+    #       type: integer
+    #     pageSize:
+    #       type: integer
+    #     total:
+    #       type: integer
+    #   required:
+    #     - data
+    #     - page
+    #     - pageSize
+    #     - total
+
     MyObject:
       type: object
       properties:
