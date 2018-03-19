@@ -28,13 +28,14 @@ let createType ctx typeName (filePath:string) =
         let schemas = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         // Add object root types
-        api.Components.Value.Schemas
-        |> Map.filter (fun _ s -> s <> Schema.Empty)
-        |> Map.map (Schema.Object.tryCreateType ctx)
-        |> Map.filter (fun _ v -> v.IsSome)
-        |> Map.map (fun _ v -> v.Value)
-        |> Map.iter (fun _ v -> schemas.AddMember v)
-
+        let createdSchemas = 
+            api.Components.Value.Schemas
+            |> Map.filter (fun _ s -> s <> Schema.Empty)
+            |> Map.map (Schema.Object.createTypes ctx)
+            |> Map.toList
+            |> List.collect snd
+        
+        createdSchemas |> List.map snd |> List.iter schemas.AddMember
 
         // Add non-object root types
         api.Components.Value.Schemas

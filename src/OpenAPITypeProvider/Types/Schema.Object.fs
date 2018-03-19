@@ -10,9 +10,9 @@ open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
-let asOption (typ:#Type) = typedefof<option<_>>.MakeGenericType typ
+let private asOption (typ:#Type) = typedefof<option<_>>.MakeGenericType typ
 
-let createProperty isOptional originalName (schema:Schema) existingObjects =
+let private createProperty isOptional originalName (schema:Schema) existingObjects =
     let name = Names.pascalName originalName
     let typ = schema |> Inference.getType (Map existingObjects) |> (fun x -> if isOptional then x |> asOption else x)
     ProvidedProperty(name, typ, (fun args -> 
@@ -22,7 +22,7 @@ let createProperty isOptional originalName (schema:Schema) existingObjects =
             objectValue.GetValue(originalName)
         @@>))
 
-let rec createObject ctx originalName (schema:Schema) existingObjects =
+let rec private createObject ctx originalName (schema:Schema) (existingObjects:(Schema * ProvidedTypeDefinition) list) : (Schema * ProvidedTypeDefinition) list =
     let name = Names.pascalName originalName
     match schema with
     | Schema.Object (props, required) ->
@@ -34,14 +34,15 @@ let rec createObject ctx originalName (schema:Schema) existingObjects =
             match s with
             | s when s = Schema.Empty -> acc
             | Schema.Object _ ->
-                let newType = createObject ctx n s acc
-                typ.AddMember(newType)
+                let newTypes = createObject ctx n s acc
+                let newType = newTypes.Head |> snd
+                //typ.AddMember(newType)
                 ProvidedProperty(Names.pascalName n, newType, fun args -> 
                     <@@  
                         let objectValue = ((%%args.[0] : obj) :?> ObjectValue)
                         objectValue.GetValue(n)
                     @@>) |> typ.AddMember
-                (s, newType) :: acc
+                newTypes
             | _ ->
                 createProperty (isOptional n) n s acc |> typ.AddMember
                 acc
@@ -94,15 +95,16 @@ let rec createObject ctx originalName (schema:Schema) existingObjects =
             @@>))
             |> typ.AddMember
 
-        typ
+        (schema, typ) :: existingObjects
     
     | _ -> failwith "YOLO"
         
 
-let tryCreateType ctx name schema =
+let createTypes ctx name schema =
     match schema with
     | Object _ ->
         match schema <> Schema.Empty with
-        | true -> createObject ctx name schema [] |> Some
-        | false -> None
-    | _ -> None
+        | true -> 
+            createObject ctx name schema []
+        | false -> []
+    | _ -> []
