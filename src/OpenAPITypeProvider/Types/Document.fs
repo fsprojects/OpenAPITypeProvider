@@ -37,11 +37,12 @@ let createType ctx typeName (filePath:string) =
 
 
         // Add non-object root types
-        //api.Components.Value.Schemas
-        //|> Map.map (Schema.NonObject.tryCreateType ctx)
-        //|> Map.filter (fun _ v -> v.IsSome)
-        //|> Map.map (fun _ v -> v.Value)
-        //|> Map.iter (fun _ v -> schemas.AddMember v)
+        api.Components.Value.Schemas
+        |> Map.filter (fun _ s -> s <> Schema.Empty)
+        |> Map.map (Schema.NonObject.tryCreateType ctx)
+        |> Map.filter (fun _ v -> v.IsSome)
+        |> Map.map (fun _ v -> v.Value)
+        |> Map.iter (fun _ v -> schemas.AddMember v)
 
 
 

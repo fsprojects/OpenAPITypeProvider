@@ -25,14 +25,15 @@ let createProperty isOptional originalName (schema:Schema) existingObjects =
 let rec createObject ctx originalName (schema:Schema) existingObjects =
     let name = Names.pascalName originalName
     match schema with
-    | Schema.Object (props, required) when props.Count > 0 ->
+    | Schema.Object (props, required) ->
         let isOptional n = required |> List.contains n |> not
         
         let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         let foldFn acc n s =
             match s with
-            | Object _ ->
+            | s when s = Schema.Empty -> acc
+            | Schema.Object _ ->
                 let newType = createObject ctx n s acc
                 typ.AddMember(newType)
                 ProvidedProperty(Names.pascalName n, newType, fun args -> 
