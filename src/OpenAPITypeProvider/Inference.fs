@@ -17,7 +17,7 @@ let private getStringType = function
     | StringFormat.Byte -> typeof<byte>
     | StringFormat.Date | StringFormat.DateTime -> typeof<DateTime>
     
-let rec getType (existingTypes:Map<Schema, ProvidedTypeDefinition>) schema = 
+let rec getType (existingTypes:(Schema * ProvidedTypeDefinition) list) schema = 
     match schema with
     | Boolean -> typeof<bool>
     | Integer format -> format |> getIntType
@@ -27,4 +27,6 @@ let rec getType (existingTypes:Map<Schema, ProvidedTypeDefinition>) schema =
         let typ = schema |> getType existingTypes
         ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
     | Object _ -> 
-        existingTypes |> Map.find schema :> Type
+        existingTypes
+        |> Map
+        |> Map.find schema :> Type

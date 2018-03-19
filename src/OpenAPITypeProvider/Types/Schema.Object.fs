@@ -14,7 +14,7 @@ let private asOption (typ:#Type) = typedefof<option<_>>.MakeGenericType typ
 
 let private createProperty isOptional originalName (schema:Schema) existingObjects =
     let name = Names.pascalName originalName
-    let typ = schema |> Inference.getType (Map existingObjects) |> (fun x -> if isOptional then x |> asOption else x)
+    let typ = schema |> Inference.getType existingObjects |> (fun x -> if isOptional then x |> asOption else x)
     ProvidedProperty(name, typ, (fun args -> 
         let t = args.[0]
         <@@  
@@ -58,7 +58,7 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
         let ctorParams = 
             props 
             |> Map.toList 
-            |> List.map (fun (n,s) -> n, s |> Inference.getType (Map existingObjects))
+            |> List.map (fun (n,s) -> n, s |> Inference.getType existingObjects)
             |> List.sortBy (fun (n,_) -> isOptional n)
             |> List.map getCtorParam 
         
@@ -81,7 +81,7 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
             <@@ 
                 let json = %%args.Head : string
-                ObjectValue(json, strSchema, Map.empty)
+                ObjectValue(json, strSchema, List.empty)
             @@>), isStatic = true)
             |> typ.AddMember
 

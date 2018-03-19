@@ -14,36 +14,16 @@ let json =
     }
     """
 
-
-
 let x = Provider.Schemas.NestedOne.Parse(json)
 
 x.Name
 x.Numbers
+x.SubValue.Age
+
 x.ToJToken() |> string
-x.ToJToken() |> string
 
-let parsed = new Provider.Schemas.NestedOne("TEST", new Provider.Schemas.NestedOne.SubValue(Some 36))
-
-
-parsed.Name
-parsed.Numbers
-parsed.SubValue.Age
-
-parsed.ToJToken() |> string
-
-let a = Provider.Schemas.MyObject.Parse(""" {"name":"Roman","age":123} """)
-a.Name
-a.Age
-a.ToJToken() |> string
-
-let sub = new Provider.Schemas.NestedOne.SubValue(Some 36)
-sub.Age
-
-let y = new Provider.Schemas.NestedOne("abc", sub)
-y.Name
-y.SubValue.Age
-
-let ab = y.SubValue
-ab.Age
-
+let item = new Provider.Schemas.ObjectArrayItem(Some "AAAA")
+item.Name
+item.ToJToken() |> string
+let items = new Provider.Schemas.ObjectArray([item])
+items.ToJToken() |> string

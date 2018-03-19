@@ -26,7 +26,7 @@ let some (typ:Type) arg =
         let meth = unionType.GetMethod("Some")
         meth.Invoke(null, [|arg|])
 
-let rec parseForSchema createObj (existingTypes:Map<Schema, ProvidedTypeDefinition>) (schema:Schema) (json:JToken) =
+let rec parseForSchema createObj (existingTypes:(Schema * ProvidedTypeDefinition) list) (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
     | Integer Int32 -> json.Value<int32>() |> box

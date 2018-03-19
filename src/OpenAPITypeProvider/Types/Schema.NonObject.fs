@@ -11,10 +11,8 @@ open Microsoft.FSharp.Quotations
 let private createNonObjectType ctx existingTypes name (schema:Schema) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let existingTypes = Map(existingTypes)
     let schemaType = schema |> Inference.getType existingTypes
     let strSchema = schema |> Serialization.serialize
-
     // constructor
     ProvidedConstructor([ProvidedParameter("value", schemaType)], (fun args ->
         let value = Expr.Coerce(args.Head, typeof<obj>)
@@ -26,7 +24,7 @@ let private createNonObjectType ctx existingTypes name (schema:Schema) =
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
         <@@ 
             let json = %%args.Head : string
-            SimpleValue(json, strSchema, existingTypes)
+            SimpleValue(json, strSchema, List.empty)
         @@>), isStatic = true)
         |> typ.AddMember
         
