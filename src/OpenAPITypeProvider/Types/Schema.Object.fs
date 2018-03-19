@@ -36,7 +36,6 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
             | Schema.Object _ ->
                 let newTypes = createObject ctx n s acc
                 let newType = newTypes.Head |> snd
-                //typ.AddMember(newType)
                 ProvidedProperty(Names.pascalName n, newType, fun args -> 
                     <@@  
                         let objectValue = ((%%args.[0] : obj) :?> ObjectValue)
@@ -97,14 +96,15 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
 
         (schema, typ) :: existingObjects
     
-    | _ -> failwith "YOLO"
-        
+    | _ -> failwith "Please, report this error as Github issue - this should not happen!"
+
+let private getNameForSubArrayObject (name:string) = name + "Item"        
 
 let createTypes ctx name schema =
     match schema with
-    | Object _ ->
-        match schema <> Schema.Empty with
-        | true -> 
-            createObject ctx name schema []
-        | false -> []
+    | Array s when s <> Schema.Empty ->
+        match s with
+        | Object _ -> createObject ctx (getNameForSubArrayObject name) s []
+        | _ -> []
+    | Object _ -> createObject ctx name schema []
     | _ -> []

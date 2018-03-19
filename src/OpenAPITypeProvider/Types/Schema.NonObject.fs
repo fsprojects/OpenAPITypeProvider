@@ -8,10 +8,11 @@ open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
-let private createNonObjectType ctx name (schema:Schema) =
+let private createNonObjectType ctx existingTypes name (schema:Schema) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let schemaType = schema |> Inference.getType Map.empty
+    let existingTypes = Map(existingTypes)
+    let schemaType = schema |> Inference.getType existingTypes
     let strSchema = schema |> Serialization.serialize
 
     // constructor
@@ -25,7 +26,7 @@ let private createNonObjectType ctx name (schema:Schema) =
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
         <@@ 
             let json = %%args.Head : string
-            SimpleValue(json, strSchema, Map.empty)
+            SimpleValue(json, strSchema, existingTypes)
         @@>), isStatic = true)
         |> typ.AddMember
         
@@ -53,11 +54,11 @@ let private createNonObjectType ctx name (schema:Schema) =
     typ
 
 
-let tryCreateType ctx name schema =
+let tryCreateType ctx existingTypes name schema =
     match schema with
     | Schema.Object _ -> None
     | Schema.Boolean 
     | Schema.Array _
     | Schema.Integer _
     | Schema.Number _
-    | Schema.String _ -> schema |> createNonObjectType ctx name |> Some
+    | Schema.String _ -> schema |> createNonObjectType ctx existingTypes name |> Some
