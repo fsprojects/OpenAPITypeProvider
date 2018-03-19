@@ -4,9 +4,11 @@ open YamlDotNet.RepresentationModel
 
 // finders
 let findByName name (node:YamlMappingNode) =
-    node.Children 
-    |> Seq.find (fun x -> x.Key.ToString() = name) 
-    |> (fun x -> x.Value)
+    try
+        node.Children 
+        |> Seq.find (fun x -> x.Key.ToString() = name) 
+        |> (fun x -> x.Value)
+    with _ -> failwith <| sprintf "Cannot find '%s' in %A" name node
 
 let findByNameM name mapFn = findByName name >> mapFn
 

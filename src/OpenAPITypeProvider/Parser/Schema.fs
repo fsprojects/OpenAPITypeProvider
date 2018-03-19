@@ -73,16 +73,16 @@ let rec parse (rootNode:YamlMappingNode) (node:YamlMappingNode) =
         | Boolean -> Schema.Boolean
         | Number -> node |> tryParseFormat numberFormatFromString |> Schema.Number
         | _ ->
-            let props = 
-                node 
-                |> findByNameM "properties" toMappingNode
-                |> toMappingNode |> toNamedMapM (parse rootNode)
-            let required = 
-                node |> tryFindByName "required" 
-                |> Option.map seqValue
-                |> Option.map (List.map (fun x -> x.ToString()))
-                |> optionToList
-            Schema.Object(props, required)
+            match node |> tryFindByNameM "properties" toMappingNode with
+            | Some p ->
+                let props = p |> toMappingNode |> toNamedMapM (parse rootNode)
+                let required = 
+                    node |> tryFindByName "required" 
+                    |> Option.map seqValue
+                    |> Option.map (List.map (fun x -> x.ToString()))
+                    |> optionToList
+                Schema.Object(props, required)
+            | None -> Schema.Empty
 
     let parseRef refString =
         refString 

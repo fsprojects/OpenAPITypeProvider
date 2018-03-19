@@ -6,5 +6,6 @@ open OpenAPITypeProvider.Tests
 
 [<Test>]
 let ``Parses document (Petstore)``() = 
-    "Document-Petstore.yaml" |> SampleLoader.parse Document.parse |> ignore
+    let x = "Document-Petstore.yaml" |> SampleLoader.parse Document.parse |> ignore
+    let y = x
     Assert.Pass()

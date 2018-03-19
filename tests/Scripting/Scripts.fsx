@@ -14,12 +14,18 @@ let json =
     }
     """
 
-let x = Provider.Schemas.SimpleArray.Parse("[2]")
 
-x.Values
+
+let x = Provider.Schemas.NestedOne.Parse(json)
+
+x.Name
+x.Numbers
+x.ToJToken() |> string
 x.ToJToken() |> string
 
-let parsed = new Provider.Schemas.NestedOne("TEST", new Provider.Schemas.NestedOne.SubValue(Some 36),Some ["aaa"])
+let parsed = new Provider.Schemas.NestedOne("TEST", new Provider.Schemas.NestedOne.SubValue(Some 36))
+
+
 parsed.Name
 parsed.Numbers
 parsed.SubValue.Age

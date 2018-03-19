@@ -83,7 +83,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Samples\Document-Petstore.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Samples\Header.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

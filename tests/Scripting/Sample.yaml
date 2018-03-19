@@ -126,7 +126,7 @@ paths:
 components:
   schemas:
     
-    # Empty: {}
+    Empty: {}
 
     # PaginatedList:
     #   type: object

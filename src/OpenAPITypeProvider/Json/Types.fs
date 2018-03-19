@@ -21,7 +21,9 @@ type ObjectValue(d:(string * obj) list) =
             let obj = JObject()
             value.Data 
             |> Seq.iter (fun (k,v) -> 
-                if v.GetType() = typeof<ObjectValue> then
+                if v = null then
+                    ()
+                else if v.GetType() = typeof<ObjectValue> then
                     obj.[k] <- getObj (v :?> ObjectValue)
                 else 
                     obj.[k] <- JToken.FromObject(v, Serialization.serializer)

@@ -25,7 +25,7 @@ let createProperty isOptional originalName (schema:Schema) existingObjects =
 let rec createObject ctx originalName (schema:Schema) existingObjects =
     let name = Names.pascalName originalName
     match schema with
-    | Schema.Object (props, required) ->
+    | Schema.Object (props, required) when props.Count > 0 ->
         let isOptional n = required |> List.contains n |> not
         
         let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
@@ -100,5 +100,8 @@ let rec createObject ctx originalName (schema:Schema) existingObjects =
 
 let tryCreateType ctx name schema =
     match schema with
-    | Schema.Object _ -> createObject ctx name schema [] |> Some
+    | Object _ ->
+        match schema <> Schema.Empty with
+        | true -> createObject ctx name schema [] |> Some
+        | false -> None
     | _ -> None
