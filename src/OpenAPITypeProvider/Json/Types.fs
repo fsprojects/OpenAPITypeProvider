@@ -7,10 +7,12 @@ open Newtonsoft.Json.Linq
 
 type ObjectValue(d:(string * obj) list) =
     let mutable data = d |> Map |> System.Collections.Generic.Dictionary
-    new(json, schema) =
+    
+    static member Parse(json, schema) =
         let schema = schema |> Serialization.deserialize<Schema>
         let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
         ObjectValue(v.GetData())
+
     member __.SetValue(x, y) = data.[x] <- y
     member __.GetValue x = if data.ContainsKey x then data.[x] else null
     member __.GetData() = data |> Seq.map (|KeyValue|) |> Seq.toList

@@ -9,7 +9,7 @@ open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
 
-let createType ctx name (operation:Operation) =
+let createType ctx findOrCreateSchemaFn name (operation:Operation) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     
@@ -39,7 +39,7 @@ let createType ctx name (operation:Operation) =
     
     // RequestBody
     if operation.RequestBody.IsSome then
-        let rb = operation.RequestBody.Value |> RequestBody.createType ctx "RequestBody"
+        let rb = operation.RequestBody.Value |> RequestBody.createType ctx findOrCreateSchemaFn "RequestBody"
         rb |> typ.AddMember
         ProvidedProperty("RequestBody", rb, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
 

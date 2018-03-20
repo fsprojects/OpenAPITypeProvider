@@ -89,6 +89,7 @@
     <Compile Include="Types\Schema.NonObject.fs" />
     <Compile Include="Types\Response.fs" />
     <Compile Include="Types\Parameter.fs" />
+    <Compile Include="Types\MediaType.fs" />
     <Compile Include="Types\RequestBody.fs" />
     <Compile Include="Types\Operation.fs" />
     <Compile Include="Types\Path.fs" />

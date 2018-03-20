@@ -21,36 +21,39 @@ let createType ctx typeName (filePath:string) =
     info |> typ.AddMember
     ProvidedProperty("Info", info, fun _ -> <@@ obj() @@>) |> typ.AddMember
     
+    
+
     // components object
-    if api.Components.IsSome then
+    let allSchemas = 
+        if api.Components.IsSome then
         
-        // Schemas
-        let schemas = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+            // Schemas
+            let schemas = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
         
-        // Add object root types
-        let createdSchemas = 
-            api.Components.Value.Schemas
-            |> Map.filter (fun _ s -> s <> Schema.Empty)
-            |> Map.map (Schema.Object.createTypes ctx)
-            |> Map.toList
-            |> List.collect snd
+            // Add object root types
+            let createdSchemas = 
+                api.Components.Value.Schemas
+                |> Map.filter (fun _ s -> s <> Schema.Empty)
+                |> Map.map (Schema.Object.createTypes ctx)
+                |> Map.toList
+                |> List.collect snd
         
-        createdSchemas |> List.map snd |> List.iter schemas.AddMember
+            createdSchemas |> List.map snd |> List.iter schemas.AddMember
 
-        // Add non-object root types
-        let createdNonObjSchemas = 
-            api.Components.Value.Schemas
-            |> Map.filter (fun _ s -> s <> Schema.Empty)
-            |> Map.map (Schema.NonObject.createTypes ctx createdSchemas)
-            |> Map.toList
-            |> List.collect snd
+            // Add non-object root types
+            let createdNonObjSchemas = 
+                api.Components.Value.Schemas
+                |> Map.filter (fun _ s -> s <> Schema.Empty)
+                |> Map.map (Schema.NonObject.createTypes ctx createdSchemas)
+                |> Map.toList
+                |> List.collect snd
         
-        createdNonObjSchemas |> List.map snd |> List.iter schemas.AddMember
-
-        let allSchemas = createdSchemas @ createdNonObjSchemas
-
-        schemas |> typ.AddMember
-        ProvidedProperty("Schemas", schemas, isStatic = true) |> typ.AddMember
+            createdNonObjSchemas |> List.map snd |> List.iter schemas.AddMember
+            schemas |> typ.AddMember
+            ProvidedProperty("Schemas", schemas, isStatic = true) |> typ.AddMember
+            
+            createdSchemas @ createdNonObjSchemas
+        else []
 
         //// Responses
         //let responses = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Responses", None, hideObjectMethods = true, nonNullable = true, isErased = true)
@@ -61,9 +64,16 @@ let createType ctx typeName (filePath:string) =
 
         //responses |> typ.AddMember
         //ProvidedProperty("Responses", responses, isStatic = true) |> typ.AddMember
-    
+    let findOrCreateSchema name schema =
+        match allSchemas |> List.tryFind (fun (s,t) -> s = schema) with
+        | Some found -> (true, found |> snd)
+        | None ->
+            let objects = Schema.Object.createTypes ctx name schema
+            let others = Schema.NonObject.createTypes ctx allSchemas name schema
+            objects @ others |> List.head |> snd |> (fun x -> (false, x))
+
     // path
-    let path = api.Paths |> Path.createTypes ctx 
+    let path = api.Paths |> Path.createTypes ctx findOrCreateSchema
     path |> typ.AddMember
     ProvidedProperty("Path", path, fun _ -> <@@ obj() @@>) |> typ.AddMember
 

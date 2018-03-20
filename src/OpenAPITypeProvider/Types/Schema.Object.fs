@@ -49,6 +49,7 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
         // properties
         let existingObjects = props |> Map.fold foldFn existingObjects
         
+        let strSchema = schema |> Serialization.serialize
         // constructor
         let getCtorParam (name,typ) =
             if name |> isOptional then
@@ -76,12 +77,11 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
         
 
         // static method Parse
-        let strSchema = schema |> Serialization.serialize
         
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
             <@@ 
                 let json = %%args.Head : string
-                ObjectValue(json, strSchema)
+                ObjectValue.Parse(json, strSchema)
             @@>), isStatic = true)
             |> typ.AddMember
 

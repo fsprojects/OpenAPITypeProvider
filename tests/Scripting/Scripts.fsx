@@ -8,12 +8,13 @@ type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvid
 
 let provider = new Provider()
 
-provider.Path.
+provider.Path.``/pets``.Get.
 
-let x = new Provider.Responses.Error()
 
-let o = Provider.Schemas.MyObject.Parse(""" { "date": "2018-03-20T08:34:32.6913454Z","name": "Roman" }""")
+
+let o = Provider.Schemas.MyObject.Parse(""" { "date": "2018-03-20T08:34:32.6913454Z" }""")
 o.Date
+o.Name
 o.ToJToken() |> string
 
 let item = new Provider.Schemas.ObjectArrayItem(Some "AAAA")
