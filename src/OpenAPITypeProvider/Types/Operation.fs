@@ -33,8 +33,14 @@ let createType ctx name (operation:Operation) =
         ProvidedProperty("OperationId", typeof<string>, (fun _ -> <@@ opId @@>)) |> typ.AddMember
     
     // Parameters
-    let pars = operation.Parameters |> Parameter.createTypes ctx 
-    pars |> typ.AddMember
-    ProvidedProperty("Parameters", pars, fun _ -> <@@ obj() @@>) |> typ.AddMember
+    //let pars = operation.Parameters |> Parameter.createTypes ctx 
+    //pars |> typ.AddMember
+    //ProvidedProperty("Parameters", pars, fun _ -> <@@ obj() @@>) |> typ.AddMember
     
+    // RequestBody
+    if operation.RequestBody.IsSome then
+        let rb = operation.RequestBody.Value |> RequestBody.createType ctx "RequestBody"
+        rb |> typ.AddMember
+        ProvidedProperty("RequestBody", rb, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
+
     typ

@@ -37,8 +37,6 @@ let createType ctx name (par:Parameter) =
     let aev = par.AllowEmptyValue
     ProvidedProperty("AllowEmptyValue", typeof<bool>, (fun _ -> <@@ aev @@>)) |> typ.AddMember
 
-
-
     typ
 
 let createTypes ctx (pars:Parameter list) =

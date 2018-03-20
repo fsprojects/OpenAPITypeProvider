@@ -23,11 +23,25 @@ let private createType ctx name (path:Path) =
         let desc = path.Description.Value
         ProvidedProperty("Description", typeof<string>, (fun _ -> <@@ desc @@>)) |> typ.AddMember
     
-    // GET
-    if path.Get.IsSome then
-        let get = path.Get.Value |> Operation.createType ctx "Get"
-        get |> typ.AddMember
-        ProvidedProperty("Get", get, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
+    let paths = 
+        [
+            path.Get, "Get"
+            path.Put, "Put"
+            path.Post, "Post"
+            path.Delete, "Delete"
+            path.Options, "Options"
+            path.Head, "Head"
+            path.Patch, "Patch"
+            path.Trace, "Trace"
+        ] 
+        |> List.filter (fun (x,_) -> x.IsSome)
+        |> List.map (fun (x,y) -> x.Value, y)
+    
+    paths |> List.iter (fun (path, name) -> 
+        let p = path|> Operation.createType ctx name
+        p |> typ.AddMember
+        ProvidedProperty(name, p, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
+    )
 
     typ
 
