@@ -32,7 +32,7 @@ type ObjectValue(d:(string * obj) list) =
         this |> getObj
 
 type SimpleValue(value:obj) =
-    new(json, strSchema) =
+    static member Parse(json, strSchema) =
         let schema = strSchema |> Serialization.deserialize<Schema>
         let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema
         SimpleValue(v)

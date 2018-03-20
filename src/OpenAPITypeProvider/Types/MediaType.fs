@@ -18,10 +18,18 @@ let createType ctx findOrCreateSchemaFn name (media:MediaType) =
 
     // static method Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], schemaTyp, (fun args -> 
-        <@@ 
-            let json = %%args.[1] : string
-            ObjectValue.Parse(json,strSchema)
-        @@>))
+        match media.Schema with
+        | Object _ ->
+            <@@ 
+                let json = %%args.[1] : string
+                ObjectValue.Parse(json,strSchema)
+            @@>
+        | _ -> 
+            <@@ 
+                let json = %%args.[1] : string
+                SimpleValue.Parse(json,strSchema)
+            @@>
+        ))
         |> typ.AddMember
 
     typ
