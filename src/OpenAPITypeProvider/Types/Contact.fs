@@ -4,7 +4,7 @@ open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Specification
 
 let createType ctx (contact:Contact) =
-    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Contact", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Contact", Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     // name
     if contact.Name.IsSome then

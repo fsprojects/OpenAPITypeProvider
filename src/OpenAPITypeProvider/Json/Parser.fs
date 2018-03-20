@@ -4,9 +4,8 @@ open System
 open OpenAPITypeProvider.Specification
 open Newtonsoft.Json.Linq
 open OpenAPITypeProvider
-open ProviderImplementation.ProvidedTypes
 
-let checkRequiredProperties (req:string list) (jObject:JObject) =
+let private checkRequiredProperties (req:string list) (jObject:JObject) =
     let propertyExist name = jObject.Properties() |> Seq.exists (fun x -> x.Name = name)
     req |> List.iter (fun p ->
         if propertyExist p |> not then failwith (sprintf "Property '%s' is required by schema definition, but not present in JSON" p)
@@ -21,7 +20,7 @@ type ReflectiveListBuilder =
             .MakeGenericMethod([|lType|])
             .Invoke(null, [|args|])
 
-let some (typ:Type) arg =
+let private some (typ:Type) arg =
         let unionType = typedefof<option<_>>.MakeGenericType typ
         let meth = unionType.GetMethod("Some")
         meth.Invoke(null, [|arg|])
@@ -67,4 +66,3 @@ let rec parseForSchema createObj typeOfObj (schema:Schema) (json:JToken) =
         |> Map.toList
         |> createObj
         |> box
-

@@ -56,13 +56,15 @@ let someOrEmptyList = function
 let (|Ref|_|) (node:YamlMappingNode) = node |> tryFindScalarValue "$ref"
 
 let findByRef (rootNode:YamlMappingNode) (refString:string) =
-    let parts = refString.Split([|'/'|]) |> Array.filter (fun x -> x <> "#")
-    let foldFn (node:YamlMappingNode) (name:string) =
-        node.Children 
-        |> Seq.filter (fun x -> x.Key.ToString() = name)
-        |> Seq.head
-        |> (fun x -> x.Value |> toMappingNode)
-    parts |> Array.fold foldFn rootNode
+    try
+        let parts = refString.Split([|'/'|]) |> Array.filter (fun x -> x <> "#")
+        let foldFn (node:YamlMappingNode) (name:string) =
+            node.Children 
+            |> Seq.filter (fun x -> x.Key.ToString() = name)
+            |> Seq.head
+            |> (fun x -> x.Value |> toMappingNode)
+        parts |> Array.fold foldFn rootNode
+    with _ -> failwith <| sprintf "Cannot find '%s' in node %A" refString rootNode
 
 let findSchema mapFn node =
     match node |> tryFindByName "schema" with

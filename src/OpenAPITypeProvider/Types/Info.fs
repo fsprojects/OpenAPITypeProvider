@@ -5,7 +5,7 @@ open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
 
 let createType ctx (info:Info) =
-    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Info", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Info", Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     // version
     let version = info.Version

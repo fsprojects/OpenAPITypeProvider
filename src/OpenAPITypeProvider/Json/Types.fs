@@ -10,14 +10,14 @@ type ObjectValue(d:(string * obj) list) =
     new(json, schema) =
         let schema = schema |> Serialization.deserialize<Schema>
         let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
-        ObjectValue(v.Data)
+        ObjectValue(v.GetData())
     member __.SetValue(x, y) = data.[x] <- y
     member __.GetValue x = if data.ContainsKey x then data.[x] else null
-    member __.Data = data |> Seq.map (|KeyValue|) |> Seq.toList
+    member __.GetData() = data |> Seq.map (|KeyValue|) |> Seq.toList
     member this.ToJToken() = 
         let rec getObj (value:ObjectValue) =
             let obj = JObject()
-            value.Data 
+            value.GetData() 
             |> Seq.iter (fun (k,v) -> 
                 if v = null then
                     ()
@@ -33,13 +33,9 @@ type SimpleValue(value:obj) =
     new(json, strSchema) =
         let schema = strSchema |> Serialization.deserialize<Schema>
         let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema
-        //match schema with
-        //| Array (Object _ ) -> (v :?> List<ObjectValue>) |> SimpleValue
-        //| _ -> v |> SimpleValue
         SimpleValue(v)
     member __.ToJToken() = 
         let valueType = value.GetType()
-        System.Console.WriteLine(valueType)
         if valueType = typeof<List<ObjectValue>> then
             let values = value :?> List<ObjectValue>
             let arr = JArray()

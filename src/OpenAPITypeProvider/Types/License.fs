@@ -4,7 +4,7 @@ open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Specification
 
 let createType ctx (license:License) =
-    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "License", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "License", Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     
     // name
     let name = license.Name

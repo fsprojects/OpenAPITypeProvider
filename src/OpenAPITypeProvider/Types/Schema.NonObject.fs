@@ -49,14 +49,14 @@ let private createNonObjectType ctx existingTypes name (schema:Schema) =
             simpleValue.ToJToken()
         @@>))
         |> typ.AddMember
-    typ
+    (schema, typ)
 
 
-let tryCreateType ctx existingTypes name schema =
+let createTypes ctx existingTypes name schema =
     match schema with
-    | Schema.Object _ -> None
+    | Schema.Object _ -> []
     | Schema.Boolean 
     | Schema.Array _
     | Schema.Integer _
     | Schema.Number _
-    | Schema.String _ -> schema |> createNonObjectType ctx existingTypes name |> Some
+    | Schema.String _ -> schema |> createNonObjectType ctx existingTypes name |> List.singleton
