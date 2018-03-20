@@ -45,7 +45,7 @@ let rec parseForSchema createObj typeOfObj (schema:Schema) (json:JToken) =
         let typ = 
             match itemsSchema with
             | Object _ -> typeOfObj
-            | _ -> itemsSchema |> Inference.getPropertyType
+            | _ -> itemsSchema |> Inference.getSimpleType
         ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
@@ -56,7 +56,7 @@ let rec parseForSchema createObj typeOfObj (schema:Schema) (json:JToken) =
                 parseForSchema createObj typeOfObj schema (jObject.[name]) |> Some
             else
                 if jObject.ContainsKey name then
-                    let typ = Inference.getPropertyType schema
+                    let typ = Inference.getSimpleType schema
                     parseForSchema createObj typeOfObj schema (jObject.[name]) 
                     |> some typ
                     |> Some

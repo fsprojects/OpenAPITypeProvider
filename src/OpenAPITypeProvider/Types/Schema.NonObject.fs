@@ -11,7 +11,7 @@ open Microsoft.FSharp.Quotations
 let private createNonObjectType ctx existingTypes name (schema:Schema) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let schemaType = schema |> Inference.getType existingTypes
+    let schemaType = schema |> Inference.getComplexType existingTypes
     let strSchema = schema |> Serialization.serialize
     // constructor
     ProvidedConstructor([ProvidedParameter("value", schemaType)], (fun args ->

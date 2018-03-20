@@ -17,21 +17,22 @@ let private getStringType = function
     | StringFormat.Byte -> typeof<byte>
     | StringFormat.Date | StringFormat.DateTime -> typeof<DateTime>
 
-let getPropertyType schema =
+let getSimpleType schema =
     match schema with
     | Boolean -> typeof<bool>
     | Integer format -> format |> getIntType
     | Number format -> format |> getNumberType
     | String format -> format |> getStringType
+    | _ -> failwith "Please, report this error as Github issue - this should not happen!"
 
-let rec getType (existingTypes:(Schema * ProvidedTypeDefinition) list) schema = 
+let rec getComplexType (existingTypes:(Schema * ProvidedTypeDefinition) list) schema = 
     match schema with
     | Boolean -> typeof<bool>
     | Integer format -> format |> getIntType
     | Number format -> format |> getNumberType
     | String format -> format |> getStringType
     | Array schema -> 
-        let typ = schema |> getType existingTypes
+        let typ = schema |> getComplexType existingTypes
         ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
     | Object _ -> 
         existingTypes

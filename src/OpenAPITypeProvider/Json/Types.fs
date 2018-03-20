@@ -28,13 +28,33 @@ type ObjectValue(d:(string * obj) list) =
             )
             obj
         this |> getObj
-        
 
-type SimpleValue(value) =
+type SimpleValue(value:obj) =
     new(json, strSchema) =
         let schema = strSchema |> Serialization.deserialize<Schema>
         let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema
+        //match schema with
+        //| Array (Object _ ) -> (v :?> List<ObjectValue>) |> SimpleValue
+        //| _ -> v |> SimpleValue
         SimpleValue(v)
-    member __.ToJToken() = JToken.FromObject(value, Serialization.serializer)
-    member __.Value = value
-        
+    member __.ToJToken() = 
+        let valueType = value.GetType()
+        System.Console.WriteLine(valueType)
+        if valueType = typeof<List<ObjectValue>> then
+            let values = value :?> List<ObjectValue>
+            let arr = JArray()
+            values |> List.iter (fun x -> x.ToJToken() |> arr.Add)
+            arr :> JToken
+        else if valueType = typeof<List<obj>> then
+            let values = value :?> List<obj>
+            let arr = JArray()
+            values |> List.iter (fun x -> (x :?> ObjectValue).ToJToken() |> arr.Add)
+            arr :> JToken
+        else
+            JToken.FromObject(value, Serialization.serializer)
+    member __.Value = 
+        if value.GetType() = typeof<List<ObjectValue>> then
+            let values = value :?> List<ObjectValue>
+            values |> List.map (fun x -> box x) |> box
+        else
+            value
