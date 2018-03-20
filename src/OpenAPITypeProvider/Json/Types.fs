@@ -6,11 +6,10 @@ open OpenAPITypeProvider.Specification
 open Newtonsoft.Json.Linq
 
 type ObjectValue(d:(string * obj) list) =
-    
     let mutable data = d |> Map |> System.Collections.Generic.Dictionary
-    new(json, schema, existingTypes) =
+    new(json, schema) =
         let schema = schema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue existingTypes schema :?> ObjectValue
+        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
         ObjectValue(v.Data)
     member __.SetValue(x, y) = data.[x] <- y
     member __.GetValue x = if data.ContainsKey x then data.[x] else null
@@ -32,9 +31,10 @@ type ObjectValue(d:(string * obj) list) =
         
 
 type SimpleValue(value) =
-    new(json, schema, existingTypes) =
-        let schema = schema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue existingTypes schema
+    new(json, strSchema) =
+        let schema = strSchema |> Serialization.deserialize<Schema>
+        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema
         SimpleValue(v)
     member __.ToJToken() = JToken.FromObject(value, Serialization.serializer)
     member __.Value = value
+        

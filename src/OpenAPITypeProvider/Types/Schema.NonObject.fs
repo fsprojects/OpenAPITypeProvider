@@ -24,7 +24,7 @@ let private createNonObjectType ctx existingTypes name (schema:Schema) =
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
         <@@ 
             let json = %%args.Head : string
-            SimpleValue(json, strSchema, List.empty)
+            SimpleValue(json, strSchema)
         @@>), isStatic = true)
         |> typ.AddMember
         

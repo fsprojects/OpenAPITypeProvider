@@ -81,7 +81,7 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
             <@@ 
                 let json = %%args.Head : string
-                ObjectValue(json, strSchema, List.empty)
+                ObjectValue(json, strSchema)
             @@>), isStatic = true)
             |> typ.AddMember
 

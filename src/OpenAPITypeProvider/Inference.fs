@@ -16,7 +16,14 @@ let private getStringType = function
     | StringFormat.String | StringFormat.Password | StringFormat.Binary -> typeof<string>
     | StringFormat.Byte -> typeof<byte>
     | StringFormat.Date | StringFormat.DateTime -> typeof<DateTime>
-    
+
+let getPropertyType schema =
+    match schema with
+    | Boolean -> typeof<bool>
+    | Integer format -> format |> getIntType
+    | Number format -> format |> getNumberType
+    | String format -> format |> getStringType
+
 let rec getType (existingTypes:(Schema * ProvidedTypeDefinition) list) schema = 
     match schema with
     | Boolean -> typeof<bool>

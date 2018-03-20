@@ -26,7 +26,7 @@ let some (typ:Type) arg =
         let meth = unionType.GetMethod("Some")
         meth.Invoke(null, [|arg|])
 
-let rec parseForSchema createObj (existingTypes:(Schema * ProvidedTypeDefinition) list) (schema:Schema) (json:JToken) =
+let rec parseForSchema createObj typeOfObj (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
     | Integer Int32 -> json.Value<int32>() |> box
@@ -41,8 +41,11 @@ let rec parseForSchema createObj (existingTypes:(Schema * ProvidedTypeDefinition
     | String StringFormat.Date -> json.Value<DateTime>() |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
-        let items = [ for x in jArray do yield parseForSchema createObj existingTypes itemsSchema x ]
-        let typ = itemsSchema |> Inference.getType existingTypes
+        let items = [ for x in jArray do yield parseForSchema createObj typeOfObj itemsSchema x ]
+        let typ = 
+            match itemsSchema with
+            | Object _ -> typeOfObj
+            | _ -> itemsSchema |> Inference.getPropertyType
         ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
@@ -50,11 +53,11 @@ let rec parseForSchema createObj (existingTypes:(Schema * ProvidedTypeDefinition
         props 
         |> Map.map (fun name schema -> 
             if required |> List.contains name then
-                parseForSchema createObj existingTypes schema (jObject.[name]) |> Some
+                parseForSchema createObj typeOfObj schema (jObject.[name]) |> Some
             else
                 if jObject.ContainsKey name then
-                    let typ = Inference.getType existingTypes schema
-                    parseForSchema createObj existingTypes schema (jObject.[name]) 
+                    let typ = Inference.getPropertyType schema
+                    parseForSchema createObj typeOfObj schema (jObject.[name]) 
                     |> some typ
                     |> Some
                 else None
