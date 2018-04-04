@@ -123,6 +123,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  responses:  
+    Error:
+      description: Blah blah
+      content:
+        application/json:
+          schema:
+            $ref: '#components/schemas/Error'
+  
   schemas:
     Pet:
       allOf:

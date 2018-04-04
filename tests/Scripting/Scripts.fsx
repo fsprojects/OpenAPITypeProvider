@@ -4,15 +4,50 @@
 open System
 open OpenAPIProvider
 
-type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\Scripting\Sample.yaml">
+type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\Scripting\Sample.yaml ">
 
 let provider = new Provider()
 
-provider.Path.``/pets``.Get.
+
+let x = Provider.Schemas.Error.Create(123, "EEE")
+x.Code
+x.Message
+x.ToJToken() |> string
+
+//let parsedBody = provider.Path.``/pets``.Post.Responses.
+let r = provider.Path.``/pets/{id}``.Get.Responses.``default``.``application/json``.
+
+
+parsedBody.Name
+parsedBody.SomeArray
 
 
 
-let o = Provider.Schemas.MyObject.Parse(""" { "date": "2018-03-20T08:34:32.6913454Z" }""")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let o = Provider.Schemas.MyObject.Parse(""" { "date": "2018-03-20T08:34:32.6913454Z", "name":"Oliver" }""")
+o.Name
+
+let mujTest = new Provider.Schemas.MyObject(DateTime.UtcNow,"Roman",Some 123)
+mujTest.ToJToken() |> string
+
 o.Date
 o.Name
 o.ToJToken() |> string

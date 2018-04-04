@@ -54,16 +54,7 @@ let createType ctx typeName (filePath:string) =
             
             createdSchemas @ createdNonObjSchemas
         else []
-
-        //// Responses
-        //let responses = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Responses", None, hideObjectMethods = true, nonNullable = true, isErased = true)
-        
-        //api.Components.Value.Responses
-        //|> Map.map (Response.createType ctx)
-        //|> Map.iter (fun _ v -> responses.AddMember v)
-
-        //responses |> typ.AddMember
-        //ProvidedProperty("Responses", responses, isStatic = true) |> typ.AddMember
+       
     let findOrCreateSchema name schema =
         match allSchemas |> List.tryFind (fun (s,t) -> s = schema) with
         | Some found -> (true, found |> snd)
@@ -72,9 +63,9 @@ let createType ctx typeName (filePath:string) =
             let others = Schema.NonObject.createTypes ctx allSchemas name schema
             objects @ others |> List.head |> snd |> (fun x -> (false, x))
 
-    // path
-    let path = api.Paths |> Path.createTypes ctx findOrCreateSchema
-    path |> typ.AddMember
-    ProvidedProperty("Path", path, fun _ -> <@@ obj() @@>) |> typ.AddMember
+    // paths
+    let paths = api.Paths |> Path.createTypes ctx findOrCreateSchema
+    paths |> typ.AddMember
+    ProvidedProperty("Paths", paths, fun _ -> <@@ obj() @@>) |> typ.AddMember
 
     typ

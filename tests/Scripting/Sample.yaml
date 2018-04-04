@@ -65,6 +65,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NewPet'
+              #$ref: '#/components/schemas/SimpleIntValue'
       responses:
         '200':
           description: pet response
