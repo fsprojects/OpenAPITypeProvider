@@ -20,7 +20,6 @@ let createType ctx findOrCreateSchemaFn name (par:RequestBody) =
     
     par.Content 
     |> Map.map (fun _ media -> media)
-    |> Map.filter (fun _ media -> media.Schema <> Schema.Empty)
     |> Map.map (MediaType.createType ctx findOrCreateSchemaFn)
     |> Map.iter (fun name t ->
         t |> typ.AddMember

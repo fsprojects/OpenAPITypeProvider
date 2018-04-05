@@ -32,7 +32,6 @@ let rec private createObject ctx originalName (schema:Schema) (existingObjects:(
         
         let foldFn acc n s =
             match s with
-            | s when s = Schema.Empty -> acc
             | Schema.Object _ ->
                 let newTypes = createObject ctx n s acc
                 let newType = newTypes.Head |> snd
@@ -101,7 +100,7 @@ let private getNameForSubArrayObject (name:string) = name + "Item"
 
 let createTypes ctx name schema =
     match schema with
-    | Array s when s <> Schema.Empty ->
+    | Array s ->
         match s with
         | Object _ -> createObject ctx (getNameForSubArrayObject name) s []
         | _ -> []
