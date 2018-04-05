@@ -35,6 +35,8 @@ let rec getComplexType (existingTypes:(Schema * ProvidedTypeDefinition) list) sc
         let typ = schema |> getComplexType existingTypes
         ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
     | Object _ -> 
-        existingTypes
-        |> Map
-        |> Map.find schema :> Type
+        try
+            existingTypes
+            |> Map
+            |> Map.find schema :> Type
+        with _ -> failwith <| sprintf "Cannot find provided type for %A in %A" schema existingTypes
