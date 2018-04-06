@@ -1,18 +1,15 @@
 ﻿module OpenAPITypeProvider.Types.MediaType
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider
 open OpenAPITypeProvider.Specification
-open OpenAPITypeProvider.Types
 open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
 
-let createType ctx findOrCreateSchemaFn name (media:MediaType) =
+let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    
     let schemaTyp = findOrCreateSchemaFn name media.Schema
     let strSchema = media.Schema |> Serialization.serialize
 
@@ -31,7 +28,13 @@ let createType ctx findOrCreateSchemaFn name (media:MediaType) =
             @@>
         ))
         |> typ.AddMember
+    typ
+
+let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
     
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let schemaTyp = findOrCreateSchemaFn name media.Schema
+
     // ToJToken
     ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp)], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
         match media.Schema with

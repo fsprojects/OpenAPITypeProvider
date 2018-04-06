@@ -19,7 +19,7 @@ let createType ctx findOrCreateSchemaFn name (response:Response) =
 
     response.Content 
     |> Map.map (fun _ media -> media)
-    |> Map.map (MediaType.createType ctx findOrCreateSchemaFn)
+    |> Map.map (MediaType.createResponseType ctx findOrCreateSchemaFn)
     |> Map.iter (fun name t ->
         t |> typ.AddMember
         ProvidedProperty(name, t, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
