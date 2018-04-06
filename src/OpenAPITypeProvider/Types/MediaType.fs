@@ -13,7 +13,7 @@ let createType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     
-    let _,schemaTyp = findOrCreateSchemaFn name media.Schema
+    let schemaTyp = findOrCreateSchemaFn name media.Schema
     let strSchema = media.Schema |> Serialization.serialize
 
     // Parse
@@ -47,7 +47,4 @@ let createType ctx findOrCreateSchemaFn name (media:MediaType) =
             @@>
         ))
         |> typ.AddMember
-    
-    
-
     typ
