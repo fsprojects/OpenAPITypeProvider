@@ -33,11 +33,11 @@ let createType ctx typeName (filePath:string) =
             // Add object root types
             let createdSchemas = 
                 api.Components.Value.Schemas
-                |> Map.map (Schema.Object.createTypes ctx)
+                |> Map.map (Schema.Object.createTypesNew ctx schemas)
                 |> Map.toList
                 |> List.collect snd
         
-            createdSchemas |> List.map snd |> List.iter schemas.AddMember
+            //createdSchemas |> List.map snd |> List.iter schemas.AddMember
 
             // Add non-object root types
             let createdNonObjSchemas = 
