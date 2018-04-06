@@ -2,11 +2,10 @@ module OpenAPITypeProvider.Types.Document
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Parser
-open OpenAPITypeProvider.Specification
 
 let createType ctx typeName (filePath:string) =
+
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, typeName, None, hideObjectMethods = true, nonNullable = true, isErased = true)
-    
     let api = filePath |> Document.loadFromYamlFile
 
     // ctor
@@ -45,7 +44,6 @@ let createType ctx typeName (filePath:string) =
             createdNonObjSchemas |> List.map snd |> List.iter schemas.AddMember
             createdSchemas @ createdNonObjSchemas
         else []
-    
        
     let findOrCreateSchema parent name schema =
         match allSchemas |> List.tryFind (fun (s,t) -> s = schema) with

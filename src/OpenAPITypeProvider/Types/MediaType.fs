@@ -6,7 +6,6 @@ open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
-
 let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
@@ -27,6 +26,7 @@ let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
                 SimpleValue.Parse(json,strSchema)
             @@>
         ))
+        |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed request"; x)
         |> typ.AddMember
     typ
 
@@ -49,5 +49,6 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
                 o.ToJToken()
             @@>
         ))
+        |> (fun x -> x.AddXmlDoc "Converts strongly typed response to JToken"; x)
         |> typ.AddMember
     typ

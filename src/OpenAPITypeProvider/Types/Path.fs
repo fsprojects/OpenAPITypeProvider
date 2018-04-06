@@ -1,27 +1,13 @@
 ﻿module OpenAPITypeProvider.Types.Path
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider
 open OpenAPITypeProvider.Specification
 open OpenAPITypeProvider.Types
-open OpenAPITypeProvider.Json
-open OpenAPITypeProvider.Json.Types
-open Microsoft.FSharp.Quotations
-
+open OpenAPITypeProvider.Types.Helpers
 
 let private createType ctx findOrCreateSchemaFn name (path:Path) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    
-    // summary
-    if path.Summary.IsSome then
-        let summary = path.Summary.Value
-        ProvidedProperty("Summary", typeof<string>, (fun _ -> <@@ summary @@>)) |> typ.AddMember
-    
-    // description
-    if path.Description.IsSome then
-        let desc = path.Description.Value
-        ProvidedProperty("Description", typeof<string>, (fun _ -> <@@ desc @@>)) |> typ.AddMember
     
     let paths = 
         [
@@ -40,9 +26,10 @@ let private createType ctx findOrCreateSchemaFn name (path:Path) =
     paths |> List.iter (fun (path, name) -> 
         let p = path|> Operation.createType ctx findOrCreateSchemaFn name
         p |> typ.AddMember
-        ProvidedProperty(name, p, (fun _ -> <@@ obj() @@>)) |> typ.AddMember
+        ProvidedProperty(name, p, (fun _ -> <@@ obj() @@>))
+        |?> path.Description
+        |> typ.AddMember
     )
-
     typ
 
 let createTypes ctx findOrCreateSchemaFn (paths:Map<string, Path>) =
@@ -51,7 +38,8 @@ let createTypes ctx findOrCreateSchemaFn (paths:Map<string, Path>) =
     paths |> Map.iter (fun n p -> 
         let path = createType ctx findOrCreateSchemaFn n p
         path |> typ.AddMember
-        ProvidedProperty(n, path, fun _ -> <@@ obj() @@>) |> typ.AddMember
+        ProvidedProperty(n, path, fun _ -> <@@ obj() @@>) 
+        |?> p.Description
+        |> typ.AddMember
     )
-
     typ

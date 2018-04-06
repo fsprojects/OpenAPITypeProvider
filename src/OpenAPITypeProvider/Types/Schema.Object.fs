@@ -66,6 +66,7 @@ let rec private createType ctx (parent:ProvidedTypeDefinition) isOptional existi
                 let json = %%args.Head : string
                 ObjectValue.Parse(json, strSchema)
             @@>), isStatic = true)
+            |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema"; x)
             |> typ.AddMember
 
         // ToJToken method
@@ -75,6 +76,7 @@ let rec private createType ctx (parent:ProvidedTypeDefinition) isOptional existi
                 let objectValue = ((%%t : obj ):?> ObjectValue)
                 objectValue.ToJToken()
             @@>))
+            |> (fun x -> x.AddXmlDoc "Converts strongly typed schema to JToken"; x)
             |> typ.AddMember
 
         typ |> parent.AddMember
@@ -82,13 +84,13 @@ let rec private createType ctx (parent:ProvidedTypeDefinition) isOptional existi
     | Schema.Array arraySchema ->
         match arraySchema with
         | Schema.Object _ ->
+            // create inner object first
             let existingTypes = createType ctx parent isOptional existingTypes (getNameForSubArrayObject name) arraySchema
             createProperty isOptional name schema existingTypes |> parent.AddMember
             existingTypes
         | _ -> 
             createProperty isOptional name schema existingTypes |> parent.AddMember
             existingTypes
-
     | _ ->
         createProperty isOptional name (schema:Schema) existingTypes |> parent.AddMember
         existingTypes

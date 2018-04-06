@@ -51,7 +51,6 @@ let private createNonObjectType ctx existingTypes name (schema:Schema) =
         |> typ.AddMember
     (schema, typ)
 
-
 let createTypes ctx existingTypes name schema =
     match schema with
     | Schema.Object _ -> []
