@@ -18,14 +18,12 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
    let createTypes typeName (args:obj[]) =
        let ctx = { Assembly = asm; Namespace = ns }
        let filePath = args.[0] :?> string
-       let resolutionFolder = args.[1] :?> string
        filePath 
-       |> OpenAPITypeProvider.IO.mkAbsoluteFileName cfg resolutionFolder
+       |> OpenAPITypeProvider.IO.getFilename cfg
        |> Document.createType ctx typeName
     
    let parameters = [ 
          ProvidedStaticParameter("FilePath", typeof<string>)
-         ProvidedStaticParameter("ResolutionFolder", typeof<string>, parameterDefaultValue = "")
        ]
         
    do tp.DefineStaticParameters(parameters, createTypes)

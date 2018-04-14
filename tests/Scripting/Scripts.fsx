@@ -4,25 +4,23 @@
 open System
 open OpenAPIProvider
 
-type Provider = OpenAPIV3Provider< @"c:\Dzoukr\Personal\dzoukr\OpenAPITypeProvider\tests\Scripting\Sample.yaml ">
-
+type Provider = OpenAPIV3Provider< @"Sample.yaml ">
 let provider = new Provider()
 
+provider.Paths.``/pets``.Post.Responses.``200``.``application/json``
 
-let x = Provider.Schemas.Error.Create(123, "EEE")
-x.Code
-x.Message
-x.ToJToken() |> string
+let ex = Provider.Schemas. .Error.Parse("{ 'code' : '123', 'message':'test'}")
+ex.Code
+ex.Message
+ex.ToJToken() |> string
 
-//let parsedBody = provider.Path.``/pets``.Post.Responses.
-let r = provider.Path.``/pets/{id}``.Get.Responses.``default``.``application/json``.
+let ex = P
+rovider.Schemas.PaginatedList
 
+ex.ToJToken() |> string
 
-parsedBody.Name
-parsedBody.SomeArray
-
-
-
+let a = new Provider.Schemas.Empty()
+a.ToJToken() |> string
 
 
 
