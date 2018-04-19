@@ -7,6 +7,8 @@ open OpenAPITypeProvider.Specification
 let mutable allSchemas : Map<Schema,ProvidedTypeDefinition> = Map.empty
 
 let createType ctx typeName (filePath:string) =
+    
+    allSchemas <- Map.empty
 
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, typeName, None, hideObjectMethods = true, nonNullable = true, isErased = true)
     let api = filePath |> Document.loadFromYamlFile
@@ -40,7 +42,6 @@ let createType ctx typeName (filePath:string) =
                     Schema.NonObject.createTypes ctx (findOrCreateSchema) name schema
             newType |> schemas.AddMember
             allSchemas <- allSchemas.Add(schema, newType)
-
             newType
 
     // components object
@@ -49,7 +50,8 @@ let createType ctx typeName (filePath:string) =
             // Add object root types
             api.Components.Value.Schemas 
             |> Map.map (findOrCreateSchema)
-            |> Map.iter (fun k v -> schemas.AddMember(v))
+            //|> Map.iter (fun k v -> schemas.AddMember(v))
+            |> ignore
             
     // paths
     let paths = api.Paths |> Path.createTypes ctx (findOrCreateSchema)

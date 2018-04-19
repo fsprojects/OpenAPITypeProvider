@@ -76,13 +76,13 @@ components:
     #           rowValue:
     #             type: string
 
-    # Simple04:
-    #   type: array
-    #   items:
-    #     type: object
-    #     properties:
-    #       age: 
-    #         type: integer
+    Simple04:
+      type: array
+      items:
+        type: object
+        properties:
+          age: 
+            type: integer
     
     Simple05:
       type: object
