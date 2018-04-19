@@ -25,18 +25,16 @@ let getSimpleType schema =
     | String format -> format |> getStringType
     | _ -> failwith "Please, report this error as Github issue - this should not happen!"
 
-let rec getComplexType (existingTypes:(Schema * ProvidedTypeDefinition) list) schema = 
+let rec getComplexType (getSchemaFun: Schema -> ProvidedTypeDefinition) schema = 
     match schema with
     | Boolean -> typeof<bool>
     | Integer format -> format |> getIntType
     | Number format -> format |> getNumberType
     | String format -> format |> getStringType
     | Array schema -> 
-        let typ = schema |> getComplexType existingTypes
+        let typ = schema |> getComplexType getSchemaFun
         ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
     | Object _ -> 
         try
-            existingTypes
-            |> Map
-            |> Map.find schema :> Type
-        with _ -> failwith <| sprintf "Cannot find provided type for %A in %A" schema existingTypes
+            schema |> getSchemaFun :> Type
+        with _ -> failwith <| sprintf "Cannot find provided type for %A" schema

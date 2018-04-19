@@ -8,7 +8,7 @@ open Microsoft.FSharp.Quotations
 
 let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
     
-    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, (name + "REQ"), Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     let schemaTyp = findOrCreateSchemaFn name media.Schema
     let strSchema = media.Schema |> Serialization.serialize
 
@@ -32,7 +32,7 @@ let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
 
 let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
     
-    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, (name + "RES"), Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     let schemaTyp = findOrCreateSchemaFn name media.Schema
 
     // ToJToken

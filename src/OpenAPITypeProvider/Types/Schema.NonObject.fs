@@ -8,10 +8,17 @@ open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
-let private createNonObjectType ctx existingTypes name (schema:Schema) =
+let getName name = function
+    | Array subS ->
+        match subS with
+        | Object _ -> name + "Item"
+        | _ -> name
+    | _ -> name
+
+let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let schemaType = schema |> Inference.getComplexType existingTypes
+    let schemaType = schema |> Inference.getComplexType (getSchemaFun (getName name schema))
     let strSchema = schema |> Serialization.serialize
     // constructor
     ProvidedConstructor([ProvidedParameter("value", schemaType)], (fun args ->
@@ -49,13 +56,13 @@ let private createNonObjectType ctx existingTypes name (schema:Schema) =
             simpleValue.ToJToken()
         @@>))
         |> typ.AddMember
-    (schema, typ)
+    typ
 
-let createTypes ctx existingTypes name schema =
+let createTypes ctx getSchemaFun name schema =
     match schema with
-    | Schema.Object _ -> []
+    | Schema.Object _ -> failwith "This function should be called only for non-Object schema"
     | Schema.Boolean 
     | Schema.Array _
     | Schema.Integer _
     | Schema.Number _
-    | Schema.String _ -> schema |> createNonObjectType ctx existingTypes name |> List.singleton
+    | Schema.String _ -> schema |> createNonObjectType ctx getSchemaFun name

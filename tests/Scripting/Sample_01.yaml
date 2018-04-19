@@ -1,0 +1,97 @@
+﻿openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  description: A sample API that uses a petstore as an example to demonstrate features in the OpenAPI 3.0 specification
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Swagger API Team
+    email: foo@example.com
+    url: http://madskristensen.net
+  license:
+    name: MIT
+    url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+servers:
+  - url: http://petstore.swagger.io/api
+paths:
+  /test:
+    summary: Something
+    post:
+      description: Creates a new pet in the store.  Duplicates are allowed
+      operationId: addPet
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Simple01'
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Simple01'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Simple01'
+ 
+
+components:
+
+  schemas:
+    
+    Simple01:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    # Simple02:
+    #   type: array
+    #   items:
+    #     type: string
+    
+    # Simple03:
+    #   type: string
+    
+    # Simple05:
+    #   type: object
+    #   properties:
+    #     id:
+    #       type: integer
+    #     rows:
+    #       type: array
+    #       items:
+    #         type: object
+    #         properties:
+    #           rowNumber: 
+    #             type: integer
+    #           rowValue:
+    #             type: string
+
+    # Simple04:
+    #   type: array
+    #   items:
+    #     type: object
+    #     properties:
+    #       age: 
+    #         type: integer
+    
+    Simple05:
+      type: object
+      properties:
+        id:
+          type: string
+        subObj:
+          type: object
+          properties:
+            name:
+              type: string
+   

@@ -4,91 +4,18 @@
 open System
 open OpenAPIProvider
 
-type Provider = OpenAPIV3Provider< @"Sample.yaml ">
+type Provider = OpenAPIV3Provider< @"Sample_01.yaml">
 let provider = new Provider()
 
-provider.Paths.``/pets``.Post.Responses.``200``.``application/json``
-
-let ex = Provider.Schemas. .Error.Parse("{ 'code' : '123', 'message':'test'}")
-ex.Code
-ex.Message
-ex.ToJToken() |> string
-
-let ex = P
-rovider.Schemas.PaginatedList
-
-ex.ToJToken() |> string
-
-let a = new Provider.Schemas.Empty()
-a.ToJToken() |> string
+provider.Paths.``/pets``.Post.Responses.``200``.``application/json``.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let o = Provider.Schemas.MyObject.Parse(""" { "date": "2018-03-20T08:34:32.6913454Z", "name":"Oliver" }""")
-o.Name
-
-let mujTest = new Provider.Schemas.MyObject(DateTime.UtcNow,"Roman",Some 123)
-mujTest.ToJToken() |> string
-
-o.Date
-o.Name
-o.ToJToken() |> string
-
-let item = new Provider.Schemas.ObjectArrayItem(Some "AAAA")
-let items = new Provider.Schemas.ObjectArray([item])
-items.ToJToken() |> string
-
-
-let p = Provider.Schemas.ObjectArrayItem.Parse("{'name':'JO'}")
-p.Name
-p.ToJToken() |> string
-
-item.Name
-item.ToJToken() |> string
-items.Values |> List.map (fun x -> x.Name)
-
-let parsed = Provider.Schemas.ObjectArray.Parse(""" [{'name':'JO'}] """)
-parsed.ToJToken() |> string
-parsed.Values.Length
-
-
-parsed.Values
-
-
-let a = Provider.Schemas.SimpleArray.Parse("[1]")
-a.ToJToken() |> string
-
-let json =
-    """
-    {
-        "name":"ABC",
-        "subValue": {"age":123456}
-    }
-    """
-
-let x = Provider.Schemas.NestedOne.Parse(json)
-let y = Provider.Schemas.SubValue.Parse(""" {"age":123456} """)
-y.Age
-y.ToJToken() |> string
-
+let x = new Provider.Schemas.Simple01(Some 124, Some "NAME")
+x.Id
 x.Name
-x.Numbers
-x.SubValue.Age
-x.SubValue.ToJToken() |> string
-x.ToJToken() |> string
+
+let b = Provider.Schemas.Simple02(["a"])
+b.Values
+
+let c = new Provider.Schemas.
+c

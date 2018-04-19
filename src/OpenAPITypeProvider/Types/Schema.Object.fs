@@ -11,9 +11,9 @@ open Microsoft.FSharp.Quotations
 
 let private asOption (typ:#Type) = typedefof<option<_>>.MakeGenericType typ
 
-let private createProperty isOptional originalName (schema:Schema) existingObjects =
+let private createProperty isOptional originalName (schema:Schema) (getSchemaFun:string -> Schema -> ProvidedTypeDefinition) =
     let name = Names.pascalName originalName
-    let typ = schema |> Inference.getComplexType existingObjects |> (fun x -> if isOptional then x |> asOption else x)
+    let typ = schema |> Inference.getComplexType (getSchemaFun name) |> (fun x -> if isOptional then x |> asOption else x)
     ProvidedProperty(name, typ, (fun args -> 
         let t = args.[0]
         <@@  
@@ -23,18 +23,16 @@ let private createProperty isOptional originalName (schema:Schema) existingObjec
 
 let private getNameForSubArrayObject (name:string) = Names.pascalName(name + "Item")
 
-let rec private createType ctx (parent:ProvidedTypeDefinition) isOptional existingTypes name schema =
+let rec private createType ctx isOptional (getSchemaFun:string -> Schema -> ProvidedTypeDefinition) name schema =
     match schema with
     | Schema.Object (props, required) ->
         let isOptional n = required |> List.contains n |> not
         let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         // create properties & sub-objects
-        let existingTypes = 
-            props
-            |> Map.map (fun n s -> createType ctx typ (isOptional n) existingTypes n s)
-            |> Map.toList
-            |> List.collect snd
+        props
+        |> Map.map (fun n s -> createProperty (isOptional n) n s getSchemaFun)
+        |> Map.iter (fun _ v -> typ.AddMember(v))
         
         // constructor
         let getCtorParam (name,typ) =
@@ -43,7 +41,7 @@ let rec private createType ctx (parent:ProvidedTypeDefinition) isOptional existi
         let ctorParams = 
             props 
             |> Map.toList 
-            |> List.map (fun (n,s) -> n, s |> Inference.getComplexType existingTypes)
+            |> List.map (fun (n,s) -> n, s |> Inference.getComplexType (getSchemaFun n))
             |> List.sortBy (fun (n,_) -> isOptional n)
             |> List.map getCtorParam 
         
@@ -79,27 +77,33 @@ let rec private createType ctx (parent:ProvidedTypeDefinition) isOptional existi
             |> (fun x -> x.AddXmlDoc "Converts strongly typed schema to JToken"; x)
             |> typ.AddMember
 
-        typ |> parent.AddMember
-        (schema, typ) :: existingTypes
-    | Schema.Array arraySchema ->
-        match arraySchema with
-        | Schema.Object _ ->
-            // create inner object first
-            let existingTypes = createType ctx parent isOptional existingTypes (getNameForSubArrayObject name) arraySchema
-            createProperty isOptional name schema existingTypes |> parent.AddMember
-            existingTypes
-        | _ -> 
-            createProperty isOptional name schema existingTypes |> parent.AddMember
-            existingTypes
+        //typ |> parent.AddMember
+        typ
+    //| Schema.Array arraySchema ->
+    //    match arraySchema with
+    //    | Schema.Object _ ->
+    //        // create inner object first
+    //        let existingTypes = createType ctx parent isOptional existingTypes (getNameForSubArrayObject name) arraySchema
+    //        createProperty isOptional name schema existingTypes |> parent.AddMember
+    //        existingTypes
+        //| _ -> 
+        //    createProperty isOptional name schema existingTypes |> parent.AddMember
+        //    existingTypes
     | _ ->
-        createProperty isOptional name (schema:Schema) existingTypes |> parent.AddMember
-        existingTypes
+        "THIS SHOUDL NOT HAPPEN" |> failwith
 
-let createTypes ctx parent name schema = 
+let rec createTypes ctx getSchemaFun name schema = 
     match schema with
-    | Array s ->
-        match s with
-        | Object _ -> createType ctx parent false [] name s
-        | _ -> []
-    | Object _ -> createType ctx parent false [] name schema
-    | _ -> []
+    | Object _ -> createType ctx false getSchemaFun name schema
+    | _ -> failwith "This function should be called only for Object schema"
+
+    
+    
+    
+    //match schema with
+    ////| Array s ->
+    ////    match s with
+    ////    | Object _ -> createType ctx parent false [] name s
+    ////    | _ -> []
+    //| Object _ -> createType ctx parent false (createTypes ctx parent) name schema
+    ////| _ -> []
