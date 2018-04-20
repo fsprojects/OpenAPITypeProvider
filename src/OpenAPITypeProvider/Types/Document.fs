@@ -3,8 +3,23 @@ module OpenAPITypeProvider.Types.Document
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider.Parser
 open OpenAPITypeProvider.Specification
+open System
 
-let mutable allSchemas : Map<Schema,ProvidedTypeDefinition> = Map.empty
+let mutable allSchemas : Map<Schema,string * ProvidedTypeDefinition> = Map.empty
+
+let rec private uniqueName (name:string) =
+    match allSchemas |> Map.exists (fun _ v -> v |> fst = name) with
+    | true -> 
+        let nameParts = name.Split([|'_'|], StringSplitOptions.RemoveEmptyEntries)
+        let newName = 
+            match nameParts |> Array.tryLast with
+            | None -> name + "_1"
+            | Some v -> 
+                match v |> Int32.TryParse with
+                | true, i -> i + 1 |> sprintf "%s_%i" name
+                | false, _ -> name + "_1"
+        newName |> uniqueName
+    | false -> name
 
 let createType ctx typeName (filePath:string) =
     
@@ -30,19 +45,16 @@ let createType ctx typeName (filePath:string) =
 
     let rec findOrCreateSchema name (schema:Schema) =
         match allSchemas |> Map.tryFind schema with
-        | Some t -> t
+        | Some t -> snd t
         | None ->
             let newType =
                 match schema with
-                | Object _ -> 
-                    printf "Creating OBJECT %A %s \n" schema name
-                    Schema.Object.createTypes ctx (findOrCreateSchema) name schema
-                | _ -> 
-                    printf "Creating OTHER %A %s \n" schema name
-                    Schema.NonObject.createTypes ctx (findOrCreateSchema) name schema
+                | Object _ -> Schema.Object.createTypes ctx findOrCreateSchema name schema
+                | _ -> Schema.NonObject.createTypes ctx findOrCreateSchema name schema
             newType |> schemas.AddMember
-            allSchemas <- allSchemas.Add(schema, newType)
-            newType
+            let n = uniqueName name
+            allSchemas <- allSchemas.Add(schema, (n, newType))
+            n, newType // must return unique name and type
 
     // components object
     if api.Components.IsSome then
@@ -50,7 +62,6 @@ let createType ctx typeName (filePath:string) =
             // Add object root types
             api.Components.Value.Schemas 
             |> Map.map (findOrCreateSchema)
-            //|> Map.iter (fun k v -> schemas.AddMember(v))
             |> ignore
             
     // paths
@@ -59,7 +70,6 @@ let createType ctx typeName (filePath:string) =
     ProvidedProperty("Paths", paths, fun _ -> <@@ obj() @@>) |> typ.AddMember
 
     // add schemas as last
-    printf "ADDING SCHEMAS"
     schemas |> typ.AddMember
     ProvidedProperty("Schemas", schemas, isStatic = true) |> typ.AddMember
             

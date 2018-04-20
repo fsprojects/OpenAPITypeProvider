@@ -21,8 +21,6 @@ let private createProperty isOptional originalName (schema:Schema) (getSchemaFun
             objectValue.GetValue(originalName)
         @@>))
 
-let private getNameForSubArrayObject (name:string) = Names.pascalName(name + "Item")
-
 let rec private createType ctx isOptional (getSchemaFun:string -> Schema -> ProvidedTypeDefinition) name schema =
     match schema with
     | Schema.Object (props, required) ->
@@ -77,33 +75,10 @@ let rec private createType ctx isOptional (getSchemaFun:string -> Schema -> Prov
             |> (fun x -> x.AddXmlDoc "Converts strongly typed schema to JToken"; x)
             |> typ.AddMember
 
-        //typ |> parent.AddMember
         typ
-    //| Schema.Array arraySchema ->
-    //    match arraySchema with
-    //    | Schema.Object _ ->
-    //        // create inner object first
-    //        let existingTypes = createType ctx parent isOptional existingTypes (getNameForSubArrayObject name) arraySchema
-    //        createProperty isOptional name schema existingTypes |> parent.AddMember
-    //        existingTypes
-        //| _ -> 
-        //    createProperty isOptional name schema existingTypes |> parent.AddMember
-        //    existingTypes
-    | _ ->
-        "THIS SHOUDL NOT HAPPEN" |> failwith
+    | _ -> failwith "Please, report this error as Github issue - this should not happen!"
 
 let rec createTypes ctx getSchemaFun name schema = 
     match schema with
     | Object _ -> createType ctx false getSchemaFun name schema
     | _ -> failwith "This function should be called only for Object schema"
-
-    
-    
-    
-    //match schema with
-    ////| Array s ->
-    ////    match s with
-    ////    | Object _ -> createType ctx parent false [] name s
-    ////    | _ -> []
-    //| Object _ -> createType ctx parent false (createTypes ctx parent) name schema
-    ////| _ -> []

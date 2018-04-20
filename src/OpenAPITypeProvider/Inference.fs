@@ -34,7 +34,4 @@ let rec getComplexType (getSchemaFun: Schema -> ProvidedTypeDefinition) schema =
     | Array schema -> 
         let typ = schema |> getComplexType getSchemaFun
         ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
-    | Object _ -> 
-        try
-            schema |> getSchemaFun :> Type
-        with _ -> failwith <| sprintf "Cannot find provided type for %A" schema
+    | Object _ -> schema |> getSchemaFun :> Type

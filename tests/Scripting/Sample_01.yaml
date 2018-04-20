@@ -53,28 +53,28 @@ components:
         name:
           type: string
 
-    # Simple02:
-    #   type: array
-    #   items:
-    #     type: string
+    Simple02:
+      type: array
+      items:
+        type: string
     
-    # Simple03:
-    #   type: string
+    Simple03:
+      type: string
     
-    # Simple05:
-    #   type: object
-    #   properties:
-    #     id:
-    #       type: integer
-    #     rows:
-    #       type: array
-    #       items:
-    #         type: object
-    #         properties:
-    #           rowNumber: 
-    #             type: integer
-    #           rowValue:
-    #             type: string
+    Simple06:
+      type: object
+      properties:
+        id:
+          type: integer
+        simple01:
+          type: array
+          items:
+            type: object
+            properties:
+              rowNumber: 
+                type: integer
+              rowValue:
+                type: string
 
     Simple04:
       type: array
