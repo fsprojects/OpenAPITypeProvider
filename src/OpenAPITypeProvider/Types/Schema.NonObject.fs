@@ -18,7 +18,7 @@ let getName name = function
 let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let schemaType = schema |> Inference.getComplexType (getSchemaFun (getName name schema))
+    let schemaType = schema |> Inference.getComplexType (getSchemaFun (getName name schema) >> SchemaType.GetType)
     let strSchema = schema |> Serialization.serialize
     // constructor
     ProvidedConstructor([ProvidedParameter("value", schemaType)], (fun args ->

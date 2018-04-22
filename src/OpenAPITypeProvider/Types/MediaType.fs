@@ -9,11 +9,11 @@ open Microsoft.FSharp.Quotations
 let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, (name + "REQ"), Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let schemaTyp = findOrCreateSchemaFn name media.Schema
+    let schemaType = findOrCreateSchemaFn name media.Schema
     let strSchema = media.Schema |> Serialization.serialize
 
     // Parse
-    ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], schemaTyp, (fun args -> 
+    ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], schemaType.Type, (fun args -> 
         match media.Schema with
         | Object _ ->
             <@@ 
@@ -36,7 +36,7 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
     let schemaTyp = findOrCreateSchemaFn name media.Schema
 
     // ToJToken
-    ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp)], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
+    ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp.Type)], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
         match media.Schema with
         | Object _ ->
             <@@ 

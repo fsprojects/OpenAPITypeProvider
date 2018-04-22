@@ -32,7 +32,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Simple01'
+                type: object
+                properties:
+                  mujObj:
+                    type: integer
         default:
           description: unexpected error
           content:
@@ -89,7 +92,7 @@ components:
       properties:
         id:
           type: string
-        subObj:
+        simple01:
           type: object
           properties:
             name:

@@ -24,7 +24,7 @@ let private createType ctx findOrCreateSchemaFn name (path:Path) =
         |> List.map (fun (x,y) -> x.Value, y)
     
     paths |> List.iter (fun (path, name) -> 
-        let p = path|> Operation.createType ctx findOrCreateSchemaFn name
+        let p = path |> Operation.createType ctx findOrCreateSchemaFn name
         p |> typ.AddMember
         ProvidedProperty(name, p, (fun _ -> <@@ obj() @@>))
         |?> path.Description

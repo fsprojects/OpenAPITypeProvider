@@ -11,9 +11,9 @@ open Microsoft.FSharp.Quotations
 
 let private asOption (typ:#Type) = typedefof<option<_>>.MakeGenericType typ
 
-let private createProperty isOptional originalName (schema:Schema) (getSchemaFun:string -> Schema -> ProvidedTypeDefinition) =
+let private createProperty isOptional originalName (schema:Schema) (getSchemaFun:string -> Schema -> SchemaType) =
     let name = Names.pascalName originalName
-    let typ = schema |> Inference.getComplexType (getSchemaFun name) |> (fun x -> if isOptional then x |> asOption else x)
+    let typ = schema |> Inference.getComplexType (getSchemaFun name >> SchemaType.GetType) |> (fun x -> if isOptional then x |> asOption else x)
     ProvidedProperty(name, typ, (fun args -> 
         let t = args.[0]
         <@@  
@@ -21,7 +21,7 @@ let private createProperty isOptional originalName (schema:Schema) (getSchemaFun
             objectValue.GetValue(originalName)
         @@>))
 
-let rec private createType ctx isOptional (getSchemaFun:string -> Schema -> ProvidedTypeDefinition) name schema =
+let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) name schema =
     match schema with
     | Schema.Object (props, required) ->
         let isOptional n = required |> List.contains n |> not
@@ -39,8 +39,7 @@ let rec private createType ctx isOptional (getSchemaFun:string -> Schema -> Prov
         let ctorParams = 
             props 
             |> Map.toList 
-            |> List.map (fun (n,s) -> n, s |> Inference.getComplexType (getSchemaFun n))
-            |> List.sortBy (fun (n,_) -> isOptional n)
+            |> List.map (fun (n,s) -> n, s |> Inference.getComplexType (getSchemaFun n >> SchemaType.GetType))
             |> List.map getCtorParam 
         
         ProvidedConstructor(ctorParams, (fun args -> 
@@ -80,5 +79,5 @@ let rec private createType ctx isOptional (getSchemaFun:string -> Schema -> Prov
 
 let rec createTypes ctx getSchemaFun name schema = 
     match schema with
-    | Object _ -> createType ctx false getSchemaFun name schema
+    | Object _ -> createType ctx getSchemaFun name schema
     | _ -> failwith "This function should be called only for Object schema"
