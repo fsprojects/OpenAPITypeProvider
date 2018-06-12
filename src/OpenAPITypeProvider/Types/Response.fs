@@ -1,7 +1,7 @@
 ﻿module OpenAPITypeProvider.Types.Response
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types
 
 let createType ctx findOrCreateSchemaFn name (response:Response) =

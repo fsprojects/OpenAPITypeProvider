@@ -2,7 +2,7 @@ namespace OpenAPITypeProvider.Json.Types
 
 open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Parser
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json.Linq
 
 type ObjectValue(d:(string * obj) list) =

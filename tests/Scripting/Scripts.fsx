@@ -4,10 +4,10 @@
 open System
 open OpenAPIProvider
 
-type Provider = OpenAPIV3Provider< @"Sample_01.yaml">
+type Provider = OpenAPIV3Provider< @"Sample_01.yaml ">
 let provider = new Provider()
 
-provider.Paths.``/pets``.Post.Responses.``200``.``application/json``.
+provider.Paths.``/test``.Post.Responses.``200``.``application/json``.
 
 
 let x = new Provider.Schemas.Simple01(Some 124, Some "NAME")
@@ -17,5 +17,5 @@ x.Name
 let b = Provider.Schemas.Simple02(["a"])
 b.Values
 
-let c = new Provider.Schemas.
+let c = new Provider.Schemas.``application/json``()
 c

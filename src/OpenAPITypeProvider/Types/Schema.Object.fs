@@ -2,7 +2,7 @@ module OpenAPITypeProvider.Types.Schema.Object
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 open System
 open OpenAPITypeProvider.Types
 open OpenAPITypeProvider.Json

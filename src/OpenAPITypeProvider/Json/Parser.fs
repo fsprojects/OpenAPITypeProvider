@@ -1,7 +1,7 @@
 module OpenAPITypeProvider.Json.Parser
 
 open System
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json.Linq
 open OpenAPITypeProvider
 

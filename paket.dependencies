@@ -1,8 +1,8 @@
 source https://api.nuget.org/v3/index.json
 framework: auto-detect
 
-nuget FSharp.Core 4.2.3
-nuget YamlDotNet
+nuget FSharp.Core = 4.2.3
+nuget OpenAPIParser
 nuget Newtonsoft.Json
 
 github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fsi

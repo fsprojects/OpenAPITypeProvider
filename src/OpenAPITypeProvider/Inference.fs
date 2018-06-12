@@ -2,7 +2,7 @@
 
 open System
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 
 let private getIntType = function
     | IntFormat.Int32 -> typeof<int>

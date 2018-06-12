@@ -1,8 +1,7 @@
 module OpenAPITypeProvider.Types.Info
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Parser
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 
 let createType ctx (info:Info) =
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Info", Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)

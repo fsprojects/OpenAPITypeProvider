@@ -1,7 +1,7 @@
 ﻿module OpenAPITypeProvider.Types.Path
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types
 open OpenAPITypeProvider.Types.Helpers
 

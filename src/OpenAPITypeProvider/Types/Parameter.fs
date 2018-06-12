@@ -2,7 +2,7 @@
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types
 open OpenAPITypeProvider.Json
 open OpenAPITypeProvider.Json.Types

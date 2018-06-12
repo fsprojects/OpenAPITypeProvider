@@ -1,7 +1,7 @@
 module OpenAPITypeProvider.Types.License
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 
 let createType ctx (license:License) =
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "License", Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)

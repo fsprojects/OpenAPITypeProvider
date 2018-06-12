@@ -1,7 +1,7 @@
 module OpenAPITypeProvider.Types.Contact
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 
 let createType ctx (contact:Contact) =
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Contact", Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)

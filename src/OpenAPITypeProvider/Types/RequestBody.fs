@@ -1,7 +1,7 @@
 ﻿module OpenAPITypeProvider.Types.RequestBody
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types
 
 let createType ctx findOrCreateSchemaFn name (par:RequestBody) =

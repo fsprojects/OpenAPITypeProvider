@@ -1,8 +1,8 @@
 module OpenAPITypeProvider.Types.Document
 
 open ProviderImplementation.ProvidedTypes
-open OpenAPITypeProvider.Parser
-open OpenAPITypeProvider.Specification
+open OpenAPIParser.Version3
+open OpenAPIParser.Version3.Specification
 open System
 
 let mutable allSchemas : Map<Schema,SchemaType> = Map.empty
@@ -30,7 +30,7 @@ let createType ctx typeName (filePath:string) =
     allSchemas <- Map.empty
 
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, typeName, None, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let api = filePath |> Document.loadFromYamlFile
+    let api = filePath |> Parser.Document.loadFromYamlFile
 
     // ctor
     ProvidedConstructor([], fun _ -> <@@ obj() @@>) |> typ.AddMember
