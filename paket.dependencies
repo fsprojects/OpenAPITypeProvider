@@ -13,8 +13,6 @@ nuget NUnit
 nuget NUnit3TestAdapter
 nuget Microsoft.NET.Test.Sdk
 
-nuget OpenAPITypeProvider 0.0.1-alpha
-
 group Build
     source https://api.nuget.org/v3/index.json
     nuget Fake.DotNet.Cli
