@@ -1,34 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="Program.fs" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\src\OpenAPITypeProvider\bin\Debug\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenAPIParser">
-      <HintPath>..\..\src\OpenAPITypeProvider\bin\Debug\netstandard2.0\OpenAPIParser.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenAPITypeProvider">
-      <HintPath>..\..\src\OpenAPITypeProvider\bin\Debug\netstandard2.0\OpenAPITypeProvider.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenAPITypeProvider.DesignTime">
-      <HintPath>..\..\src\OpenAPITypeProvider\bin\Debug\netstandard2.0\OpenAPITypeProvider.DesignTime.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenAPITypeProvider.Runtime">
-      <HintPath>..\..\src\OpenAPITypeProvider\bin\Debug\netstandard2.0\OpenAPITypeProvider.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="YamlDotNet">
-      <HintPath>..\..\src\OpenAPITypeProvider\bin\Debug\netstandard2.0\YamlDotNet.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

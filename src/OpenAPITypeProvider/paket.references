@@ -1,1 +1,5 @@
 FSharp.Core
+OpenAPIParser
+Newtonsoft.Json
+File: ProvidedTypes.fsi
+File: ProvidedTypes.fs
