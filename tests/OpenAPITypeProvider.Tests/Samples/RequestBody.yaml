@@ -1,9 +1,0 @@
-direct:
-  description: Hello
-  content: 
-    'application/json':
-      schema:
-        type: integer
-
-referenced:
-  $ref: '#/direct'
