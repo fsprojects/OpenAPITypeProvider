@@ -1,4 +1,4 @@
-namespace ProviderImplementation
+namespace OpenAPITypeProvider
 
 open ProviderImplementation.ProvidedTypes
 open Microsoft.FSharp.Core.CompilerServices
@@ -8,7 +8,7 @@ open OpenAPITypeProvider.Types
 
 [<TypeProvider>]
 type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
-   inherit TypeProviderForNamespaces (cfg)
+   inherit TypeProviderForNamespaces (cfg, assemblyReplacementMap=[ "OpenAPITypeProvider", "OpenAPIProvider" ])
 
    let ns = "OpenAPIProvider"
    let asm = Assembly.GetExecutingAssembly()

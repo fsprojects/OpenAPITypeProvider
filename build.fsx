@@ -28,6 +28,11 @@ Target.create "CleanBinObj" (fun _ ->
     |> Shell.deleteDirs
 )
 
+Target.create "CopyDependencies" (fun _ -> 
+    [@"packages\OpenAPIParser\lib\netstandard1.6\OpenAPIParser.dll" ]
+    |> Shell.copyFiles (sprintf "%s/bin/Release/netstandard2.0" projectSrc)
+)
+
 Target.create "Nuget" (fun _ ->
     let toNotes = List.map (fun x -> x + System.Environment.NewLine) >> List.fold (+) ""
     let args = 
@@ -53,7 +58,7 @@ Target.create "Nuget" (fun _ ->
 )
 
 open Fake.Core.TargetOperators
-"CleanBinObj" ==> "Nuget"
+"CleanBinObj" ==> "CopyDependencies" ==> "Nuget"
 
 // start build
 Target.runOrDefault "Build"
