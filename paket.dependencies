@@ -13,13 +13,7 @@ nuget NUnit
 nuget NUnit3TestAdapter
 nuget Microsoft.NET.Test.Sdk
 
-group Build
+group Tests
     source https://api.nuget.org/v3/index.json
-    nuget Fake.DotNet.Cli
-    nuget Fake.Core.Target
-    nuget Fake.IO.FileSystem
-    nuget GitVersion.CommandLine
-    nuget Fake.Tools.GitVersion
-    nuget Fake.DotNet.Testing.NUnit
-    nuget Fake.Dotnet.AssemblyInfoFile
-    nuget Fake.Core.ReleaseNotes
+    framework: auto-detect
+    nuget OpenAPITypeProvider

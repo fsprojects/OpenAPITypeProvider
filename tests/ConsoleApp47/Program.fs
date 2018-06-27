@@ -1,7 +1,7 @@
 ﻿open System
 open OpenAPIProvider
 
-type Provider = OpenAPIV3Provider< @"Sample.yaml">
+type Provider = OpenAPIV3Provider< @"..\Sample.yaml">
 
 
 [<EntryPoint>]

@@ -10,4 +10,5 @@
   <ItemGroup>
     <PackageReference Include="OpenAPITypeProvider" Version="0.0.4-alpha" />
   </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

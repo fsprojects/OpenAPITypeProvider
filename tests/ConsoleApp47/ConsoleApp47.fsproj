@@ -55,7 +55,6 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
@@ -66,13 +65,13 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>packages\OpenAPITypeProvider.0.0.2-alpha\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OpenAPIParser">
-      <HintPath>packages\OpenAPITypeProvider.0.0.2-alpha\lib\netstandard2.0\OpenAPIParser.dll</HintPath>
+      <HintPath>..\packages\OpenAPIParser.1.0.3\lib\netstandard1.6\OpenAPIParser.dll</HintPath>
     </Reference>
     <Reference Include="OpenAPITypeProvider">
-      <HintPath>packages\OpenAPITypeProvider.0.0.2-alpha\lib\netstandard2.0\OpenAPITypeProvider.dll</HintPath>
+      <HintPath>..\packages\OpenAPITypeProvider.0.0.4-alpha\lib\netstandard2.0\OpenAPITypeProvider.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -82,7 +81,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="YamlDotNet">
-      <HintPath>packages\OpenAPITypeProvider.0.0.2-alpha\lib\netstandard2.0\YamlDotNet.dll</HintPath>
+      <HintPath>..\packages\YamlDotNet.4.3.1\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

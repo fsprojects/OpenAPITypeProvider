@@ -5,13 +5,21 @@ open Microsoft.FSharp.Core.CompilerServices
 open System.Reflection
 open OpenAPITypeProvider.Types
 
-
 [<TypeProvider>]
 type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
-   inherit TypeProviderForNamespaces (cfg, assemblyReplacementMap=[ "OpenAPITypeProvider", "OpenAPIProvider" ])
+   inherit TypeProviderForNamespaces (cfg)
 
+   do System.AppDomain.CurrentDomain.add_AssemblyResolve(fun _ args ->
+        let expectedName = (AssemblyName(args.Name)).Name + ".dll"
+        let asmPath = 
+            cfg.ReferencedAssemblies
+            |> Seq.tryFind (fun asmPath -> System.IO.Path.GetFileName(asmPath) = expectedName)
+        match asmPath with
+        | Some f -> Assembly.LoadFrom f
+        | None -> null)
+    
    let ns = "OpenAPIProvider"
-   let asm = Assembly.GetExecutingAssembly()
+   let asm = Assembly.GetExecutingAssembly()// cfg.RuntimeAssembly // Assembly.GetExecutingAssembly()
     
    let tp = ProvidedTypeDefinition(asm, ns, "OpenAPIV3Provider", None,  hideObjectMethods = true, nonNullable = true, isErased = true)
     
