@@ -26,7 +26,7 @@ type ObjectValue(d:(string * obj) list) =
                 else if v.GetType() = typeof<ObjectValue> then
                     obj.[k] <- getObj (v :?> ObjectValue)
                 else 
-                    obj.[k] <- JToken.FromObject(v, Serialization.serializer)
+                    obj.[k] <- JToken.FromObject(v, Serialization.getSerializer())
             )
             obj
         this |> getObj
@@ -49,7 +49,7 @@ type SimpleValue(value:obj) =
             values |> List.iter (fun x -> (x :?> ObjectValue).ToJToken() |> arr.Add)
             arr :> JToken
         else
-            JToken.FromObject(value, Serialization.serializer)
+            JToken.FromObject(value, Serialization.getSerializer())
     member __.Value = 
         if value.GetType() = typeof<List<ObjectValue>> then
             let values = value :?> List<ObjectValue>

@@ -3,6 +3,8 @@ module OpenAPITypeProvider.Types.Document
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3
 open OpenAPIParser.Version3.Specification
+open OpenAPITypeProvider.Types.Helpers
+
 open System
 
 let mutable allSchemas : Map<Schema,SchemaType> = Map.empty
@@ -46,6 +48,12 @@ let createType ctx typeName (filePath:string) =
     
     // Schemas
     let schemas = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Schemas", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+    
+    // Responses
+    let responses = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "Responses", None, hideObjectMethods = true, nonNullable = true, isErased = true)
+    
+    // Request bodies
+    let requestBodies = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "RequestBodies", None, hideObjectMethods = true, nonNullable = true, isErased = true)
 
     let rec findOrCreateSchema name (schema:Schema) =
         match allSchemas |> Map.tryFind schema with
@@ -66,14 +74,42 @@ let createType ctx typeName (filePath:string) =
         
             // Add object root types
             api.Components.Value.Schemas 
-            |> Map.map (findOrCreateSchema)
+            |> Map.map findOrCreateSchema
             |> ignore
-            
+    
+            // add responses
+            if api.Components.Value.Responses.Count > 0 then
+                api.Components.Value.Responses
+                |> Map.iter (fun n p -> 
+                    let resp = Response.createType ctx findOrCreateSchema n p
+                    resp |> responses.AddMember
+                    ProvidedProperty(n, resp, (fun _ -> <@@ obj() @@>), isStatic = true) 
+                    |?> Some p.Description
+                    |> responses.AddMember
+                )
+
+                responses |> typ.AddMember
+                ProvidedProperty("Responses", responses, isStatic = true) |> typ.AddMember
+    
+            // add request bodies
+            if api.Components.Value.RequestBodies.Count > 0 then
+                api.Components.Value.RequestBodies
+                |> Map.iter (fun n p -> 
+                    let resp = RequestBody.createType ctx findOrCreateSchema n p
+                    resp |> requestBodies.AddMember
+                    ProvidedProperty(n, resp, (fun _ -> <@@ obj() @@>), isStatic = true) 
+                    |?> p.Description
+                    |> requestBodies.AddMember
+                )
+                requestBodies |> typ.AddMember
+                ProvidedProperty("RequestBodies", requestBodies, isStatic = true) |> typ.AddMember
+
+
     // paths
     let paths = api.Paths |> Path.createTypes ctx findOrCreateSchema
     paths |> typ.AddMember
     ProvidedProperty("Paths", paths, fun _ -> <@@ obj() @@>) |> typ.AddMember
-
+            
     // add schemas as last
     schemas |> typ.AddMember
     ProvidedProperty("Schemas", schemas, isStatic = true) |> typ.AddMember

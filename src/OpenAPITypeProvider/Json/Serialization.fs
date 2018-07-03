@@ -29,12 +29,10 @@ type OptionConverter() =
         if isNull value then FSharpValue.MakeUnion(cases.[0], [||])
         else FSharpValue.MakeUnion(cases.[1], [|value|])
 
-// settings
-let settings = JsonSerializerSettings()
+let mutable public settings = JsonSerializerSettings()
 settings.NullValueHandling <- NullValueHandling.Ignore
 settings.Converters.Add(OptionConverter())
 
-let serializer = JsonSerializer.Create(settings)
-
+let getSerializer() = JsonSerializer.Create(settings)
 let serialize obj = JsonConvert.SerializeObject(obj, settings)
 let deserialize<'a> json = JsonConvert.DeserializeObject<'a>(json, settings)

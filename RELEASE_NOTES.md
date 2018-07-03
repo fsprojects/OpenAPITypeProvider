@@ -1,3 +1,6 @@
+### 0.0.5-alpha - July 03 2018
+* Adding Newtonsoft properties to configuration
+
 ### 0.0.4-alpha - June 27 2018
 * Fighting dependencies
 
