@@ -39,9 +39,17 @@ Target "Nuget" <| fun () ->
 
     Fake.DotNetCli.Pack (fun p -> { p with Project = appSrc; OutputPath = "../../nuget"; AdditionalArgs = args })
 
-Target "Clean" (fun _ -> DeleteDir "deploy" )
+Target "Clean" (fun _ -> 
+    DeleteDir "deploy" 
+    !! "src/*/bin"
+    ++ "src/*/obj"
+    ++ "tests/*/bin"
+    ++ "tests/*/obj"
+    |> DeleteDirs
+)
 
 "Clean" ==> "Publish"
+"Clean" ==> "Nuget"
 
 // start build
 RunTargetOrDefault "BuildApp"

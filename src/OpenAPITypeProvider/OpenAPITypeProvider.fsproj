@@ -33,6 +33,7 @@
     <Compile Include="Types\Path.fs" />
     <Compile Include="Types\Document.fs" />
     <None Include="paket.references" />
+    <Compile Include="Common.fs" />
     <Compile Include="OpenAPITypeProvider.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

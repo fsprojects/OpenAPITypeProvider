@@ -694,7 +694,7 @@ NUGET
       System.Xml.ReaderWriter (>= 4.3)
       System.Xml.XmlDocument (>= 4.3)
       System.Xml.XPath (>= 4.3)
-    YamlDotNet (4.3.1)
+    YamlDotNet (5.0.1)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.SDK
     src/ProvidedTypes.fs (1d9f236c03e749712b069c4fed51aec40a3c1601)
@@ -709,7 +709,7 @@ NUGET
       FSharp.Core (>= 4.2.3)
       Newtonsoft.Json (>= 10.0.1)
       YamlDotNet (>= 4.3.1)
-    OpenAPITypeProvider (0.0.4-alpha)
+    OpenAPITypeProvider (0.0.6-alpha)
       FSharp.Core (>= 4.2.3)
       Newtonsoft.Json (>= 11.0.2)
       OpenAPIParser (>= 1.0.3)

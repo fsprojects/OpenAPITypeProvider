@@ -4,7 +4,7 @@ open ProviderImplementation.ProvidedTypes
 open Microsoft.FSharp.Core.CompilerServices
 open System.Reflection
 open OpenAPITypeProvider.Types
-open Newtonsoft.Json
+open OpenAPIProvider.Common
 
 [<TypeProvider>]
 type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
@@ -26,11 +26,18 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
     
    let createTypes typeName (args:obj[]) =
        let filePath = args.[0] :?> string
-       let dateFormatString = args.[1] :?> string
-       let dateTimeZoneHandling = args.[2] :?> DateTimeZoneHandling
-             
+       let dateTimeZoneHandling = args.[1] :?> OpenAPIProvider.Common.DateTimeZoneHandling
+       let dateFormatString = args.[2] :?> string
+       
+       let toNewtonsoft (value:DateTimeZoneHandling) =
+            match value with
+            | DateTimeZoneHandling.Local -> Newtonsoft.Json.DateTimeZoneHandling.Local
+            | DateTimeZoneHandling.Utc -> Newtonsoft.Json.DateTimeZoneHandling.Utc
+            | DateTimeZoneHandling.Unspecified -> Newtonsoft.Json.DateTimeZoneHandling.Unspecified
+            | DateTimeZoneHandling.RoundtripKind | _ -> Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind
+
        Json.Serialization.settings.DateFormatString <- dateFormatString
-       Json.Serialization.settings.DateTimeZoneHandling <- dateTimeZoneHandling
+       Json.Serialization.settings.DateTimeZoneHandling <- dateTimeZoneHandling |> toNewtonsoft
        
        let ctx = { Assembly = asm; Namespace = ns }
 
@@ -40,10 +47,18 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
     
    let parameters = [ 
          ProvidedStaticParameter("FilePath", typeof<string>)
-         ProvidedStaticParameter("DateFormatString", typeof<string>, parameterDefaultValue = "yyyy-MM-ddTHH:mm:ss.fffZ") 
-         ProvidedStaticParameter("DateTimeZoneHandling", typeof<DateTimeZoneHandling>, parameterDefaultValue = DateTimeZoneHandling.Utc) 
+         ProvidedStaticParameter("DateTimeZoneHandling", typeof<OpenAPIProvider.Common.DateTimeZoneHandling>, parameterDefaultValue = OpenAPIProvider.Common.DateTimeZoneHandling.Local) 
+         ProvidedStaticParameter("DateFormatString", typeof<string>, parameterDefaultValue = "yyyy-MM-ddTHH:mm:ss.FFFFFFFK") 
        ]
-        
+   
+   let helpText = 
+        """<summary>OpenAPI Version 3 Type Provider</summary>
+           <param name='FilePath'>Location of a YAML file with specification.</param>
+           <param name='DateTimeZoneHandling'>Specifies how to treat the time value when converting between string and DateTime. 1:1 to Newtonsoft DateTimeZoneHandling enumeration.</param>
+           <param name='DateFormatString'>Specifies format for (de)serialization of DateTime. Default is 'yyyy-MM-ddTHH:mm:ss.FFFFFFFK'.</param>
+           """
+  
+   do tp.AddXmlDoc helpText
    do tp.DefineStaticParameters(parameters, createTypes)
    do this.AddNamespace(ns, [tp])
 

@@ -8,6 +8,6 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="OpenAPITypeProvider" Version="0.0.4-alpha" />
+    <PackageReference Include="OpenAPITypeProvider" Version="0.0.5-alpha" />
   </ItemGroup>
 </Project>

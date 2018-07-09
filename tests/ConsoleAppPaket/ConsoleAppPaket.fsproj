@@ -8,7 +8,6 @@
     <None Include="paket.references" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <PackageReference Include="OpenAPITypeProvider" Version="0.0.4-alpha" />
   </ItemGroup>
