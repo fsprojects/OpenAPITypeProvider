@@ -1,7 +1,7 @@
 RESTRICTION: || (== netcoreapp2.1) (== netstandard2.0)
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FAKE (5.1)
+    FAKE (5.2)
     FSharp.Core (4.2.3)
       System.Collections (>= 4.0.11)
       System.Console (>= 4.0)
@@ -699,18 +699,3 @@ GITHUB
   remote: fsprojects/FSharp.TypeProviders.SDK
     src/ProvidedTypes.fs (1d9f236c03e749712b069c4fed51aec40a3c1601)
     src/ProvidedTypes.fsi (1d9f236c03e749712b069c4fed51aec40a3c1601)
-GROUP Tests
-RESTRICTION: || (== netcoreapp2.1) (== netstandard2.0)
-NUGET
-  remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (4.5)
-    Newtonsoft.Json (11.0.2)
-    OpenAPIParser (1.0.3)
-      FSharp.Core (>= 4.2.3)
-      Newtonsoft.Json (>= 10.0.1)
-      YamlDotNet (>= 4.3.1)
-    OpenAPITypeProvider (0.0.10-alpha)
-      FSharp.Core (>= 4.3.4)
-      Newtonsoft.Json (>= 11.0.2)
-      OpenAPIParser (>= 1.0.3)
-    YamlDotNet (5.0.1)

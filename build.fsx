@@ -7,13 +7,14 @@ open Fake
 open System.IO
 
 let appSrc = "src/OpenAPITypeProvider"
+let testsSrc = "tests/OpenAPITypeProvider.Tests"
 
 Target "BuildApp" (fun _ ->
     Fake.DotNetCli.Build (fun p -> { p with Project = appSrc; Configuration = "Debug";})
 )
 
-Target "Publish" (fun _ ->
-    Fake.DotNetCli.Publish (fun p -> { p with Project = appSrc; Configuration = "Release"; Output = "../../deploy" })
+Target "RunTests" (fun _ ->
+    Fake.DotNetCli.Test (fun p -> { p with Project = testsSrc; Configuration = "Debug"; })
 )
 
 // Read release notes & version info from RELEASE_NOTES.md
@@ -40,7 +41,6 @@ Target "Nuget" <| fun () ->
     Fake.DotNetCli.Pack (fun p -> { p with Project = appSrc; OutputPath = "../../nuget"; AdditionalArgs = args })
 
 Target "Clean" (fun _ -> 
-    DeleteDir "deploy" 
     !! "src/*/bin"
     ++ "src/*/obj"
     ++ "tests/*/bin"
@@ -48,8 +48,7 @@ Target "Clean" (fun _ ->
     |> DeleteDirs
 )
 
-"Clean" ==> "Publish"
-"Clean" ==> "Nuget"
+"Clean" ==> "RunTests" ==> "Nuget"
 
 // start build
 RunTargetOrDefault "BuildApp"

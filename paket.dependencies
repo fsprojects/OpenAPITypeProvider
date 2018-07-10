@@ -13,8 +13,3 @@ github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
 nuget NUnit
 nuget NUnit3TestAdapter
 nuget Microsoft.NET.Test.Sdk
-
-group Tests
-    source https://api.nuget.org/v3/index.json
-    framework: auto-detect
-    nuget OpenAPITypeProvider
