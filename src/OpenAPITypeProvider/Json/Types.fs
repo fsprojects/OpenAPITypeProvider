@@ -10,31 +10,34 @@ type ObjectValue(d:(string * obj) list) =
     
     static member Parse(json, schema) =
         let schema = schema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<obj> schema :?> ObjectValue
+        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue schema :?> ObjectValue
         ObjectValue(v.GetData())
 
     member __.SetValue(x, y) = data.[x] <- y
     member __.GetValue x = if data.ContainsKey x then data.[x] else null
     member __.GetData() = data |> Seq.map (|KeyValue|) |> Seq.toList
     member this.ToJToken() = 
-        let rec getObj (value:ObjectValue) =
-            let obj = JObject()
-            value.GetData() 
-            |> Seq.iter (fun (k,v) -> 
-                if v = null then
-                    ()
-                else if v.GetType() = typeof<ObjectValue> then
-                    obj.[k] <- getObj (v :?> ObjectValue)
-                else 
-                    obj.[k] <- JToken.FromObject(v, Serialization.getSerializer())
-            )
-            obj
-        this |> getObj
+        let obj = JObject()
+        this.GetData() 
+        |> Seq.iter (fun (k,v) -> 
+            if v = null then
+                ()
+            else if v.GetType() = typeof<ObjectValue> then
+                obj.[k] <- (v :?> ObjectValue).ToJToken()
+            else if v.GetType() = typeof<List<obj>> then
+                let values = v :?> List<_>
+                let arr = JArray()
+                values |> List.map (fun (x:obj) -> x :?> ObjectValue) |> List.iter (fun x -> x.ToJToken() |> arr.Add)
+                obj.[k] <- arr :> JToken
+            else 
+                obj.[k] <- JToken.FromObject(v, Serialization.getSerializer())
+        )
+        obj
 
 type SimpleValue(value:obj) =
     static member Parse(json, strSchema) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<obj> schema
+        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue schema
         SimpleValue(v)
     member __.ToJToken() = 
         let valueType = value.GetType()

@@ -2,29 +2,31 @@ module OpenAPITypeProvider.Tests.PetStore
 
 open NUnit.Framework
 open OpenAPIProvider
-open Newtonsoft.Json
-open Newtonsoft.Json.Linq
+open OpenAPITypeProvider.Tests.Shared
 
-type OpenAPI = OpenAPIV3Provider<"Samples/PetStore.yaml">
-
-let private toString (x:JToken) = x.ToString(Formatting.None)
-let inline private getJToken x = (^T:(member ToJToken: unit -> JToken)x)
-let inline private compareJson (json:string) ob =
-    let j = ob |> getJToken |> toString
-    Assert.AreEqual(json, j)
+type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml">
 
 [<Test>]
 let ``Empty schema``() =
     let json = "{}"
-    let instance = OpenAPI.Schemas.Empty()
+    let instance = PetStore.Schemas.Empty()
     instance |> compareJson json
-    json |> OpenAPI.Schemas.Empty.Parse |> compareJson json
+    json |> PetStore.Schemas.Empty.Parse |> compareJson json
 
 [<Test>]
 let ``NewPet schema``() =
     let json = """{"name":"Name","tag":"TAG"}"""
-    let instance = new OpenAPI.Schemas.NewPet(name = "Name", tag = Some "TAG")
+    let instance = new PetStore.Schemas.NewPet(name = "Name", tag = Some "TAG")
     instance |> compareJson json
-    json |> OpenAPI.Schemas.NewPet.Parse |> compareJson json
+    json |> PetStore.Schemas.NewPet.Parse |> compareJson json
     Assert.AreEqual("Name", instance.Name)
     Assert.AreEqual(Some "TAG", instance.Tag)
+
+[<Test>]
+let ``Error schema``() =
+    let json = """{"code":123,"message":"Msg"}"""
+    let instance = new PetStore.Schemas.Error (code = 123, message = "Msg")
+    instance |> compareJson json
+    json |> PetStore.Schemas.Error.Parse |> compareJson json
+    Assert.AreEqual(123, instance.Code)
+    Assert.AreEqual("Msg", instance.Message)

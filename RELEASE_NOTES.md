@@ -1,3 +1,6 @@
+### 0.0.13-alpha - July 10 2018
+* Fixing bugs & added initial tests
+
 ### 0.0.12-alpha - July 10 2018
 * Fixing parsing bug
 

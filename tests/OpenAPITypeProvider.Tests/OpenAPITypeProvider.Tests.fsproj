@@ -5,7 +5,10 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Shared.fs" />
     <Compile Include="PetStore.fs" />
+    <Compile Include="Nested.fs" />
+    <Compile Include="Simple.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />

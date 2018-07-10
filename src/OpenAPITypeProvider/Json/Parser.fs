@@ -25,7 +25,7 @@ let private some (typ:Type) arg =
         let meth = unionType.GetMethod("Some")
         meth.Invoke(null, [|arg|])
 
-let rec parseForSchema createObj typeOfObj (schema:Schema) (json:JToken) =
+let rec parseForSchema createObj (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
     | Integer Int32 -> json.Value<int32>() |> box
@@ -40,10 +40,10 @@ let rec parseForSchema createObj typeOfObj (schema:Schema) (json:JToken) =
     | String StringFormat.Date -> json.Value<DateTime>() |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
-        let items = [ for x in jArray do yield parseForSchema createObj typeOfObj itemsSchema x ]
+        let items = [ for x in jArray do yield parseForSchema createObj itemsSchema x ]
         let typ = 
             match itemsSchema with
-            | Object _ -> typeOfObj
+            | Object _ -> typeof<obj>
             | _ -> itemsSchema |> Inference.getSimpleType
         ReflectiveListBuilder.BuildTypedList typ items// |> box
     | Object (props, required) ->
@@ -52,11 +52,11 @@ let rec parseForSchema createObj typeOfObj (schema:Schema) (json:JToken) =
         props 
         |> Map.map (fun name schema -> 
             if required |> List.contains name then
-                parseForSchema createObj typeOfObj schema (jObject.[name]) |> Some
+                parseForSchema createObj schema (jObject.[name]) |> Some
             else
                 if jObject.ContainsKey name then
                     let typ = Inference.getSimpleType schema
-                    parseForSchema createObj typeOfObj schema (jObject.[name]) 
+                    parseForSchema createObj schema (jObject.[name]) 
                     |> some typ
                     |> Some
                 else None
