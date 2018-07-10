@@ -25,25 +25,32 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
    let tp = ProvidedTypeDefinition(asm, ns, "OpenAPIV3Provider", None,  hideObjectMethods = true, nonNullable = true, isErased = true)
     
    let createTypes typeName (args:obj[]) =
-       let filePath = args.[0] :?> string
-       let dateTimeZoneHandling = args.[1] :?> OpenAPIProvider.Common.DateTimeZoneHandling
-       let dateFormatString = args.[2] :?> string
-       
-       let toNewtonsoft (value:DateTimeZoneHandling) =
-            match value with
-            | DateTimeZoneHandling.Local -> Newtonsoft.Json.DateTimeZoneHandling.Local
-            | DateTimeZoneHandling.Utc -> Newtonsoft.Json.DateTimeZoneHandling.Utc
-            | DateTimeZoneHandling.Unspecified -> Newtonsoft.Json.DateTimeZoneHandling.Unspecified
-            | DateTimeZoneHandling.RoundtripKind | _ -> Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind
+       try
+           let filePath = args.[0] :?> string
+           let dateTimeZoneHandling = args.[1] :?> OpenAPIProvider.Common.DateTimeZoneHandling
+           let dateFormatString = args.[2] :?> string
+           
+           let toNewtonsoft (value:DateTimeZoneHandling) =
+                match value with
+                | DateTimeZoneHandling.Local -> Newtonsoft.Json.DateTimeZoneHandling.Local
+                | DateTimeZoneHandling.Utc -> Newtonsoft.Json.DateTimeZoneHandling.Utc
+                | DateTimeZoneHandling.Unspecified -> Newtonsoft.Json.DateTimeZoneHandling.Unspecified
+                | DateTimeZoneHandling.RoundtripKind | _ -> Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind
 
-       Json.Serialization.settings.DateFormatString <- dateFormatString
-       Json.Serialization.settings.DateTimeZoneHandling <- dateTimeZoneHandling |> toNewtonsoft
-       
-       let ctx = { Assembly = asm; Namespace = ns }
+           Json.Serialization.settings.DateFormatString <- dateFormatString
+           Json.Serialization.settings.DateTimeZoneHandling <- dateTimeZoneHandling |> toNewtonsoft
+           
+           let ctx = { Assembly = asm; Namespace = ns }
 
-       filePath 
-       |> OpenAPITypeProvider.IO.getFilename cfg
-       |> Document.createType ctx typeName
+           filePath 
+           |> OpenAPITypeProvider.IO.getFilename cfg
+           |> Document.createType ctx typeName
+        with ex -> 
+            let rec getMsg list (ex:System.Exception) = 
+                match ex.InnerException with
+                | null -> (sprintf "Error: %s, StackTrace: %s" ex.Message ex.StackTrace) :: list
+                | x -> x |> getMsg list
+            ex |> getMsg [] |> List.rev |> String.concat ", " |> failwith
     
    let parameters = [ 
          ProvidedStaticParameter("FilePath", typeof<string>)

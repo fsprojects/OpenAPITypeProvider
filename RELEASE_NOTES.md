@@ -1,3 +1,18 @@
+### 0.0.12-alpha - July 10 2018
+* Fixing parsing bug
+
+### 0.0.11-alpha - July 10 2018
+* Back to previous version
+
+### 0.0.10-alpha - July 10 2018
+* Trying to get to higher FSharp.Core version
+
+### 0.0.9-alpha - July 10 2018
+* Better error handling
+
+### 0.0.8-alpha - July 10 2018
+* Better error handling
+
 ### 0.0.7-alpha - July 09 2018
 * Swapped custom properties
 

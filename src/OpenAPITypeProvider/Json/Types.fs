@@ -10,7 +10,7 @@ type ObjectValue(d:(string * obj) list) =
     
     static member Parse(json, schema) =
         let schema = schema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
+        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<obj> schema :?> ObjectValue
         ObjectValue(v.GetData())
 
     member __.SetValue(x, y) = data.[x] <- y
@@ -34,7 +34,7 @@ type ObjectValue(d:(string * obj) list) =
 type SimpleValue(value:obj) =
     static member Parse(json, strSchema) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<ObjectValue> schema
+        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue typeof<obj> schema
         SimpleValue(v)
     member __.ToJToken() = 
         let valueType = value.GetType()
