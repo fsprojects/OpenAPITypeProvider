@@ -1,3 +1,6 @@
+### 0.0.14-alpha - July 11 2018
+* Fixing bug with JToken
+
 ### 0.0.13-alpha - July 10 2018
 * Fixing bugs & added initial tests
 

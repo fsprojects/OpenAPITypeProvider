@@ -159,6 +159,18 @@ components:
         tag:
           type: string    
 
+    TwoDates:
+      properties:
+        date1:
+          type: string
+          format: date
+        date2:
+          type: string
+          format: date-time
+      required:
+        - date1
+        - date2
+
     Error:
       required:
         - code

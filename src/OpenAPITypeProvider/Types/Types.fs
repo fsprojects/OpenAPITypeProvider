@@ -1,5 +1,6 @@
 ﻿namespace OpenAPITypeProvider.Types
 
+open System
 open System.Reflection
 open ProviderImplementation.ProvidedTypes
 
@@ -13,4 +14,4 @@ type SchemaType = {
     Type : ProvidedTypeDefinition
 }
 with
-    static member GetType schema = schema.Type
+    static member GetType schema = schema.Type :> Type

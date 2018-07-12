@@ -17,15 +17,7 @@ let private getStringType = function
     | StringFormat.Byte -> typeof<byte>
     | StringFormat.Date | StringFormat.DateTime -> typeof<DateTime>
 
-let getSimpleType schema =
-    match schema with
-    | Boolean -> typeof<bool>
-    | Integer format -> format |> getIntType
-    | Number format -> format |> getNumberType
-    | String format -> format |> getStringType
-    | _ -> failwith "Please, report this error as Github issue - this should not happen!"
-
-let rec getComplexType (getSchemaFun: Schema -> ProvidedTypeDefinition) schema = 
+let rec getComplexType (getSchemaFun: Schema -> Type) schema = 
     match schema with
     | Boolean -> typeof<bool>
     | Integer format -> format |> getIntType
@@ -34,4 +26,4 @@ let rec getComplexType (getSchemaFun: Schema -> ProvidedTypeDefinition) schema =
     | Array schema -> 
         let typ = schema |> getComplexType getSchemaFun
         ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
-    | Object _ -> schema |> getSchemaFun :> Type
+    | Object _ -> schema |> getSchemaFun

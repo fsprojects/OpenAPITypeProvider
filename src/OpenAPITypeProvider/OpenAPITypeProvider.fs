@@ -27,8 +27,7 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
    let createTypes typeName (args:obj[]) =
        try
            let filePath = args.[0] :?> string
-           let dateTimeZoneHandling = args.[1] :?> OpenAPIProvider.Common.DateTimeZoneHandling
-           let dateFormatString = args.[2] :?> string
+           let dateFormatString = args.[1] :?> string
            
            let toNewtonsoft (value:DateTimeZoneHandling) =
                 match value with
@@ -38,7 +37,6 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
                 | DateTimeZoneHandling.RoundtripKind | _ -> Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind
 
            Json.Serialization.settings.DateFormatString <- dateFormatString
-           Json.Serialization.settings.DateTimeZoneHandling <- dateTimeZoneHandling |> toNewtonsoft
            
            let ctx = { Assembly = asm; Namespace = ns }
 
@@ -54,14 +52,12 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
     
    let parameters = [ 
          ProvidedStaticParameter("FilePath", typeof<string>)
-         ProvidedStaticParameter("DateTimeZoneHandling", typeof<OpenAPIProvider.Common.DateTimeZoneHandling>, parameterDefaultValue = OpenAPIProvider.Common.DateTimeZoneHandling.Local) 
          ProvidedStaticParameter("DateFormatString", typeof<string>, parameterDefaultValue = "yyyy-MM-ddTHH:mm:ss.FFFFFFFK") 
        ]
    
    let helpText = 
         """<summary>OpenAPI Version 3 Type Provider</summary>
            <param name='FilePath'>Location of a YAML file with specification.</param>
-           <param name='DateTimeZoneHandling'>Specifies how to treat the time value when converting between string and DateTime. 1:1 to Newtonsoft DateTimeZoneHandling enumeration.</param>
            <param name='DateFormatString'>Specifies format for (de)serialization of DateTime. Default is 'yyyy-MM-ddTHH:mm:ss.FFFFFFFK'.</param>
            """
   

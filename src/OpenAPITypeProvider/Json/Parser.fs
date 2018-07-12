@@ -21,9 +21,24 @@ type ReflectiveListBuilder =
             .Invoke(null, [|args|])
 
 let private some (typ:Type) arg =
-        let unionType = typedefof<option<_>>.MakeGenericType typ
-        let meth = unionType.GetMethod("Some")
-        meth.Invoke(null, [|arg|])
+    
+    System.Console.WriteLine "*************************************"
+    typ |> System.Console.WriteLine
+    System.Console.WriteLine "*************************************"
+    //let unionType = typedefof<option<_>>.MakeGenericType typ
+    let unionType = typedefof<option<_>>
+    unionType |> System.Console.WriteLine
+    let meth = unionType.GetMethod("Some")
+    //failwith "SUCCESS"
+    meth.Invoke(null, [|arg|])
+
+
+// let typ = ["AB"].GetType()
+// let unionType = typedefof<option<_>> // typ
+// unionType.GetMethod("Some")
+// typ :> Type
+// let unionType = typedefof<option<_>>.MakeGenericType typ
+
 
 let rec parseForSchema createObj (schema:Schema) (json:JToken) =
     match schema with
@@ -44,7 +59,7 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
         let typ = 
             match itemsSchema with
             | Object _ -> typeof<obj>
-            | _ -> itemsSchema |> Inference.getSimpleType
+            | _ -> itemsSchema |> Inference.getComplexType (fun _ -> typeof<obj>)
         ReflectiveListBuilder.BuildTypedList typ items// |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
@@ -53,13 +68,21 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
         |> Map.map (fun name schema -> 
             if required |> List.contains name then
                 parseForSchema createObj schema (jObject.[name]) |> Some
-            else
-                if jObject.ContainsKey name then
-                    let typ = Inference.getSimpleType schema
-                    parseForSchema createObj schema (jObject.[name]) 
-                    |> some typ
-                    |> Some
-                else None
+            else if jObject.ContainsKey name then
+                let typ = schema |> Inference.getComplexType (fun _ -> typeof<obj>)
+                parseForSchema createObj schema (jObject.[name]) 
+                |> some typ
+                |> Some
+            else None
+            // if required |> List.contains name then
+            //     parseForSchema createObj schema (jObject.[name]) |> Some
+            // else if jObject.ContainsKey name then
+            //         let typ = schema |> Inference.getComplexType (fun _ -> failwith "Please, report this error as Github issue - this should not happen!")
+            //         parseForSchema createObj schema (jObject.[name]) 
+            //         |> some typ
+            //         |> Some
+            // else None
+
         )
         |> Map.filter (fun _ v -> v.IsSome)
         |> Map.map (fun _ v -> v.Value)

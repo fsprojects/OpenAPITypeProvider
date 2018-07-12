@@ -4,7 +4,7 @@ open NUnit.Framework
 open OpenAPIProvider
 open OpenAPITypeProvider.Tests.Shared
 
-type Nested = OpenAPIV3Provider<"Samples/Nested.yaml">
+type Nested = OpenAPIV3Provider<"Samples/Nested.yaml ">
 
 [<Test>]
 let ``Nested array schema``() =
@@ -36,3 +36,20 @@ let ``Nested array simple schema``() =
     json |> Nested.Schemas.WithArray.Parse |> compareJson json
     Assert.AreEqual("A", instance.Items.[0])
     Assert.AreEqual("B", instance.Items.[1])
+
+[<Test>]
+let ``Nested optional array simple schema``() =
+    let json = """{"items":["A","B"]}"""
+    let instance = new Nested.Schemas.WithArrayOptional(items = Some ["A";"B"])
+    instance |> compareJson json
+    json |> Nested.Schemas.WithArrayOptional.Parse |> compareJson json
+    Assert.AreEqual("A", instance.Items.Value.[0])
+    Assert.AreEqual("B", instance.Items.Value.[1])
+
+[<Test>]
+let ``Nested optional array simple schema - not provided``() =
+    let json = """{"name":"A"}"""
+    let instance = new Nested.Schemas.WithArrayOptional(name = Some "A")
+    instance |> compareJson json
+    json |> Nested.Schemas.WithArrayOptional.Parse |> compareJson json
+    Assert.AreEqual("A", instance.Name.Value)

@@ -2,7 +2,7 @@ source https://api.nuget.org/v3/index.json
 framework: auto-detect
 
 nuget FAKE
-nuget FSharp.Core = 4.2.3
+nuget FSharp.Core = 4.3.4
 nuget OpenAPIParser
 nuget Newtonsoft.Json
 

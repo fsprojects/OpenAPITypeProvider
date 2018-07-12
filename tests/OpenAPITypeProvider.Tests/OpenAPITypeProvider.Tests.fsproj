@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
@@ -9,6 +8,7 @@
     <Compile Include="PetStore.fs" />
     <Compile Include="Nested.fs" />
     <Compile Include="Simple.fs" />
+    <Compile Include="Issues.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />

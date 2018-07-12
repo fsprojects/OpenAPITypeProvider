@@ -37,10 +37,20 @@ components:
           type: string
         surname:
           type: string    
+    
     WithArray:
       required:
         - items
       properties:
+        items:
+          type: array
+          items:
+            type: string
+    
+    WithArrayOptional:
+      properties:
+        name:
+          type: string
         items:
           type: array
           items:
