@@ -20,20 +20,69 @@ type ReflectiveListBuilder =
             .MakeGenericMethod([|lType|])
             .Invoke(null, [|args|])
 
-let private some (typ:Type) arg =
-    
-    System.Console.WriteLine "*************************************"
-    typ |> System.Console.WriteLine
-    System.Console.WriteLine "*************************************"
-    //let unionType = typedefof<option<_>>.MakeGenericType typ
-    let unionType = typedefof<option<_>>
-    unionType |> System.Console.WriteLine
-    let meth = unionType.GetMethod("Some")
-    //failwith "SUCCESS"
-    meth.Invoke(null, [|arg|])
 
+// let private some (typ:Type) arg =
+//     let unionType = typedefof<option<_>>.MakeGenericType typ
+//     let meth = unionType.GetMethod("Some")
+//     meth.Invoke(null, [|arg|])
+
+
+open Microsoft.FSharp.Reflection
+
+let some typ arg = 
+  let cases = FSharpType.GetUnionCases(typedefof<option<_>>.MakeGenericType([| typ |]))
+  let case = cases |> Seq.find (fun c -> c.Name = "Some")
+  FSharpValue.MakeUnion(case, [| arg |])
+
+// type MakeSomeHelper<'T> = 
+//   static member MakeSome<'T>(v:'T) = Some(v)
+
+// // let some2 (typ:System.Type) arg =
+// //   typeof<MakeSomeHelper>
+// //     .GetMethod("MakeSome")
+// //     .MakeGenericMethod(typ)
+// //     .Invoke(null, [|arg|])
+
+
+
+// let some (typ:System.Type) arg =
+//   typedefof<MakeSomeHelper<obj>>.MakeGenericType([| typ |]).GetMethod("MakeSome").Invoke(null, [|arg|])
+
+//let trySome (typ:System.Type) arg =
+
+
+//let private some (typ:Type) arg =
+    
+
+
+    //Option.Some arg |> box
+
+    // System.Console.WriteLine "*************************************"
+    // typ |> System.Console.WriteLine
+    // System.Console.WriteLine "*************************************"
+    
+    // let unionType = typedefof<option<_>>.MakeGenericType typ
+    // let meth = unionType.GetMethod("Some")
+    // meth.Invoke(null, [|arg|])
+
+    // let unionType = 
+    //     if typ.IsGenericType then
+    //         System.Console.WriteLine "HEEEEEEEEEEER"
+    //         let t = typedefof<List<_>>
+    //         typedefof<Option<_>>.MakeGenericType t
+    //     else
+    //         typedefof<Option<_>>.MakeGenericType typ
+    // let meth = unionType.GetMethod("Some")
+    // meth |> System.Console.WriteLine
+    // meth.Invoke(null, [|arg|])
 
 // let typ = ["AB"].GetType()
+// let unionType = typedefof<option<int>>
+// let unionType2 = typedefof<option<_>>.MakeGenericType typedefof<_>
+// let meth = unionType2.GetMethod("Some")
+// let meth2 = meth.MakeGenericMethod(unionType2)
+// meth.Invoke(null, [||])
+
 // let unionType = typedefof<option<_>> // typ
 // unionType.GetMethod("Some")
 // typ :> Type
@@ -56,11 +105,8 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
     | Array itemsSchema ->
         let jArray = json :?> JArray
         let items = [ for x in jArray do yield parseForSchema createObj itemsSchema x ]
-        let typ = 
-            match itemsSchema with
-            | Object _ -> typeof<obj>
-            | _ -> itemsSchema |> Inference.getComplexType (fun _ -> typeof<obj>)
-        ReflectiveListBuilder.BuildTypedList typ items// |> box
+        let typ = itemsSchema |> Inference.getComplexType (fun _ -> typeof<obj>)
+        ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
         jObject |> checkRequiredProperties required
@@ -74,15 +120,6 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
                 |> some typ
                 |> Some
             else None
-            // if required |> List.contains name then
-            //     parseForSchema createObj schema (jObject.[name]) |> Some
-            // else if jObject.ContainsKey name then
-            //         let typ = schema |> Inference.getComplexType (fun _ -> failwith "Please, report this error as Github issue - this should not happen!")
-            //         parseForSchema createObj schema (jObject.[name]) 
-            //         |> some typ
-            //         |> Some
-            // else None
-
         )
         |> Map.filter (fun _ v -> v.IsSome)
         |> Map.map (fun _ v -> v.Value)
