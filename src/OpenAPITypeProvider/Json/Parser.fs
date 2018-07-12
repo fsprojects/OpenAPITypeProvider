@@ -20,74 +20,10 @@ type ReflectiveListBuilder =
             .MakeGenericMethod([|lType|])
             .Invoke(null, [|args|])
 
-
-// let private some (typ:Type) arg =
-//     let unionType = typedefof<option<_>>.MakeGenericType typ
-//     let meth = unionType.GetMethod("Some")
-//     meth.Invoke(null, [|arg|])
-
-
-open Microsoft.FSharp.Reflection
-
-let some typ arg = 
-  let cases = FSharpType.GetUnionCases(typedefof<option<_>>.MakeGenericType([| typ |]))
-  let case = cases |> Seq.find (fun c -> c.Name = "Some")
-  FSharpValue.MakeUnion(case, [| arg |])
-
-// type MakeSomeHelper<'T> = 
-//   static member MakeSome<'T>(v:'T) = Some(v)
-
-// // let some2 (typ:System.Type) arg =
-// //   typeof<MakeSomeHelper>
-// //     .GetMethod("MakeSome")
-// //     .MakeGenericMethod(typ)
-// //     .Invoke(null, [|arg|])
-
-
-
-// let some (typ:System.Type) arg =
-//   typedefof<MakeSomeHelper<obj>>.MakeGenericType([| typ |]).GetMethod("MakeSome").Invoke(null, [|arg|])
-
-//let trySome (typ:System.Type) arg =
-
-
-//let private some (typ:Type) arg =
-    
-
-
-    //Option.Some arg |> box
-
-    // System.Console.WriteLine "*************************************"
-    // typ |> System.Console.WriteLine
-    // System.Console.WriteLine "*************************************"
-    
-    // let unionType = typedefof<option<_>>.MakeGenericType typ
-    // let meth = unionType.GetMethod("Some")
-    // meth.Invoke(null, [|arg|])
-
-    // let unionType = 
-    //     if typ.IsGenericType then
-    //         System.Console.WriteLine "HEEEEEEEEEEER"
-    //         let t = typedefof<List<_>>
-    //         typedefof<Option<_>>.MakeGenericType t
-    //     else
-    //         typedefof<Option<_>>.MakeGenericType typ
-    // let meth = unionType.GetMethod("Some")
-    // meth |> System.Console.WriteLine
-    // meth.Invoke(null, [|arg|])
-
-// let typ = ["AB"].GetType()
-// let unionType = typedefof<option<int>>
-// let unionType2 = typedefof<option<_>>.MakeGenericType typedefof<_>
-// let meth = unionType2.GetMethod("Some")
-// let meth2 = meth.MakeGenericMethod(unionType2)
-// meth.Invoke(null, [||])
-
-// let unionType = typedefof<option<_>> // typ
-// unionType.GetMethod("Some")
-// typ :> Type
-// let unionType = typedefof<option<_>>.MakeGenericType typ
-
+let private some (typ:Type) arg =
+    let unionType = typedefof<option<_>>.MakeGenericType typ
+    let meth = unionType.GetMethod("Some")
+    meth.Invoke(null, [|arg|])
 
 let rec parseForSchema createObj (schema:Schema) (json:JToken) =
     match schema with

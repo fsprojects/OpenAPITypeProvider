@@ -4,6 +4,15 @@ open System
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification
 
+type ReflectiveListBuilder = 
+    static member BuildList<'a> (args: obj list) = 
+        [ for a in args do yield a :?> 'a ] 
+    static member BuildTypedList lType (args: obj list) = 
+        typeof<ReflectiveListBuilder>
+            .GetMethod("BuildList")
+            .MakeGenericMethod([|lType|])
+            .Invoke(null, [|args|])
+
 let private getIntType = function
     | IntFormat.Int32 -> typeof<int>
     | IntFormat.Int64 -> typeof<int64>
@@ -25,5 +34,5 @@ let rec getComplexType (getSchemaFun: Schema -> Type) schema =
     | String format -> format |> getStringType
     | Array schema -> 
         let typ = schema |> getComplexType getSchemaFun
-        ProvidedTypeBuilder.MakeGenericType (typedefof<List<_>>, [typ])
+        typedefof<List<_>>.MakeGenericType([|typ|])
     | Object _ -> schema |> getSchemaFun

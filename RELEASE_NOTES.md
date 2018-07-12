@@ -1,3 +1,6 @@
+### 0.0.15-alpha - July 12 2018
+* Fixing bug with creating List types - Thanks Tomas Petricek!!!
+
 ### 0.0.14-alpha - July 11 2018
 * Fixing bug with JToken
 
