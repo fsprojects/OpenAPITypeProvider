@@ -57,9 +57,10 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
         // static method Parse
         let strSchema = schema |> Serialization.serialize
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
+            let format = ctx.DateFormatString
             <@@ 
                 let json = %%args.Head : string
-                ObjectValue.Parse(json, strSchema)
+                ObjectValue.Parse(json, strSchema, format)
             @@>), isStatic = true)
             |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema"; x)
             |> typ.AddMember

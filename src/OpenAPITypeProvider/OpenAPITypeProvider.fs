@@ -4,7 +4,6 @@ open ProviderImplementation.ProvidedTypes
 open Microsoft.FSharp.Core.CompilerServices
 open System.Reflection
 open OpenAPITypeProvider.Types
-open OpenAPIProvider.Common
 
 [<TypeProvider>]
 type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
@@ -29,16 +28,7 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
            let filePath = args.[0] :?> string
            let dateFormatString = args.[1] :?> string
            
-           let toNewtonsoft (value:DateTimeZoneHandling) =
-                match value with
-                | DateTimeZoneHandling.Local -> Newtonsoft.Json.DateTimeZoneHandling.Local
-                | DateTimeZoneHandling.Utc -> Newtonsoft.Json.DateTimeZoneHandling.Utc
-                | DateTimeZoneHandling.Unspecified -> Newtonsoft.Json.DateTimeZoneHandling.Unspecified
-                | DateTimeZoneHandling.RoundtripKind | _ -> Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind
-
-           Json.Serialization.settings.DateFormatString <- dateFormatString
-           
-           let ctx = { Assembly = asm; Namespace = ns }
+           let ctx = { Assembly = asm; Namespace = ns; DateFormatString = dateFormatString }
 
            filePath 
            |> OpenAPITypeProvider.IO.getFilename cfg

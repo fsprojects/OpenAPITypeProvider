@@ -14,16 +14,17 @@ let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
 
     // Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], schemaType.Type, (fun args -> 
+        let format = ctx.DateFormatString
         match media.Schema with
         | Object _ ->
             <@@ 
                 let json = %%args.[1] : string
-                ObjectValue.Parse(json,strSchema)
+                ObjectValue.Parse(json,strSchema, format)
             @@>
         | _ -> 
             <@@ 
                 let json = %%args.[1] : string
-                SimpleValue.Parse(json,strSchema)
+                SimpleValue.Parse(json,strSchema, format)
             @@>
         ))
         |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed request"; x)

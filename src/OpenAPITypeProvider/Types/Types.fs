@@ -7,6 +7,7 @@ open ProviderImplementation.ProvidedTypes
 type Context = {
     Assembly : Assembly
     Namespace : string
+    DateFormatString : string
 }
 
 type SchemaType = {

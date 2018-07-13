@@ -5,12 +5,13 @@ open OpenAPITypeProvider.Json.Parser
 open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json.Linq
 
+
 type ObjectValue(d:(string * obj) list) =
     let mutable data = d |> Map |> System.Collections.Generic.Dictionary
     
-    static member Parse(json, schema) =
+    static member Parse(json, schema, dateFormat) =
         let schema = schema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue schema :?> ObjectValue
+        let v = json |> Serialization.toJToken dateFormat |> parseForSchema ObjectValue schema :?> ObjectValue
         ObjectValue(v.GetData())
 
     member __.SetValue(x, y) = data.[x] <- y
@@ -35,9 +36,9 @@ type ObjectValue(d:(string * obj) list) =
         obj
 
 type SimpleValue(value:obj) =
-    static member Parse(json, strSchema) =
+    static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        let v = json |> Newtonsoft.Json.Linq.JToken.Parse |> parseForSchema ObjectValue schema
+        let v = json |> Serialization.toJToken dateFormat |> parseForSchema ObjectValue schema
         SimpleValue(v)
     member __.ToJToken() = 
         let valueType = value.GetType()

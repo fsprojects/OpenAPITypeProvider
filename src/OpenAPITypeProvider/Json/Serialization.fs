@@ -4,6 +4,7 @@ module internal OpenAPITypeProvider.Json.Serialization
 open System
 open Newtonsoft.Json
 open Microsoft.FSharp.Reflection
+open Newtonsoft.Json.Linq
 
 type OptionConverter() =
     inherit JsonConverter()
@@ -29,10 +30,17 @@ type OptionConverter() =
         if isNull value then FSharpValue.MakeUnion(cases.[0], [||])
         else FSharpValue.MakeUnion(cases.[1], [|value|])
 
-let mutable public settings = JsonSerializerSettings()
-settings.NullValueHandling <- NullValueHandling.Ignore
-settings.Converters.Add(OptionConverter())
+let getSettings() = 
+    let settings = JsonSerializerSettings()
+    settings.NullValueHandling <- NullValueHandling.Ignore
+    settings.Converters.Add(OptionConverter())
+    settings
 
-let getSerializer() = JsonSerializer.Create(settings)
-let serialize obj = JsonConvert.SerializeObject(obj, settings)
-let deserialize<'a> json = JsonConvert.DeserializeObject<'a>(json, settings)
+let getSerializer() = JsonSerializer.Create(getSettings())
+let serialize obj = JsonConvert.SerializeObject(obj, getSettings())
+let deserialize<'a> json = JsonConvert.DeserializeObject<'a>(json, getSettings())
+
+let toJToken dateFormat json =
+    let settings = getSettings()
+    settings.DateFormatString <- dateFormat
+    JsonConvert.DeserializeObject<JToken>(json, settings)

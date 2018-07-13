@@ -32,12 +32,12 @@ let ``Error schema``() =
     Assert.AreEqual(123, instance.Code)
     Assert.AreEqual("Msg", instance.Message)
 
-// [<Test>]
-// let ``Two dates schema``() =
-//     let json = """{"date1":"31. 12. 2018 12:34:56","date2":"31. 12. 2018 12:34:56"}"""
-//     let parsed = PetStore.Schemas.TwoDates.Parse(json)
-//     Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date1)
-//     Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date2)
+[<Test>]
+let ``Two dates schema``() =
+    let json = """{"date1":"31. 12. 2018 12:34:56","date2":"31. 12. 2018 12:34:56"}"""
+    let parsed = PetStore.Schemas.TwoDates.Parse(json)
+    Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date1)
+    Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date2)
 
 // [<Test>]
 // let ``Two dates schema``() =

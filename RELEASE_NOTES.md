@@ -1,3 +1,6 @@
+### 0.0.16-alpha - July 12 2018
+* Back to FSharp.Core 4.2.3
+
 ### 0.0.15-alpha - July 12 2018
 * Fixing bug with creating List types - Thanks Tomas Petricek!!!
 

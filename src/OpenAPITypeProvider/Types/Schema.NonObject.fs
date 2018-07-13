@@ -29,9 +29,10 @@ let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
 
     // static method Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
+        let format = ctx.DateFormatString
         <@@ 
             let json = %%args.Head : string
-            SimpleValue.Parse(json, strSchema)
+            SimpleValue.Parse(json, strSchema, format)
         @@>), isStatic = true)
         |> typ.AddMember
         
