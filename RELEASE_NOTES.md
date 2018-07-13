@@ -1,3 +1,6 @@
+### 0.0.17-alpha - July 13 2018
+* Fixing date format for parsing
+
 ### 0.0.16-alpha - July 12 2018
 * Back to FSharp.Core 4.2.3
 

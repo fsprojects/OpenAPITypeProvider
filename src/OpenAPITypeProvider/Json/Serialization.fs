@@ -31,7 +31,6 @@ type OptionConverter() =
         else FSharpValue.MakeUnion(cases.[1], [|value|])
 
 let settings = JsonSerializerSettings()
-settings.NullValueHandling <- NullValueHandling.Ignore
 settings.Converters.Add(OptionConverter())
 
 let getSerializer() = JsonSerializer.Create(settings)
