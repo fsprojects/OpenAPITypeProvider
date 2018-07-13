@@ -5,7 +5,8 @@ open OpenAPIProvider
 open OpenAPITypeProvider.Tests.Shared
 open System
 
-type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml", "dd. MM. yyyy HH:mm:ss">
+type PetStoreWithDate = OpenAPIV3Provider<"Samples/PetStore.yaml", "dd. MM. yyyy HH:mm:ss">
+type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml">
 
 [<Test>]
 let ``Empty schema``() =
@@ -34,10 +35,17 @@ let ``Error schema``() =
 
 [<Test>]
 let ``Two dates schema``() =
-    let json = """{"date1":"31. 12. 2018 12:34:56","date2":"31. 12. 2018 12:34:56"}"""
-    let parsed = PetStore.Schemas.TwoDates.Parse(json)
+    let json = """{"date1":"31. 12. 2018 12:34:56","date2":"31. 12. 2017 12:34:56"}"""
+    let parsed = PetStoreWithDate.Schemas.TwoDates.Parse(json)
     Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date1)
-    Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date2)
+    Assert.AreEqual(DateTime(2017,12,31,12,34,56, DateTimeKind.Local), parsed.Date2)
+
+[<Test>]
+let ``Two dates schema default``() =
+    let json = """{"date1":"2018-12-31T12:34:56","date2":"2017-12-31T12:34:56"}"""
+    let parsed = PetStoreWithDate.Schemas.TwoDates.Parse(json)
+    Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date1)
+    Assert.AreEqual(DateTime(2017,12,31,12,34,56, DateTimeKind.Local), parsed.Date2)
 
 // [<Test>]
 // let ``Two dates schema``() =
