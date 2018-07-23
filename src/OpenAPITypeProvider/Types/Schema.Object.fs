@@ -54,33 +54,33 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
                     args
                     |> Seq.toList
                     |> List.mapi(fun i v -> Expr.NewTuple [ Expr.Value ctorParams.[i].Name ; Expr.Coerce(v, typeof<obj>) ] ))
-            let format = ctx.DateFormatString                
             <@@  
             let v = (%%values : (string * obj) array) |> Array.toList 
-            ObjectValue(v, format)
+            ObjectValue(v)
             @@>)) |> typ.AddMember
 
         // static method Parse
         let strSchema = schema |> Serialization.serialize
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
-            let format = ctx.DateFormatString
+            let format = Json.Parser.defaultDateFormat
             <@@ 
                 let json = %%args.Head : string
                 ObjectValue.Parse(json, strSchema, format)
             @@>), isStatic = true)
             |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema"; x)
             |> typ.AddMember
+        
+        // static method Parse
+        ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>);ProvidedParameter("dateFormatString", typeof<string>)], typ, (fun args -> 
+            <@@ 
+                let json = %%args.[0] : string
+                let format = %%args.[1] : string
+                ObjectValue.Parse(json, strSchema, format)
+            @@>), isStatic = true)
+            |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema with custom DateFormatString"; x)
+            |> typ.AddMember
 
-        // // ToJToken method
-        // ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
-        //     let t = args.[0]
-        //     <@@ 
-        //         let objectValue = ((%%t : ObjectValue ) :> IJsonValue)
-        //         objectValue.ToJToken()
-        //     @@>))
-        //     |> (fun x -> x.AddXmlDoc "Converts strongly typed schema to JToken"; x)
-        //     |> typ.AddMember
-
+        
         typ
     | _ -> failwith "Please, report this error as Github issue - this should not happen!"
 

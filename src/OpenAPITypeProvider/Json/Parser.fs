@@ -12,6 +12,8 @@ let private checkRequiredProperties (req:string list) (jObject:JObject) =
         if propertyExist p |> not then raise <| FormatException (sprintf "Property '%s' is required by schema definition, but not present in JSON or is null" p)
     )
 
+let defaultDateFormat = "yyyy-MM-ddTHH:mm:ss.FFFFFFFK"
+
 type ReflectiveListBuilder = 
     static member BuildList<'a> (args: obj list) = 
         [ for a in args do yield a :?> 'a ] 
@@ -60,8 +62,7 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
                     |> Some
             else None
         )
-        |> Map.filter (fun _ v -> v.IsSome)
-        |> Map.map (fun _ v -> v.Value)
+        |> Map.map (fun _ v -> defaultArg v null)
         |> Map.toList
         |> createObj
         |> box

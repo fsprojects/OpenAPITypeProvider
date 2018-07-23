@@ -3,9 +3,10 @@ module OpenAPITypeProvider.Tests.ObjectValue
 open NUnit.Framework
 open OpenAPITypeProvider
 open System
+open Newtonsoft.Json
 
-type PetStoreWithDate = OpenAPIV3Provider<"Samples/PetStore.yaml", "dd. MM. yyyy HH:mm:ss">
 type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml">
+let customDateFormat = "dd. MM. yyyy HH:mm:ss"
 
 [<Test>]
 let ``Parses and converts empty schema``() =
@@ -64,6 +65,46 @@ let ``Parses and converts basic schema with optional properties (with nulls in j
     Assert.AreEqual(None, instance.Tag)
     Assert.AreEqual("Name", parsed.Name)
     Assert.AreEqual(None, parsed.Tag)
+
+[<Test>]
+let ``Parses and converts basic schema with optional properties (with nulls in json even in response)``() =
+    let customSettings = new JsonSerializerSettings()
+    customSettings.NullValueHandling <- NullValueHandling.Include
+    let json = """{"name":"Name","tag":null}"""
+    let instance = new PetStore.Schemas.NewPet(name = "Name", tag = None)
+    let parsed = PetStore.Schemas.NewPet.Parse json
+    Assert.AreEqual(json, instance.ToJson(customSettings, Formatting.None))
+    Assert.AreEqual(json, parsed.ToJson(customSettings, Formatting.None))
+    Assert.AreEqual("Name", instance.Name)
+    Assert.AreEqual(None, instance.Tag)
+    Assert.AreEqual("Name", parsed.Name)
+    Assert.AreEqual(None, parsed.Tag)
+
+[<Test>]
+let ``Parses and converts basic schema with optional properties (with not present values in json)``() =
+    let json = """{"name":"Name"}"""
+    let jsonToParse = """{"name":"Name"}"""
+    let instance = new PetStore.Schemas.NewPet(name = "Name", tag = None)
+    let parsed = PetStore.Schemas.NewPet.Parse jsonToParse
+    Assert.AreEqual(json, instance.ToJson())
+    Assert.AreEqual(json, parsed.ToJson())
+    Assert.AreEqual("Name", instance.Name)
+    Assert.AreEqual(None, instance.Tag)
+    Assert.AreEqual("Name", parsed.Name)
+    Assert.AreEqual(None, parsed.Tag)
+
+[<Test>]
+let ``Parses and converts basic schema with two dates properties (custom format)``() =
+    let customSettings = new JsonSerializerSettings()
+    customSettings.DateFormatString <- customDateFormat
+    let json = """{"date1":"31. 12. 2018 12:34:56","date2":"31. 12. 2017 12:34:56"}"""
+    let d1 = DateTime(2018,12,31,12,34,56, DateTimeKind.Local)
+    let d2 = DateTime(2017,12,31,12,34,56, DateTimeKind.Local)
+    let instance = new PetStore.Schemas.TwoDates(d1, d2)
+    let parsed = PetStore.Schemas.TwoDates.Parse(json, customDateFormat)
+    Assert.AreEqual(json, instance.ToJson(customSettings, Formatting.None))
+    Assert.AreEqual(json, parsed.ToJson(customSettings, Formatting.None))
+
 
 [<Test>]
 let ``Fails with parsing mismatched types``() =

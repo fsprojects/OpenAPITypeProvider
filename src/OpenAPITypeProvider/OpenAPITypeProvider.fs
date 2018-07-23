@@ -26,9 +26,8 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
    let createTypes typeName (args:obj[]) =
        try
            let filePath = args.[0] :?> string
-           let dateFormatString = args.[1] :?> string
            
-           let ctx = { Assembly = asm; Namespace = ns; DateFormatString = dateFormatString }
+           let ctx = { Assembly = asm; Namespace = ns }
 
            filePath 
            |> OpenAPITypeProvider.IO.getFilename cfg
@@ -42,14 +41,12 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
     
    let parameters = [ 
          ProvidedStaticParameter("FilePath", typeof<string>)
-         ProvidedStaticParameter("DateFormatString", typeof<string>, parameterDefaultValue = "yyyy-MM-ddTHH:mm:ss.FFFFFFFK") 
        ]
    
    let helpText = 
         """<summary>OpenAPI Version 3 Type Provider</summary>
            <param name='FilePath'>Location of a YAML file with specification.</param>
-           <param name='DateFormatString'>Specifies format for (de)serialization of DateTime. Default is 'yyyy-MM-ddTHH:mm:ss.FFFFFFFK'.</param>
-           """
+        """
   
    do tp.AddXmlDoc helpText
    do tp.DefineStaticParameters(parameters, createTypes)

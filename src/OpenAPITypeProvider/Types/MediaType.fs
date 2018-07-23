@@ -14,7 +14,7 @@ let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
 
     // Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], schemaType.Type, (fun args -> 
-        let format = ctx.DateFormatString
+        let format = Json.Parser.defaultDateFormat
         match media.Schema with
         | Object _ ->
             <@@ 
@@ -28,6 +28,25 @@ let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
             @@>
         ))
         |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed request"; x)
+        |> typ.AddMember
+    
+    // Parse
+    ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>);ProvidedParameter("dateFormatString", typeof<string>)], schemaType.Type, (fun args -> 
+        match media.Schema with
+        | Object _ ->
+            <@@ 
+                let json = %%args.[1] : string
+                let format = %%args.[2] : string
+                ObjectValue.Parse(json,strSchema, format)
+            @@>
+        | _ -> 
+            <@@ 
+                let json = %%args.[1] : string
+                let format = %%args.[2] : string
+                SimpleValue.Parse(json,strSchema, format)
+            @@>
+        ))
+        |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed request with custom DateFormatString"; x)
         |> typ.AddMember
     typ
 

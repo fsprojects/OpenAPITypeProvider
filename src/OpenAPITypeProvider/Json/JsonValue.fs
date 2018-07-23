@@ -5,7 +5,6 @@ open OpenAPITypeProvider.Json
 open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json
 
-
 module private Reflection =
     let getOptionValue (o:obj) =
         match o with
@@ -20,7 +19,7 @@ module private Reflection =
         | null -> false
         | v -> v.GetType() = typeof<'a>
 
-type ObjectValue(d:(string * obj) list, dateFormat) =
+type ObjectValue(d:(string * obj) list) =
     let mutable data = d |> Map |> System.Collections.Generic.Dictionary
 
     let toJToken nullHandling (o:obj) =
@@ -35,23 +34,26 @@ type ObjectValue(d:(string * obj) list, dateFormat) =
         values |> List.iter (toJToken nullHandling >> arr.Add)
         arr :> JToken
 
-    static member Parse(json, schema, dateFormat) =
-        let schema = schema |> Serialization.deserialize<Schema>
-        json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema (fun x -> ObjectValue(x, dateFormat)) schema :?> ObjectValue
+    static member Parse(json, strSchema, dateFormat) =
+        let schema = strSchema |> Serialization.deserialize<Schema>
+        json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue schema :?> ObjectValue
 
     member  __.GetValue x = if data.ContainsKey x then data.[x] else null
 
+    /// Converts strongly typed value to JSON string
     member this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
         let jToken = this.ToJToken(settings.NullValueHandling)
         JsonConvert.SerializeObject(jToken, formatting, settings)
-        
+
+    /// Converts strongly typed value to JSON string        
     member this.ToJson formatting = 
         let settings = Serialization.getDefaultSettings()
-        settings.DateFormatString <- dateFormat
         this.ToJson(settings, formatting)
 
+    /// Converts strongly typed value to JSON string
     member this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
-    member this.ToJToken () = this.ToJToken(NullValueHandling.Ignore)
+    
+    /// Converts strongly typed value to Newtonsoft JToken
     member __.ToJToken (nullHandling:NullValueHandling) =
         let obj = JObject()
         let setEmpty (o:JObject) key =
@@ -78,10 +80,13 @@ type ObjectValue(d:(string * obj) list, dateFormat) =
         )
         obj :> JToken
 
+    /// Converts strongly typed value to Newtonsoft JToken    
+    member this.ToJToken () = this.ToJToken(NullValueHandling.Ignore)
+
 type SimpleValue(value:obj) =
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        let v = json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema (fun x -> ObjectValue(x, dateFormat)) schema
+        let v = json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema  ObjectValue schema
         SimpleValue(v)
     member __.ToJToken() = 
         let valueType = value.GetType()
