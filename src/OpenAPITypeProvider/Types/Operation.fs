@@ -1,4 +1,4 @@
-﻿module OpenAPITypeProvider.Types.Operation
+﻿module internal OpenAPITypeProvider.Types.Operation
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification

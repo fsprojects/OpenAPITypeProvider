@@ -1,13 +1,8 @@
-﻿module OpenAPITypeProvider.Types.Parameter
+﻿module internal OpenAPITypeProvider.Types.Parameter
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider
 open OpenAPIParser.Version3.Specification
-open OpenAPITypeProvider.Types
-open OpenAPITypeProvider.Json
-open OpenAPITypeProvider.Json.Types
-open Microsoft.FSharp.Quotations
-
 
 let createType ctx name (par:Parameter) =
     

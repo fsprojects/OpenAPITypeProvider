@@ -4,13 +4,13 @@ open System
 open System.Reflection
 open ProviderImplementation.ProvidedTypes
 
-type Context = {
+type internal Context = {
     Assembly : Assembly
     Namespace : string
     DateFormatString : string
 }
 
-type SchemaType = {
+type internal SchemaType = {
     Name : string
     Type : ProvidedTypeDefinition
 }

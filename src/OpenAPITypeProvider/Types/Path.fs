@@ -1,4 +1,4 @@
-﻿module OpenAPITypeProvider.Types.Path
+﻿module internal OpenAPITypeProvider.Types.Path
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification

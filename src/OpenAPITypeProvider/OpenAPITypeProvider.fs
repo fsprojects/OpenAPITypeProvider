@@ -18,7 +18,7 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
         | Some f -> Assembly.LoadFrom f
         | None -> null)
     
-   let ns = "OpenAPIProvider"
+   let ns = "OpenAPITypeProvider"
    let asm = Assembly.GetExecutingAssembly()
     
    let tp = ProvidedTypeDefinition(asm, ns, "OpenAPIV3Provider", None,  hideObjectMethods = true, nonNullable = true, isErased = true)

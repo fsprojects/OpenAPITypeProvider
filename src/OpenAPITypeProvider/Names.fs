@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Names
+module internal OpenAPITypeProvider.Names
 
 open System
 

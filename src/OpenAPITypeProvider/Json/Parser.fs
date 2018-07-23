@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Json.Parser
+module internal OpenAPITypeProvider.Json.Parser
 
 open System
 open OpenAPIParser.Version3.Specification

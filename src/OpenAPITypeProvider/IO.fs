@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.IO
+module internal OpenAPITypeProvider.IO
 
 open System
 open System.IO

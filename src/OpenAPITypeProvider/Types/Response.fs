@@ -1,4 +1,4 @@
-﻿module OpenAPITypeProvider.Types.Response
+﻿module internal OpenAPITypeProvider.Types.Response
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification

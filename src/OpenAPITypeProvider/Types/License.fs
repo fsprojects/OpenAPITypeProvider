@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Types.License
+module internal OpenAPITypeProvider.Types.License
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification

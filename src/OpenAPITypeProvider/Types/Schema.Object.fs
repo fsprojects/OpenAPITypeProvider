@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Types.Schema.Object
+module internal OpenAPITypeProvider.Types.Schema.Object
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider
@@ -6,7 +6,6 @@ open OpenAPIParser.Version3.Specification
 open System
 open OpenAPITypeProvider.Types
 open OpenAPITypeProvider.Json
-open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
 let private asOption (typ:#Type) = typedefof<option<_>>.MakeGenericType typ
@@ -17,7 +16,7 @@ let private createProperty isOptional originalName (schema:Schema) (getSchemaFun
     ProvidedProperty(name, typ, (fun args -> 
         let t = args.[0]
         <@@  
-            let objectValue = ((%%t : obj) :?> ObjectValue)
+            let objectValue = ((%%t : ObjectValue))
             objectValue.GetValue(originalName)
         @@>))
 
@@ -25,7 +24,7 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
     match schema with
     | Schema.Object (props, required) ->
         let isOptional n = required |> List.contains n |> not
-        let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+        let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<ObjectValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         // create properties & sub-objects
         props
@@ -72,15 +71,15 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
             |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema"; x)
             |> typ.AddMember
 
-        // ToJToken method
-        ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
-            let t = args.[0]
-            <@@ 
-                let objectValue = ((%%t : obj ):?> ObjectValue)
-                objectValue.ToJToken()
-            @@>))
-            |> (fun x -> x.AddXmlDoc "Converts strongly typed schema to JToken"; x)
-            |> typ.AddMember
+        // // ToJToken method
+        // ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
+        //     let t = args.[0]
+        //     <@@ 
+        //         let objectValue = ((%%t : ObjectValue ) :> IJsonValue)
+        //         objectValue.ToJToken()
+        //     @@>))
+        //     |> (fun x -> x.AddXmlDoc "Converts strongly typed schema to JToken"; x)
+        //     |> typ.AddMember
 
         typ
     | _ -> failwith "Please, report this error as Github issue - this should not happen!"

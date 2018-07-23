@@ -1,7 +1,7 @@
 module OpenAPITypeProvider.Tests.PetStore
 
 open NUnit.Framework
-open OpenAPIProvider
+open OpenAPITypeProvider
 open OpenAPITypeProvider.Tests.Shared
 open System
 

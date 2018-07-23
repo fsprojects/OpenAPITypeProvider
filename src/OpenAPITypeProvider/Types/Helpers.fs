@@ -1,4 +1,4 @@
-﻿module OpenAPITypeProvider.Types.Helpers
+﻿module internal OpenAPITypeProvider.Types.Helpers
 
 open ProviderImplementation.ProvidedTypes
 

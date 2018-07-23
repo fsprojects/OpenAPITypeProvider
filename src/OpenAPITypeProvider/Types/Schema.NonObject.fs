@@ -1,11 +1,10 @@
-﻿module OpenAPITypeProvider.Types.Schema.NonObject
+﻿module internal OpenAPITypeProvider.Types.Schema.NonObject
 
-open ProviderImplementation.ProvidedTypes
 open OpenAPITypeProvider
+open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types
 open OpenAPITypeProvider.Json
-open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
 let getName name = function
@@ -17,7 +16,7 @@ let getName name = function
 
 let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
     
-    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
+    let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<SimpleValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
     let schemaType = schema |> Inference.getComplexType (getSchemaFun (getName name schema) >> SchemaType.GetType)
     let strSchema = schema |> Serialization.serialize
     // constructor
@@ -45,18 +44,18 @@ let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
     ProvidedProperty(valueMethodName, schemaType, (fun args -> 
         let t = args.[0]
         <@@  
-            let simpleValue = ((%%t : obj) :?> SimpleValue)
+            let simpleValue = (%%t : SimpleValue)
             simpleValue.Value
         @@>)) |> typ.AddMember
 
-    // ToJToken method
-    ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
-        let t = args.[0]
-        <@@ 
-            let simpleValue = ((%%t : obj ):?> SimpleValue)
-            simpleValue.ToJToken()
-        @@>))
-        |> typ.AddMember
+    // // ToJToken method
+    // ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
+    //     let t = args.[0]
+    //     <@@ 
+    //         let simpleValue = ((%%t : obj ):?> SimpleValue)
+    //         simpleValue.ToJToken()
+    //     @@>))
+    //     |> typ.AddMember
     typ
 
 let createTypes ctx getSchemaFun name schema =

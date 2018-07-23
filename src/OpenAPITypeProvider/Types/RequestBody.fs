@@ -1,4 +1,4 @@
-﻿module OpenAPITypeProvider.Types.RequestBody
+﻿module internal OpenAPITypeProvider.Types.RequestBody
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification

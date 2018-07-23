@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Types.Contact
+module internal OpenAPITypeProvider.Types.Contact
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification

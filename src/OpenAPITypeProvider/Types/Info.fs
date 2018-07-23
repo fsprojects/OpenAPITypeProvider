@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Types.Info
+module internal OpenAPITypeProvider.Types.Info
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification

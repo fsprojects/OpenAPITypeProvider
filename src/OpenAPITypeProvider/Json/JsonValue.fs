@@ -1,9 +1,13 @@
-namespace OpenAPITypeProvider.Json.Types
+namespace OpenAPITypeProvider
 
-open OpenAPITypeProvider.Json
-open OpenAPITypeProvider.Json.Parser
-open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json.Linq
+open OpenAPITypeProvider.Json
+open OpenAPIParser.Version3.Specification
+
+[<RequireQualifiedAccess>]
+type JsonFormatting =
+    | None
+    | Indented
 
 module private Reflection =
     let getOptionValue (o:obj) =
@@ -21,7 +25,7 @@ module private Reflection =
 
 type ObjectValue(d:(string * obj) list) =
     let mutable data = d |> Map |> System.Collections.Generic.Dictionary
-    
+
     let toJToken (o:obj) =
         if o.GetType() = typeof<ObjectValue> then
             (o :?> ObjectValue).ToJToken()
@@ -36,25 +40,32 @@ type ObjectValue(d:(string * obj) list) =
 
     static member Parse(json, schema, dateFormat) =
         let schema = schema |> Serialization.deserialize<Schema>
-        let v = json |> Serialization.toJToken dateFormat |> parseForSchema ObjectValue schema :?> ObjectValue
-        ObjectValue(v.GetData())
+        json |> Serialization.toJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue schema :?> ObjectValue
 
-    member __.SetValue(x, y) = data.[x] <- y
-    member __.GetValue x = if data.ContainsKey x then data.[x] else null
-    member __.GetData() = data |> Seq.map (|KeyValue|) |> Seq.toList
-    member this.ToJToken() = 
+    member internal __.GetValue x = if data.ContainsKey x then data.[x] else null
+    member __.ToJson formatting = 
+        match formatting with
+        | JsonFormatting.None -> "TODO"
+        | JsonFormatting.Indented -> "TODO"
+    member this.ToJson () = this.ToJson(JsonFormatting.None)
+    member __.ToJToken() =
         let obj = JObject()
-        this.GetData() 
-        |> Seq.iter (fun (k,v) -> 
-            if v |> isNull then
-                obj.[k] <- JValue.CreateNull()
+        let setEmpty (o:JObject) key =
+            if true then
+                o.[key] <- JValue.CreateNull()
+            else ()
+        data
+        |> Seq.map (|KeyValue|)
+        |> Seq.toList
+        |> List.iter (fun (k,v) -> 
+            if v |> isNull then setEmpty obj k
             else if v |> Reflection.isOption<ObjectValue> then
                 match v |> Reflection.getOptionValue with
-                | null -> obj.[k] <- JValue.CreateNull()
+                | null -> setEmpty obj k
                 | v -> obj.[k] <- v |> toJToken
             else if v.GetType() = typeof<Option<List<obj>>> then
                 match v |> Reflection.getOptionValue with
-                | null -> obj.[k] <- JValue.CreateNull()
+                | null -> setEmpty obj k
                 | v -> obj.[k] <- v |> arrayToJToken
             else if v.GetType() = typeof<List<obj>> then
                 obj.[k] <- v |> arrayToJToken
@@ -66,7 +77,7 @@ type ObjectValue(d:(string * obj) list) =
 type SimpleValue(value:obj) =
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        let v = json |> Serialization.toJToken dateFormat |> parseForSchema ObjectValue schema
+        let v = json |> Serialization.toJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue schema
         SimpleValue(v)
     member __.ToJToken() = 
         let valueType = value.GetType()
@@ -82,9 +93,9 @@ type SimpleValue(value:obj) =
             arr :> JToken
         else
             JToken.FromObject(value, Serialization.getSerializer())
-    member __.Value = 
+    member internal __.Value = 
         if value.GetType() = typeof<List<ObjectValue>> then
             let values = value :?> List<ObjectValue>
-            values |> List.map (fun x -> box x) |> box
+            values |> List.map box |> box
         else
             value

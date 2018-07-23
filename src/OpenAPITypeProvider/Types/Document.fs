@@ -1,4 +1,4 @@
-module OpenAPITypeProvider.Types.Document
+module internal OpenAPITypeProvider.Types.Document
 
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3

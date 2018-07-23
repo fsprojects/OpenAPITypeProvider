@@ -1,4 +1,4 @@
-﻿module OpenAPITypeProvider.Inference
+﻿module internal OpenAPITypeProvider.Inference
 
 open System
 open OpenAPIParser.Version3.Specification

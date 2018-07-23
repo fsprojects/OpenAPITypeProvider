@@ -1,9 +1,9 @@
-﻿module OpenAPITypeProvider.Types.MediaType
+﻿module internal OpenAPITypeProvider.Types.MediaType
 
+open OpenAPITypeProvider
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Json
-open OpenAPITypeProvider.Json.Types
 open Microsoft.FSharp.Quotations
 
 let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
