@@ -30,13 +30,19 @@ type OptionConverter() =
         if isNull value then FSharpValue.MakeUnion(cases.[0], [||])
         else FSharpValue.MakeUnion(cases.[1], [|value|])
 
-let settings = JsonSerializerSettings()
-settings.Converters.Add(OptionConverter())
+
+let getDefaultSettings() =
+    let settings = JsonSerializerSettings()
+    settings.Converters.Add(OptionConverter())
+    settings.NullValueHandling <- NullValueHandling.Ignore
+    settings
+
+let private settings = getDefaultSettings()
 
 let getSerializer() = JsonSerializer.Create(settings)
 let serialize obj = JsonConvert.SerializeObject(obj, settings)
 let deserialize<'a> json = JsonConvert.DeserializeObject<'a>(json, settings)
 
-let toJToken dateFormat json =
+let parseToJToken dateFormat json =
     settings.DateFormatString <- dateFormat
     JsonConvert.DeserializeObject<JToken>(json, settings)

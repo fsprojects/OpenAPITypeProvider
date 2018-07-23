@@ -3,11 +3,8 @@ namespace OpenAPITypeProvider
 open Newtonsoft.Json.Linq
 open OpenAPITypeProvider.Json
 open OpenAPIParser.Version3.Specification
+open Newtonsoft.Json
 
-[<RequireQualifiedAccess>]
-type JsonFormatting =
-    | None
-    | Indented
 
 module private Reflection =
     let getOptionValue (o:obj) =
@@ -23,37 +20,44 @@ module private Reflection =
         | null -> false
         | v -> v.GetType() = typeof<'a>
 
-type ObjectValue(d:(string * obj) list) =
+type ObjectValue(d:(string * obj) list, dateFormat) =
     let mutable data = d |> Map |> System.Collections.Generic.Dictionary
 
-    let toJToken (o:obj) =
+    let toJToken nullHandling (o:obj) =
         if o.GetType() = typeof<ObjectValue> then
-            (o :?> ObjectValue).ToJToken()
+            (o :?> ObjectValue).ToJToken(nullHandling)
         else
             JToken.FromObject(o, Serialization.getSerializer())
 
-    let arrayToJToken (o:obj) =
+    let arrayToJToken nullHandling (o:obj) =
         let values = o :?> List<_>
         let arr = JArray()
-        values |> List.iter (toJToken >> arr.Add)
+        values |> List.iter (toJToken nullHandling >> arr.Add)
         arr :> JToken
 
     static member Parse(json, schema, dateFormat) =
         let schema = schema |> Serialization.deserialize<Schema>
-        json |> Serialization.toJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue schema :?> ObjectValue
+        json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema (fun x -> ObjectValue(x, dateFormat)) schema :?> ObjectValue
 
-    member internal __.GetValue x = if data.ContainsKey x then data.[x] else null
-    member __.ToJson formatting = 
-        match formatting with
-        | JsonFormatting.None -> "TODO"
-        | JsonFormatting.Indented -> "TODO"
-    member this.ToJson () = this.ToJson(JsonFormatting.None)
-    member __.ToJToken() =
+    member  __.GetValue x = if data.ContainsKey x then data.[x] else null
+
+    member this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
+        let jToken = this.ToJToken(settings.NullValueHandling)
+        JsonConvert.SerializeObject(jToken, formatting, settings)
+        
+    member this.ToJson formatting = 
+        let settings = Serialization.getDefaultSettings()
+        settings.DateFormatString <- dateFormat
+        this.ToJson(settings, formatting)
+
+    member this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
+    member this.ToJToken () = this.ToJToken(NullValueHandling.Ignore)
+    member __.ToJToken (nullHandling:NullValueHandling) =
         let obj = JObject()
         let setEmpty (o:JObject) key =
-            if true then
-                o.[key] <- JValue.CreateNull()
-            else ()
+            match nullHandling with
+            | NullValueHandling.Include -> o.[key] <- JValue.CreateNull()
+            | _ -> ()
         data
         |> Seq.map (|KeyValue|)
         |> Seq.toList
@@ -62,22 +66,22 @@ type ObjectValue(d:(string * obj) list) =
             else if v |> Reflection.isOption<ObjectValue> then
                 match v |> Reflection.getOptionValue with
                 | null -> setEmpty obj k
-                | v -> obj.[k] <- v |> toJToken
+                | v -> obj.[k] <- v |> toJToken nullHandling
             else if v.GetType() = typeof<Option<List<obj>>> then
                 match v |> Reflection.getOptionValue with
                 | null -> setEmpty obj k
-                | v -> obj.[k] <- v |> arrayToJToken
+                | v -> obj.[k] <- v |> arrayToJToken nullHandling
             else if v.GetType() = typeof<List<obj>> then
-                obj.[k] <- v |> arrayToJToken
+                obj.[k] <- v |> arrayToJToken nullHandling
             else 
-                obj.[k] <- v |> toJToken
+                obj.[k] <- v |> toJToken nullHandling
         )
         obj :> JToken
 
 type SimpleValue(value:obj) =
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        let v = json |> Serialization.toJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue schema
+        let v = json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema (fun x -> ObjectValue(x, dateFormat)) schema
         SimpleValue(v)
     member __.ToJToken() = 
         let valueType = value.GetType()

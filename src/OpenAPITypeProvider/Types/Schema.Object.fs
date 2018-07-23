@@ -54,10 +54,10 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
                     args
                     |> Seq.toList
                     |> List.mapi(fun i v -> Expr.NewTuple [ Expr.Value ctorParams.[i].Name ; Expr.Coerce(v, typeof<obj>) ] ))
-                
+            let format = ctx.DateFormatString                
             <@@  
             let v = (%%values : (string * obj) array) |> Array.toList 
-            ObjectValue(v)
+            ObjectValue(v, format)
             @@>)) |> typ.AddMember
 
         // static method Parse
