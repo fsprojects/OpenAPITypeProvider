@@ -36,10 +36,17 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
         let getCtorParam (name,typ) =
             if name |> isOptional then ProvidedParameter(name, asOption typ, false, None) else ProvidedParameter(name, typ)
 
+        let sortFn (x:string,_) (y:string,_) = 
+            match x |> isOptional, y |> isOptional with
+            | true, true | false, false -> x.CompareTo(y)
+            | true, false -> 1
+            | false, true -> -1
+
         let ctorParams = 
             props 
             |> Map.toList 
             |> List.map (fun (n,s) -> n, s |> Inference.getComplexType (getSchemaFun n >> SchemaType.GetType))
+            |> List.sortWith sortFn
             |> List.map getCtorParam 
         
         ProvidedConstructor(ctorParams, (fun args -> 

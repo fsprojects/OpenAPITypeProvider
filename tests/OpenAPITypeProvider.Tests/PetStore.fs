@@ -12,15 +12,15 @@ type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml">
 let ``Empty schema``() =
     let json = "{}"
     let instance = PetStore.Schemas.Empty()
-    instance |> compareJson json
-    json |> PetStore.Schemas.Empty.Parse |> compareJson json
+    instance.ToJToken() |> compareJson json
+    json |> PetStore.Schemas.Empty.Parse |> fun x -> x.ToJToken() |> compareJson json
 
 [<Test>]
 let ``NewPet schema``() =
     let json = """{"name":"Name","tag":"TAG"}"""
     let instance = new PetStore.Schemas.NewPet(name = "Name", tag = Some "TAG")
-    instance |> compareJson json
-    json |> PetStore.Schemas.NewPet.Parse |> compareJson json
+    instance.ToJToken() |> compareJson json
+    json |> PetStore.Schemas.NewPet.Parse |> fun x -> x.ToJToken() |> compareJson json
     Assert.AreEqual("Name", instance.Name)
     Assert.AreEqual(Some "TAG", instance.Tag)
 
@@ -28,8 +28,8 @@ let ``NewPet schema``() =
 let ``Error schema``() =
     let json = """{"code":123,"message":"Msg"}"""
     let instance = new PetStore.Schemas.Error (code = 123, message = "Msg")
-    instance |> compareJson json
-    json |> PetStore.Schemas.Error.Parse |> compareJson json
+    instance.ToJToken() |> compareJson json
+    json |> PetStore.Schemas.Error.Parse |> fun x -> x.ToJToken() |> compareJson json
     Assert.AreEqual(123, instance.Code)
     Assert.AreEqual("Msg", instance.Message)
 

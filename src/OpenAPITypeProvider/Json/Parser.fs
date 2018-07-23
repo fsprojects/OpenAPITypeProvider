@@ -26,39 +26,41 @@ let private some (typ:Type) arg =
     meth.Invoke(null, [|arg|])
 
 let rec parseForSchema createObj (schema:Schema) (json:JToken) =
-    match schema with
-    | Boolean -> json.Value<bool>() |> box
-    | Integer Int32 -> json.Value<int32>() |> box
-    | Integer Int64 -> json.Value<int64>() |> box
-    | Number NumberFormat.Double -> json.Value<double>() |> box
-    | Number NumberFormat.Float -> json.Value<float32>() |> box
-    | String StringFormat.String 
-    | String StringFormat.Binary 
-    | String StringFormat.Password -> json.Value<string>() |> box
-    | String StringFormat.Byte -> json.Value<byte>() |> box
-    | String StringFormat.DateTime
-    | String StringFormat.Date -> json.Value<DateTime>() |> box
-    | Array itemsSchema ->
-        let jArray = json :?> JArray
-        let items = [ for x in jArray do yield parseForSchema createObj itemsSchema x ]
-        let typ = itemsSchema |> Inference.getComplexType (fun _ -> typeof<obj>)
-        ReflectiveListBuilder.BuildTypedList typ items |> box
-    | Object (props, required) ->
-        let jObject = json :?> JObject
-        jObject |> checkRequiredProperties required
-        props 
-        |> Map.map (fun name schema -> 
-            if required |> List.contains name then
-                parseForSchema createObj schema (jObject.[name]) |> Some
-            else if jObject.ContainsKey name then
-                let typ = schema |> Inference.getComplexType (fun _ -> typeof<obj>)
-                parseForSchema createObj schema (jObject.[name]) 
-                |> some typ
-                |> Some
-            else None
-        )
-        |> Map.filter (fun _ v -> v.IsSome)
-        |> Map.map (fun _ v -> v.Value)
-        |> Map.toList
-        |> createObj
-        |> box
+    if json.Type = JTokenType.Null then null
+    else
+        match schema with
+        | Boolean -> json.Value<bool>() |> box
+        | Integer Int32 -> json.Value<int32>() |> box
+        | Integer Int64 -> json.Value<int64>() |> box
+        | Number NumberFormat.Double -> json.Value<double>() |> box
+        | Number NumberFormat.Float -> json.Value<float32>() |> box
+        | String StringFormat.String 
+        | String StringFormat.Binary 
+        | String StringFormat.Password -> json.Value<string>() |> box
+        | String StringFormat.Byte -> json.Value<byte>() |> box
+        | String StringFormat.DateTime
+        | String StringFormat.Date -> json.Value<DateTime>() |> box
+        | Array itemsSchema ->
+            let jArray = json :?> JArray
+            let items = [ for x in jArray do yield parseForSchema createObj itemsSchema x ]
+            let typ = itemsSchema |> Inference.getComplexType (fun _ -> typeof<obj>)
+            ReflectiveListBuilder.BuildTypedList typ items |> box
+        | Object (props, required) ->
+            let jObject = json :?> JObject
+            jObject |> checkRequiredProperties required
+            props 
+            |> Map.map (fun name schema -> 
+                if required |> List.contains name then
+                    parseForSchema createObj schema (jObject.[name]) |> Some
+                else if jObject.ContainsKey name then
+                    let typ = schema |> Inference.getComplexType (fun _ -> typeof<obj>)
+                    parseForSchema createObj schema (jObject.[name]) 
+                    |> some typ
+                    |> Some
+                else None
+            )
+            |> Map.filter (fun _ v -> v.IsSome)
+            |> Map.map (fun _ v -> v.Value)
+            |> Map.toList
+            |> createObj
+            |> box

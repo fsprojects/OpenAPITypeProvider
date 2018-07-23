@@ -1,3 +1,6 @@
+### 0.0.18-alpha - July 18 2018
+* Fixing converting optional array to JToken
+
 ### 0.0.17-alpha - July 13 2018
 * Fixing date format for parsing
 

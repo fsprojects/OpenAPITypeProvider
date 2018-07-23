@@ -55,7 +55,7 @@ components:
           type: array
           items:
             type: string
-
+    
     ContactWrapper:
       properties:
         name:
@@ -76,4 +76,3 @@ components:
           $ref: '#/components/schemas/Contact'
       required:
         - name
-        - contact

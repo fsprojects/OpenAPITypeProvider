@@ -10,24 +10,24 @@ type Simple = OpenAPIV3Provider<"Samples/Simple.yaml">
 let ``String schema``() =
     let json = "\"ABC\""
     let instance = Simple.Schemas.SimpleString("ABC")
-    instance |> compareJson json
-    json |> Simple.Schemas.SimpleString.Parse |> compareJson json
+    instance.ToJToken() |> compareJson json
+    json |> Simple.Schemas.SimpleString.Parse |> fun x -> x.ToJToken() |> compareJson json
     Assert.AreEqual("ABC", instance.Value)
 
 [<Test>]
 let ``String array``() =
     let json = """["A","B"]"""
     let instance = Simple.Schemas.SimpleArray(["A";"B"])
-    instance |> compareJson json
-    json |> Simple.Schemas.SimpleArray.Parse |> compareJson json
+    instance.ToJToken() |> compareJson json
+    json |> Simple.Schemas.SimpleArray.Parse |> fun x -> x.ToJToken() |> compareJson json
     Assert.AreEqual(["A";"B"], instance.Values)
 
 [<Test>]
 let ``String array2``() =
     let json = """[1,2]"""
     let instance = Simple.Schemas.SimpleArray2([1;2])
-    instance |> compareJson json
-    json |> Simple.Schemas.SimpleArray2.Parse |> compareJson json
+    instance.ToJToken() |> compareJson json
+    json |> Simple.Schemas.SimpleArray2.Parse |> fun x -> x.ToJToken() |> compareJson json
     Assert.AreEqual([1;2], instance.Values)
 
 [<Test>]
@@ -35,6 +35,6 @@ let ``String array3``() =
     let json = """[{"name":"N"}]"""
     let ob = Simple.Schemas.MyObj("N")
     let instance = Simple.Schemas.SimpleArray3([ob])
-    instance |> compareJson json
-    json |> Simple.Schemas.SimpleArray3.Parse |> compareJson json
+    instance.ToJToken() |> compareJson json
+    json |> Simple.Schemas.SimpleArray3.Parse |> fun x -> x.ToJToken() |> compareJson json
     Assert.AreEqual("N", instance.Values.[0].Name)

@@ -89,5 +89,22 @@ components:
         - name
         - accountNumber
         - apiKey
-        - address
         - primaryContact
+    
+    SmallAgent:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+          
+    SmallAgentWithArray:
+      type: object
+      properties:
+        name:
+          type: string
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
