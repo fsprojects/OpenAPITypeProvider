@@ -1,4 +1,4 @@
-// include Fake lib
+﻿// include Fake lib
 #I "packages/FAKE/tools/"
 
 #r "FakeLib.dll"
@@ -26,8 +26,8 @@ Target "Nuget" <| fun () ->
         [
             "PackageId=\"OpenAPITypeProvider\""
             "Title=\"OpenAPITypeProvider\""
-            "Description=\"F# Type ProviderOpen for API Specification\""
-            "Summary=\"F# Type ProviderOpen for API Specification\""
+            "Description=\"F# Type Provider for Open API Specification\""
+            "Summary=\"F# Type Provider for Open API Specification\""
             sprintf "PackageVersion=\"%s\"" release.NugetVersion
             sprintf "PackageReleaseNotes=\"%s\"" (release.Notes |> toNotes)
             "PackageLicenseUrl=\"http://github.com/dzoukr/OpenAPITypeProvider/blob/master/LICENSE.md\""

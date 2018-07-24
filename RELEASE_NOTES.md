@@ -1,3 +1,6 @@
+### 1.0.1 - July 24 2018
+* Typo in package description
+
 ### 1.0.0 - July 24 2018
 * Initial public release
 
