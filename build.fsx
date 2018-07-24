@@ -32,7 +32,7 @@ Target "Nuget" <| fun () ->
             sprintf "PackageReleaseNotes=\"%s\"" (release.Notes |> toNotes)
             "PackageLicenseUrl=\"http://github.com/dzoukr/OpenAPITypeProvider/blob/master/LICENSE.md\""
             "PackageProjectUrl=\"http://github.com/dzoukr/OpenAPITypeProvider\""
-            "PackageIconUrl=\"https://avatars2.githubusercontent.com/u/851307?v=3&amp;s=64\""
+            "PackageIconUrl=\"https://raw.githubusercontent.com/Dzoukr/OpenAPITypeProvider/master/logo.jpg"
             "PackageTags=\"F# FSharp OpenAPI Swagger TypeProvider\""
             "Copyright=\"Roman Provazník - 2018\""
             "Authors=\"Roman Provazník\""
