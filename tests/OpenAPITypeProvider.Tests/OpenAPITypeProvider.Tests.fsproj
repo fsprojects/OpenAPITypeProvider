@@ -2,14 +2,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ObjectValue.fs" />
-    <!-- <Compile Include="Shared.fs" />
-    <Compile Include="PetStore.fs" />
-    <Compile Include="Nested.fs" />
-    <Compile Include="Simple.fs" />
-    <Compile Include="Issues.fs" /> -->
+    <Compile Include="BasicTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenAPITypeProvider\OpenAPITypeProvider.fsproj" />

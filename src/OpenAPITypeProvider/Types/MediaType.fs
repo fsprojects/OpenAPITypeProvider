@@ -4,7 +4,7 @@ open OpenAPITypeProvider
 open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Json
-open Microsoft.FSharp.Quotations
+open Newtonsoft.Json
 
 let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
     
@@ -55,23 +55,92 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     let schemaTyp = findOrCreateSchemaFn name media.Schema
 
-    // ToJToken
-    ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp.Type)], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
+    // ToJson
+    ProvidedMethod("ToJson", [ProvidedParameter(name, schemaTyp.Type)], typeof<string>, (fun args -> 
         match media.Schema with
         | Object _ ->
             <@@ 
-                //let o = %%Expr.Coerce(args.[1], typeof<ObjectValue>) : ObjectValue
+                let o = %%args.[1] : ObjectValue
+                o.ToJson()
+            @@>
+        | _ -> 
+            <@@ 
+                let o = %%args.[1] : SimpleValue
+                o.ToJson()
+            @@>
+        ))
+        |> (fun x -> x.AddXmlDoc "Converts strongly typed value to JSON string"; x)
+        |> typ.AddMember
+    
+    // ToJson
+    ProvidedMethod("ToJson", [ProvidedParameter(name, schemaTyp.Type);ProvidedParameter("formatting", typeof<Formatting>)], typeof<string>, (fun args -> 
+        match media.Schema with
+        | Object _ ->
+            <@@ 
+                let o = %%args.[1] : ObjectValue
+                let f = %%args.[2] : Formatting
+                o.ToJson(f)
+            @@>
+        | _ -> 
+            <@@ 
+                let o = %%args.[1] : SimpleValue
+                let f = %%args.[2] : Formatting
+                o.ToJson(f)
+            @@>
+        ))
+        |> (fun x -> x.AddXmlDoc "Converts strongly typed value to JSON string"; x)
+        |> typ.AddMember
+    
+    // ToJson
+    ProvidedMethod("ToJson", [ProvidedParameter(name, schemaTyp.Type);ProvidedParameter("settings", typeof<JsonSerializerSettings>);ProvidedParameter("formatting", typeof<Formatting>)], typeof<string>, (fun args -> 
+        match media.Schema with
+        | Object _ ->
+            <@@ 
+                let o = %%args.[1] : ObjectValue
+                let s = %%args.[2] : JsonSerializerSettings
+                let f = %%args.[3] : Formatting
+                o.ToJson(s,f)
+            @@>
+        | _ -> 
+            <@@ 
+                let o = %%args.[1] : SimpleValue
+                let s = %%args.[2] : JsonSerializerSettings
+                let f = %%args.[3] : Formatting
+                o.ToJson(s,f)
+            @@>
+        ))
+        |> (fun x -> x.AddXmlDoc "Converts strongly typed value to JSON string"; x)
+        |> typ.AddMember
+    
+    // ToJToken
+    ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp.Type)], typeof<Linq.JToken>, (fun args -> 
+        match media.Schema with
+        | Object _ ->
+            <@@ 
                 let o = %%args.[1] : ObjectValue
                 o.ToJToken()
             @@>
         | _ -> 
             <@@ 
-                //let o = %%Expr.Coerce(args.[1], typeof<SimpleValue>) : SimpleValue
                 let o = %%args.[1] : SimpleValue
                 o.ToJToken()
             @@>
         ))
-        |> (fun x -> x.AddXmlDoc "Converts strongly typed response to JToken"; x)
+        |> (fun x -> x.AddXmlDoc "Converts strongly typed value to Newtonsoft JToken"; x)
         |> typ.AddMember
+    
+    match media.Schema with
+    | Object _ ->
+        // ToJToken
+        ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp.Type);ProvidedParameter("nullValueHandling", typeof<NullValueHandling>)], typeof<Linq.JToken>, (fun args -> 
+                <@@ 
+                    let o = %%args.[1] : ObjectValue
+                    let h = %%args.[2] : NullValueHandling
+                    o.ToJToken(h)
+                @@>
+            ))
+            |> (fun x -> x.AddXmlDoc "Converts strongly typed value to Newtonsoft JToken"; x)
+            |> typ.AddMember
+    | _ -> ()
     
     typ

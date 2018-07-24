@@ -33,7 +33,19 @@ let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
             let json = %%args.Head : string
             SimpleValue.Parse(json, strSchema, format)
         @@>), isStatic = true)
+        |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema"; x)
         |> typ.AddMember
+    
+    // static method Parse
+    ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>);ProvidedParameter("dateFormatString", typeof<string>)], typ, (fun args -> 
+        <@@ 
+            let json = %%args.[0] : string
+            let format = %%args.[1] : string
+            SimpleValue.Parse(json, strSchema, format)
+        @@>), isStatic = true)
+        |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema with custom DateFormatString"; x)
+        |> typ.AddMember
+
         
     // Value(s) property
     let valueMethodName = 
@@ -45,17 +57,9 @@ let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
         let t = args.[0]
         <@@  
             let simpleValue = (%%t : SimpleValue)
-            simpleValue.Value
+            simpleValue.GetValue
         @@>)) |> typ.AddMember
 
-    // // ToJToken method
-    // ProvidedMethod("ToJToken", [], typeof<Newtonsoft.Json.Linq.JToken>, (fun args -> 
-    //     let t = args.[0]
-    //     <@@ 
-    //         let simpleValue = ((%%t : obj ):?> SimpleValue)
-    //         simpleValue.ToJToken()
-    //     @@>))
-    //     |> typ.AddMember
     typ
 
 let createTypes ctx getSchemaFun name schema =

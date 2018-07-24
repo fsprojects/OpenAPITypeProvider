@@ -1,3 +1,6 @@
+### 1.0.0 - July 24 2018
+* Initial public release
+
 ### 0.0.18-alpha - July 18 2018
 * Fixing converting optional array to JToken
 

@@ -170,7 +170,25 @@ components:
       required:
         - date1
         - date2
-
+    
+    WithArray:
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            type: string
+    
+    WithArrayOptional:
+      properties:
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            type: string
+    
     Error:
       required:
         - code
@@ -181,6 +199,33 @@ components:
           format: int32
         message:
           type: string
+    
+    SimpleInt:
+      type: integer
+
+    SimpleString:
+      type: string    
+    
+    SimpleArray:
+      type: array
+      items:
+        type: string
+
+    SimpleArray2:
+      type: array
+      items:
+        $ref: '#/components/schemas/SimpleInt'
+
+    SimpleArray3:
+      type: array
+      items:
+        $ref: '#/components/schemas/Error'
+    
+    SimpleDate:
+      type: string
+      format: date
+    
     Empty:
       type: object
+    
     Empty2: {}

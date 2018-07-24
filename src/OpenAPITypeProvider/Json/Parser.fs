@@ -14,20 +14,6 @@ let private checkRequiredProperties (req:string list) (jObject:JObject) =
 
 let defaultDateFormat = "yyyy-MM-ddTHH:mm:ss.FFFFFFFK"
 
-type ReflectiveListBuilder = 
-    static member BuildList<'a> (args: obj list) = 
-        [ for a in args do yield a :?> 'a ] 
-    static member BuildTypedList lType (args: obj list) = 
-        typeof<ReflectiveListBuilder>
-            .GetMethod("BuildList")
-            .MakeGenericMethod([|lType|])
-            .Invoke(null, [|args|])
-
-let private some (typ:Type) arg =
-    let unionType = typedefof<option<_>>.MakeGenericType typ
-    let meth = unionType.GetMethod("Some")
-    meth.Invoke(null, [|arg|])
-
 let rec parseForSchema createObj (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
@@ -45,7 +31,7 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
         let jArray = json :?> JArray
         let items = [ for x in jArray do yield parseForSchema createObj itemsSchema x ]
         let typ = itemsSchema |> Inference.getComplexType (fun _ -> typeof<obj>)
-        ReflectiveListBuilder.BuildTypedList typ items |> box
+        Reflection.ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
         jObject |> checkRequiredProperties required
@@ -58,7 +44,7 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
                 if jObject.[name].Type = JTokenType.Null then None
                 else
                     parseForSchema createObj schema (jObject.[name]) 
-                    |> some typ
+                    |> Reflection.some typ
                     |> Some
             else None
         )

@@ -5,20 +5,6 @@ open OpenAPITypeProvider.Json
 open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json
 
-module private Reflection =
-    let getOptionValue (o:obj) =
-        match o with
-        | null -> null
-        | v ->
-            match v.GetType().GetProperty("Value") with
-            | null -> null
-            | prop -> prop.GetValue(o, null )
-    
-    let isOption<'a> (o:obj) =
-        match o |> getOptionValue with
-        | null -> false
-        | v -> v.GetType() = typeof<'a>
-
 type ObjectValue(d:(string * obj) list) =
     let mutable data = d |> Map |> System.Collections.Generic.Dictionary
 
@@ -88,7 +74,9 @@ type SimpleValue(value:obj) =
         let schema = strSchema |> Serialization.deserialize<Schema>
         let v = json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema  ObjectValue schema
         SimpleValue(v)
-    member __.ToJToken() = 
+
+    /// Converts strongly typed value to Newtonsoft JToken    
+    member __.ToJToken () = 
         let valueType = value.GetType()
         if valueType = typeof<List<ObjectValue>> then
             let values = value :?> List<ObjectValue>
@@ -102,9 +90,18 @@ type SimpleValue(value:obj) =
             arr :> JToken
         else
             JToken.FromObject(value, Serialization.getSerializer())
-    member internal __.Value = 
-        if value.GetType() = typeof<List<ObjectValue>> then
-            let values = value :?> List<ObjectValue>
-            values |> List.map box |> box
-        else
-            value
+    
+    /// Converts strongly typed value to JSON string
+    member this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
+        let jToken = this.ToJToken()
+        JsonConvert.SerializeObject(jToken, formatting, settings)
+
+    /// Converts strongly typed value to JSON string
+    member this.ToJson formatting = 
+        let settings = Serialization.getDefaultSettings()
+        this.ToJson(settings, formatting)
+
+    /// Converts strongly typed value to JSON string
+    member this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
+    member __.GetValue = value
+        

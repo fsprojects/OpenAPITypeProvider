@@ -15,6 +15,7 @@
     <Compile Include="IO.fs" />
     <Compile Include="Names.fs" />
     <Compile Include="Inference.fs" />
+    <Compile Include="Reflection.fs" />
     <Compile Include="Json\Serialization.fs" />
     <Compile Include="Json\Parser.fs" />
     <Compile Include="Json\JsonValue.fs" />
