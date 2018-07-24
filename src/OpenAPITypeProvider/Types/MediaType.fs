@@ -60,15 +60,18 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
         match media.Schema with
         | Object _ ->
             <@@ 
-                let o = %%Expr.Coerce(args.[1], typeof<ObjectValue>) : ObjectValue
+                //let o = %%Expr.Coerce(args.[1], typeof<ObjectValue>) : ObjectValue
+                let o = %%args.[1] : ObjectValue
                 o.ToJToken()
             @@>
         | _ -> 
             <@@ 
-                let o = %%Expr.Coerce(args.[1], typeof<SimpleValue>) : SimpleValue
+                //let o = %%Expr.Coerce(args.[1], typeof<SimpleValue>) : SimpleValue
+                let o = %%args.[1] : SimpleValue
                 o.ToJToken()
             @@>
         ))
         |> (fun x -> x.AddXmlDoc "Converts strongly typed response to JToken"; x)
         |> typ.AddMember
+    
     typ

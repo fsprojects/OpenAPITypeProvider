@@ -54,10 +54,10 @@ type ObjectValue(d:(string * obj) list) =
     member this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
     
     /// Converts strongly typed value to Newtonsoft JToken
-    member __.ToJToken (nullHandling:NullValueHandling) =
+    member __.ToJToken (nullValueHandling:NullValueHandling) =
         let obj = JObject()
         let setEmpty (o:JObject) key =
-            match nullHandling with
+            match nullValueHandling with
             | NullValueHandling.Include -> o.[key] <- JValue.CreateNull()
             | _ -> ()
         data
@@ -68,15 +68,15 @@ type ObjectValue(d:(string * obj) list) =
             else if v |> Reflection.isOption<ObjectValue> then
                 match v |> Reflection.getOptionValue with
                 | null -> setEmpty obj k
-                | v -> obj.[k] <- v |> toJToken nullHandling
+                | v -> obj.[k] <- v |> toJToken nullValueHandling
             else if v.GetType() = typeof<Option<List<obj>>> then
                 match v |> Reflection.getOptionValue with
                 | null -> setEmpty obj k
-                | v -> obj.[k] <- v |> arrayToJToken nullHandling
+                | v -> obj.[k] <- v |> arrayToJToken nullValueHandling
             else if v.GetType() = typeof<List<obj>> then
-                obj.[k] <- v |> arrayToJToken nullHandling
+                obj.[k] <- v |> arrayToJToken nullValueHandling
             else 
-                obj.[k] <- v |> toJToken nullHandling
+                obj.[k] <- v |> toJToken nullValueHandling
         )
         obj :> JToken
 

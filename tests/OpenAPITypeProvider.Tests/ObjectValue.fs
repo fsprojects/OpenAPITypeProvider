@@ -2,10 +2,11 @@ module OpenAPITypeProvider.Tests.ObjectValue
 
 open NUnit.Framework
 open OpenAPITypeProvider
-open System
 open Newtonsoft.Json
+open System
 
 type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml">
+
 let customDateFormat = "dd. MM. yyyy HH:mm:ss"
 
 [<Test>]
@@ -105,6 +106,28 @@ let ``Parses and converts basic schema with two dates properties (custom format)
     Assert.AreEqual(json, instance.ToJson(customSettings, Formatting.None))
     Assert.AreEqual(json, parsed.ToJson(customSettings, Formatting.None))
 
+//[<Test>]
+//let ``Converts response to JToken``() =
+//    let petStoreAPI = new PetStore()
+//    let json = """{"id":1,"name":"AHOJ"}"""
+//    let instance = PetStore.Schemas.Pet(1L, "AHOJ")
+//    let parsed = PetStore.Schemas.Pet.Parse json
+//    Assert.AreEqual(json, petStoreAPI.Paths.``/pets``.Post.Responses.``200``.``application/json``.ToJToken(instance).ToString(Formatting.None))
+//    Assert.AreEqual(json, petStoreAPI.Paths.``/pets``.Post.Responses.``200``.``application/json``.ToJToken(parsed).ToString(Formatting.None))
+
+// [<Test>]
+// let ``Parses request from JSON``() =
+//     let petStoreAPI = PetStore()
+//     let json = """{"name":"Name"}"""
+//     let instance = PetStore.Schemas.NewPet("Name")
+//     let parsed = petStoreAPI.Paths.``/pets``.Post.RequestBody.``application/json``.Parse(json)
+//     Assert.AreEqual(json, instance.ToJson())
+//     Assert.AreEqual(json, parsed.ToJson())
+//     Assert.AreEqual("Name", instance.Name)
+//     Assert.AreEqual(None, instance.Tag)
+//     Assert.AreEqual("Name", parsed.Name)
+//     Assert.AreEqual(None, parsed.Tag)
+    
 
 [<Test>]
 let ``Fails with parsing mismatched types``() =
@@ -126,27 +149,3 @@ let ``Fails with parsing null in required properties``() =
         let json = """{"code":123,"message":null}"""
         PetStore.Schemas.Error.Parse json |> ignore
     ) |> ignore
-
-
-// [<Test>]
-// let ``Error schema``() =
-//     let json = """{"code":123,"message":"Msg"}"""
-//     let instance = new PetStore.Schemas.Error (code = 123, message = "Msg")
-//     instance.ToJToken() |> compareJson json
-//     json |> PetStore.Schemas.Error.Parse |> fun x -> x.ToJToken() |> compareJson json
-//     Assert.AreEqual(123, instance.Code)
-//     Assert.AreEqual("Msg", instance.Message)
-
-// [<Test>]
-// let ``Two dates schema``() =
-//     let json = """{"date1":"31. 12. 2018 12:34:56","date2":"31. 12. 2017 12:34:56"}"""
-//     let parsed = PetStoreWithDate.Schemas.TwoDates.Parse(json)
-//     Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date1)
-//     Assert.AreEqual(DateTime(2017,12,31,12,34,56, DateTimeKind.Local), parsed.Date2)
-
-// [<Test>]
-// let ``Two dates schema default``() =
-//     let json = """{"date1":"2018-12-31T12:34:56","date2":"2017-12-31T12:34:56","addedValue":null,"xyz":"abc"}"""
-//     let parsed = PetStore.Schemas.TwoDates.Parse(json)
-//     Assert.AreEqual(DateTime(2018,12,31,12,34,56, DateTimeKind.Local), parsed.Date1)
-//     Assert.AreEqual(DateTime(2017,12,31,12,34,56, DateTimeKind.Local), parsed.Date2)
