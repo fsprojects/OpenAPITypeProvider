@@ -23,7 +23,7 @@ When I started to think about writing this type provider, I set few goals:
 
 ## Instalation
 
-First install NuGet package
+First install [NuGet package](https://www.nuget.org/packages/OpenAPITypeProvider/)
 
     Install-Package OpenAPITypeProvider
 
