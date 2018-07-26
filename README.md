@@ -166,6 +166,7 @@ In case you have any doubts, you can always have a look [at unit tests](https://
 1. Only YAML files are now supported in type provider (will be fixed soon)
 2. Only local (in the same document) $ref values are supported (will be fixed once I fix [OpenAPIParser](https://github.com/Dzoukr/OpenAPIParser))
 3. No support for `OneOf` and `ManyOf` since they are basically union types which is quite difficult (or maybe impossible) to generate from type provider
+4. No filewatcher on source file - I'll probably need help with this. Anyone? :)
 
 
 ## Contribution
