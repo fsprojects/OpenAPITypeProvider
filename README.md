@@ -25,11 +25,11 @@ When I started to think about writing this type provider, I set few goals:
 
 First install NuGet package
 
-`Install-Package OpenAPITypeProvider`
+    Install-Package OpenAPITypeProvider
 
 or using Paket
 
-`nuget OpenAPITypeProvider`
+    nuget OpenAPITypeProvider
 
 ## How to use
 
