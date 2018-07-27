@@ -189,6 +189,9 @@ components:
           items:
             type: string
     
+    WithUUID:
+      $ref: 'ExternalSchemas.yaml#WithUUID'
+    
     Error:
       required:
         - code
@@ -225,6 +228,10 @@ components:
       type: string
       format: date
     
+    SimpleGuid:
+      type: string
+      format: uuid
+
     Empty:
       type: object
     

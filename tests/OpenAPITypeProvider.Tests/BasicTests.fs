@@ -6,6 +6,7 @@ open Newtonsoft.Json
 open System
 
 type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml">
+type PetStoreJson = OpenAPIV3Provider<"Samples/PetStoreJson.json">
 
 let customDateFormat = "dd. MM. yyyy HH:mm:ss"
 
@@ -209,6 +210,42 @@ let ``Parses and converts simple value schema (date)``() =
     Assert.AreEqual(json, instance.ToJson(customSettings, Formatting.None))
     Assert.AreEqual(json, parsed.ToJson(customSettings, Formatting.None))
     Assert.AreEqual(d1, instance.Value)
+
+[<Test>]
+let ``Parses and converts simple value schema (UUID)``() =
+    let json = "\"3ca191ae-6d5b-45a5-9767-0d610dd47497\""
+    let guid = Guid("3ca191ae-6d5b-45a5-9767-0d610dd47497")
+    let instance = PetStore.Schemas.SimpleGuid(guid)
+    let parsed = PetStore.Schemas.SimpleGuid.Parse(json)
+    Assert.AreEqual(json, instance.ToJson())
+    Assert.AreEqual(json, parsed.ToJson())
+    Assert.AreEqual(guid, instance.Value)
+
+[<Test>]
+let ``Parses and converts basic schema with UUID property``() =
+    let guid = Guid("3ca191ae-6d5b-45a5-9767-0d610dd47497")
+    let json = """{"id":"3ca191ae-6d5b-45a5-9767-0d610dd47497","name":"Name"}"""
+    let instance = new PetStore.Schemas.WithUUID(name = "Name", id = guid)
+    let parsed = PetStore.Schemas.WithUUID.Parse json
+    Assert.AreEqual(json, instance.ToJson())
+    Assert.AreEqual(json, parsed.ToJson())
+    Assert.AreEqual("Name", instance.Name)
+    Assert.AreEqual(guid, instance.Id)
+    Assert.AreEqual("Name", parsed.Name)
+    Assert.AreEqual(guid, parsed.Id)
+
+[<Test>]
+let ``Parses and converts basic schema with UUID property (from JSON)``() =
+    let guid = Guid("3ca191ae-6d5b-45a5-9767-0d610dd47497")
+    let json = """{"id":"3ca191ae-6d5b-45a5-9767-0d610dd47497","name":"Name"}"""
+    let instance = new PetStoreJson.Schemas.WithUUID(name = "Name", id = guid)
+    let parsed = PetStoreJson.Schemas.WithUUID.Parse json
+    Assert.AreEqual(json, instance.ToJson())
+    Assert.AreEqual(json, parsed.ToJson())
+    Assert.AreEqual("Name", instance.Name)
+    Assert.AreEqual(guid, instance.Id)
+    Assert.AreEqual("Name", parsed.Name)
+    Assert.AreEqual(guid, parsed.Id)
 
 [<Test>]
 let ``Fails with parsing mismatched types``() =

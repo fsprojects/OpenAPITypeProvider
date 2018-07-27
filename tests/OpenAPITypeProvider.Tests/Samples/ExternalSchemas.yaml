@@ -1,0 +1,8 @@
+WithUUID:
+  properties:
+    name:
+      type: string
+    id:
+      type: string
+      format: uuid
+  required: [name, id]

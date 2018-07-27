@@ -97,7 +97,7 @@ NUGET
       System.Threading.Thread (>= 4.3) - restriction: || (== netcoreapp2.1) (&& (== netstandard2.0) (>= netcoreapp1.0))
       System.Xml.XmlDocument (>= 4.3) - restriction: || (== netcoreapp2.1) (&& (== netstandard2.0) (>= netcoreapp1.0))
       System.Xml.XPath.XmlDocument (>= 4.3) - restriction: || (== netcoreapp2.1) (&& (== netstandard2.0) (>= netcoreapp1.0))
-    OpenAPIParser (1.0.3)
+    OpenAPIParser (1.1)
       FSharp.Core (>= 4.2.3)
       Newtonsoft.Json (>= 10.0.1)
       YamlDotNet (>= 4.3.1)
@@ -707,5 +707,5 @@ NUGET
     YamlDotNet (5.0.1)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.SDK
-    src/ProvidedTypes.fs (1d9f236c03e749712b069c4fed51aec40a3c1601)
-    src/ProvidedTypes.fsi (1d9f236c03e749712b069c4fed51aec40a3c1601)
+    src/ProvidedTypes.fs (d50b7556cc57c403cd53bd1116027450d60c72db)
+    src/ProvidedTypes.fsi (d50b7556cc57c403cd53bd1116027450d60c72db)

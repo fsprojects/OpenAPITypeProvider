@@ -45,7 +45,7 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
    
    let helpText = 
         """<summary>OpenAPI Version 3 Type Provider</summary>
-           <param name='FilePath'>Location of a YAML file with specification.</param>
+           <param name='FilePath'>Location of a YAML or JSON file with specification.</param>
         """
   
    do tp.AddXmlDoc helpText

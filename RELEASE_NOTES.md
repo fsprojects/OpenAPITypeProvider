@@ -1,3 +1,7 @@
+### 1.1.0 - July 27 2018
+* Support for Guids (from UUID)
+* Support for $ref to local files
+
 ### 1.0.1 - July 24 2018
 * Typo in package description
 

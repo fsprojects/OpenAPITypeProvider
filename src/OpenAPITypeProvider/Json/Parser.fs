@@ -27,6 +27,7 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
     | String StringFormat.Byte -> json.Value<byte>() |> box
     | String StringFormat.DateTime
     | String StringFormat.Date -> json.Value<DateTime>() |> box
+    | String StringFormat.UUID -> json.Value<string>() |> Guid |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
         let items = [ for x in jArray do yield parseForSchema createObj itemsSchema x ]
