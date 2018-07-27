@@ -15,7 +15,13 @@ type ObjectValue(d:(string * obj) list) =
             JToken.FromObject(o, Serialization.getSerializer())
 
     let arrayToJToken nullHandling (o:obj) =
-        let values = o :?> List<_>
+        let values = o :?> List<obj>
+        let arr = JArray()
+        values |> List.iter (toJToken nullHandling >> arr.Add)
+        arr :> JToken
+    
+    let arrayObjectValueToJToken nullHandling (o:obj) =
+        let values = o :?> List<ObjectValue>
         let arr = JArray()
         values |> List.iter (toJToken nullHandling >> arr.Add)
         arr :> JToken
@@ -59,6 +65,12 @@ type ObjectValue(d:(string * obj) list) =
                 match v |> Reflection.getOptionValue with
                 | null -> setEmpty obj k
                 | v -> obj.[k] <- v |> arrayToJToken nullValueHandling
+            else if v.GetType() = typeof<Option<List<ObjectValue>>> then
+                match v |> Reflection.getOptionValue with
+                | null -> setEmpty obj k
+                | v -> obj.[k] <- v |> arrayObjectValueToJToken nullValueHandling
+            else if v.GetType() = typeof<List<ObjectValue>> then
+                obj.[k] <- v |> arrayObjectValueToJToken nullValueHandling
             else if v.GetType() = typeof<List<obj>> then
                 obj.[k] <- v |> arrayToJToken nullValueHandling
             else 

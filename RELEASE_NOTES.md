@@ -1,3 +1,7 @@
+### 1.1.1 - July 27 2018
+* Fix of issue with array in Schema type
+* Fix of issue with optional array in Schema type
+
 ### 1.1.0 - July 27 2018
 * Support for Guids (from UUID)
 * Support for $ref to local files

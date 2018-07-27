@@ -188,6 +188,32 @@ components:
           type: array
           items:
             type: string
+
+    WithArrayOfObjects:
+      required: [items]            
+      properties:
+        items:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
+              surname:
+                type: string
+            required: [name, surname]
+    
+    WithArrayOfObjectsOptional:
+      properties:
+        items:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
+              surname:
+                type: string
+            required: [name, surname]
+
     
     WithUUID:
       $ref: 'ExternalSchemas.yaml#WithUUID'
