@@ -28,7 +28,7 @@ type ObjectValue(d:(string * obj) list) =
 
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue schema :?> ObjectValue
+        json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
 
     member  __.GetValue x = if data.ContainsKey x then data.[x] else null
 
@@ -84,7 +84,7 @@ type ObjectValue(d:(string * obj) list) =
 type SimpleValue(value:obj) =
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<Schema>
-        let v = json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema  ObjectValue schema
+        let v = json |> Serialization.parseToJToken dateFormat |> OpenAPITypeProvider.Json.Parser.parseForSchema ObjectValue typeof<ObjectValue> schema
         SimpleValue(v)
 
     /// Converts strongly typed value to Newtonsoft JToken    

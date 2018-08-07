@@ -14,7 +14,7 @@ let private checkRequiredProperties (req:string list) (jObject:JObject) =
 
 let defaultDateFormat = "yyyy-MM-ddTHH:mm:ss.FFFFFFFK"
 
-let rec parseForSchema createObj (schema:Schema) (json:JToken) =
+let rec parseForSchema createObj defaultTyp (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
     | Integer Int32 -> json.Value<int32>() |> box
@@ -30,8 +30,8 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
     | String StringFormat.UUID -> json.Value<string>() |> Guid |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
-        let items = [ for x in jArray do yield parseForSchema createObj itemsSchema x ]
-        let typ = itemsSchema |> Inference.getComplexType (fun _ -> typeof<obj>)
+        let items = [ for x in jArray do yield parseForSchema createObj defaultTyp itemsSchema x ]
+        let typ = itemsSchema |> Inference.getComplexType (fun _ -> defaultTyp)
         Reflection.ReflectiveListBuilder.BuildTypedList typ items |> box
     | Object (props, required) ->
         let jObject = json :?> JObject
@@ -39,12 +39,12 @@ let rec parseForSchema createObj (schema:Schema) (json:JToken) =
         props 
         |> Map.map (fun name schema -> 
             if required |> List.contains name then
-                parseForSchema createObj schema (jObject.[name]) |> Some
+                parseForSchema createObj defaultTyp schema (jObject.[name]) |> Some
             else if jObject.ContainsKey name then
-                let typ = schema |> Inference.getComplexType (fun _ -> typeof<obj>)
+                let typ = schema |> Inference.getComplexType (fun _ -> defaultTyp)
                 if jObject.[name].Type = JTokenType.Null then None
                 else
-                    parseForSchema createObj schema (jObject.[name]) 
+                    parseForSchema createObj defaultTyp schema (jObject.[name]) 
                     |> Reflection.some typ
                     |> Some
             else None

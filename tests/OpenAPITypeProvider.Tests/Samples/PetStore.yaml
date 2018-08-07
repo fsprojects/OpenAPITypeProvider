@@ -213,7 +213,6 @@ components:
               surname:
                 type: string
             required: [name, surname]
-
     
     WithUUID:
       $ref: 'ExternalSchemas.yaml#WithUUID'

@@ -1,0 +1,66 @@
+﻿openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  description: A sample API that uses a petstore as an example to demonstrate features in the OpenAPI 3.0 specification
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Swagger API Team
+    email: foo@example.com
+    url: http://madskristensen.net
+  license:
+    name: MIT
+    url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+servers:
+  - url: http://petstore.swagger.io/api
+paths:
+  /pets:
+    post:
+      description: Creates a new pet in the store.  Duplicates are allowed
+      operationId: addPet
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentRequest'
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Empty'
+  
+components:
+  schemas:
+    
+    AddressView:
+      type: object
+      properties:
+        street:
+          type: string
+        zip:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+      required:
+        - street
+        - zip
+        - city
+        - country
+        
+    AgentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        invoiceAddress:
+          $ref: '#/components/schemas/AddressView'
+      required:
+        - name
+    
+    Empty: {}

@@ -1,11 +1,11 @@
-module OpenAPITypeProvider.Tests.ObjectValue
+module OpenAPITypeProvider.Tests.BasicTests
 
 open NUnit.Framework
 open OpenAPITypeProvider
 open Newtonsoft.Json
 open System
 
-type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml ">
+type PetStore = OpenAPIV3Provider<"Samples/PetStore.yaml">
 type PetStoreJson = OpenAPIV3Provider<"Samples/PetStoreJson.json">
 
 let customDateFormat = "dd. MM. yyyy HH:mm:ss"

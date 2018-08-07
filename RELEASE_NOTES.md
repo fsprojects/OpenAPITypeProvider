@@ -1,3 +1,6 @@
+### 1.1.2 - August 07 2018
+* Fix for #2 issue - Cannot read values from parsed schema with optional sub schema
+
 ### 1.1.1 - July 27 2018
 * Fix of issue with array in Schema type
 * Fix of issue with optional array in Schema type
