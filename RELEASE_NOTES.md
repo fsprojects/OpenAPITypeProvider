@@ -1,3 +1,6 @@
+### 1.1.3 - August 07 2018
+* Fixing nuget problem
+
 ### 1.1.2 - August 07 2018
 * Fix for #2 issue - Cannot read values from parsed schema with optional sub schema
 
