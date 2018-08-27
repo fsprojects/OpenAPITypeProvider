@@ -6,7 +6,7 @@ open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json
 
 type ObjectValue(d:(string * obj) list) =
-    let mutable data = d |> Map |> System.Collections.Generic.Dictionary
+    let data = d |> Map |> System.Collections.Generic.Dictionary
 
     let toJToken nullHandling (o:obj) =
         if o.GetType() = typeof<ObjectValue> then

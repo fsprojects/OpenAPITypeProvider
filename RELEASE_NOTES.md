@@ -1,3 +1,7 @@
+### 1.1.5 - August 27 2018
+* Used ConcurrentDictionary on Document level
+* Removed unnecessary mutable values
+
 ### 1.1.4 - August 27 2018
 * Fix of #3 - Prefer schema name instead of property name
 * Better error reporting

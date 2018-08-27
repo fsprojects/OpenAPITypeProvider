@@ -6,11 +6,12 @@ open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types.Helpers
 
 open System
+open System.Collections.Concurrent
 
-let mutable allSchemas : Map<Schema,SchemaType> = Map.empty
+let allSchemas = new ConcurrentDictionary<Schema,SchemaType>()
 
 let rec private uniqueName (name:string) =
-    match allSchemas |> Map.exists (fun _ v -> v.Name = name) with
+    match allSchemas.Values |> Seq.exists (fun v -> v.Name = name) with
     | true -> 
         let nameParts = name.Split([|'_'|], StringSplitOptions.RemoveEmptyEntries)
         let newName = 
@@ -29,7 +30,7 @@ let rec private uniqueName (name:string) =
 
 let createType ctx typeName (filePath:string) =
     
-    allSchemas <- Map.empty
+    allSchemas.Clear()// <- Map.empty
 
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, typeName, None, hideObjectMethods = true, nonNullable = true, isErased = true)
     let api = filePath |> Parser.Document.loadFromYamlFile
@@ -61,9 +62,9 @@ let createType ctx typeName (filePath:string) =
         | None -> None
 
     let rec findOrCreateSchema name (schema:Schema) =
-        match allSchemas |> Map.tryFind schema with
-        | Some t -> t
-        | None ->
+        match allSchemas.TryGetValue schema with
+        | true, t -> t
+        | false, _ ->
             let name = defaultArg (checkForKnownName schema) name |> uniqueName
             let newType =
                 match schema with
@@ -71,7 +72,7 @@ let createType ctx typeName (filePath:string) =
                 | _ -> Schema.NonObject.createTypes ctx findOrCreateSchema name schema
             newType |> schemas.AddMember
             let schemaType = { Name = name; Type = newType }
-            allSchemas <- allSchemas.Add(schema, schemaType)
+            allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
             schemaType
 
     // components object

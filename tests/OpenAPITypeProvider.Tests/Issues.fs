@@ -5,7 +5,7 @@ open OpenAPITypeProvider
 open Newtonsoft.Json
 open System
 
-type Issues = OpenAPIV3Provider<"Samples/Issues.yaml ">
+type Issues = OpenAPIV3Provider<"Samples/Issues.yaml">
 
 [<Test>]
 let ``Issue #2 - Parses and converts object schema with optional sub schema``() =
@@ -17,4 +17,3 @@ let ``Issue #2 - Parses and converts object schema with optional sub schema``() 
 let ``Issue #3 - Use name of known Schema if exists``() =
     let _ = Issues.Schemas.ObjectB(Some "Name")
     Assert.Pass("Testing just schema is created")
-
