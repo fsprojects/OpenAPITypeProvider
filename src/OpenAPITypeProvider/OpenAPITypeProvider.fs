@@ -32,12 +32,7 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
            filePath 
            |> OpenAPITypeProvider.IO.getFilename cfg
            |> Document.createType ctx typeName
-        with ex -> 
-            let rec getMsg list (ex:System.Exception) = 
-                match ex.InnerException with
-                | null -> (sprintf "Error: %s, StackTrace: %s" ex.Message ex.StackTrace) :: list
-                | x -> x |> getMsg list
-            ex |> getMsg [] |> List.rev |> String.concat ", " |> failwith
+        with ex -> ex |> sprintf "%A" |> failwith
     
    let parameters = [ 
          ProvidedStaticParameter("FilePath", typeof<string>)

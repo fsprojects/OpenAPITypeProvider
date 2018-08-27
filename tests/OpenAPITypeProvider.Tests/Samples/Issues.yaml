@@ -63,4 +63,16 @@ components:
       required:
         - name
     
+    ObjectA:
+      type: object
+      properties:
+        subObj:
+            $ref: '#/components/schemas/ObjectB'
+
+    ObjectB:
+      type: object
+      properties:
+        name:
+          type: string
+
     Empty: {}

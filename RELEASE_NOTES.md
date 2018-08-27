@@ -1,3 +1,7 @@
+### 1.1.4 - August 27 2018
+* Fix of #3 - Prefer schema name instead of property name
+* Better error reporting
+
 ### 1.1.3 - August 07 2018
 * Fixing nuget problem
 

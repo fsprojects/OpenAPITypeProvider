@@ -55,11 +55,16 @@ let createType ctx typeName (filePath:string) =
     // Request bodies
     let requestBodies = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "RequestBodies", None, hideObjectMethods = true, nonNullable = true, isErased = true)
 
+    let checkForKnownName (schema:Schema) =
+        match api.Components with
+        | Some x -> x.Schemas |> Map.tryFindKey (fun k v -> v = schema)
+        | None -> None
+
     let rec findOrCreateSchema name (schema:Schema) =
         match allSchemas |> Map.tryFind schema with
         | Some t -> t
         | None ->
-            let name = uniqueName name
+            let name = defaultArg (checkForKnownName schema) name |> uniqueName
             let newType =
                 match schema with
                 | Object _ -> Schema.Object.createTypes ctx findOrCreateSchema name schema
