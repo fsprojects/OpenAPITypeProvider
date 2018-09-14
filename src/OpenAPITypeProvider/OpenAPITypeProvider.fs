@@ -4,6 +4,7 @@ open ProviderImplementation.ProvidedTypes
 open Microsoft.FSharp.Core.CompilerServices
 open System.Reflection
 open OpenAPITypeProvider.Types
+open System.IO
 
 [<TypeProvider>]
 type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
@@ -13,7 +14,7 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
         let expectedName = (AssemblyName(args.Name)).Name + ".dll"
         let asmPath = 
             cfg.ReferencedAssemblies
-            |> Seq.tryFind (fun asmPath -> System.IO.Path.GetFileName(asmPath) = expectedName)
+            |> Seq.tryFind (fun asmPath -> Path.GetFileName(asmPath) = expectedName)
         match asmPath with
         | Some f -> Assembly.LoadFrom f
         | None -> null)
@@ -23,15 +24,10 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
     
    let tp = ProvidedTypeDefinition(asm, ns, "OpenAPIV3Provider", None,  hideObjectMethods = true, nonNullable = true, isErased = true)
     
-   let createTypes typeName (args:obj[]) =
+   let createTypes typeName filePath =
        try
-           let filePath = args.[0] :?> string
-           
            let ctx = { Assembly = asm; Namespace = ns }
-
-           filePath 
-           |> OpenAPITypeProvider.IO.getFilename cfg
-           |> Document.createType ctx typeName
+           filePath |> Document.createType ctx typeName
         with ex -> ex |> sprintf "%A" |> failwith
     
    let parameters = [ 
@@ -44,7 +40,21 @@ type OpenAPITypeProviderImplementation (cfg : TypeProviderConfig) as this =
         """
   
    do tp.AddXmlDoc helpText
-   do tp.DefineStaticParameters(parameters, createTypes)
+   do tp.DefineStaticParameters(parameters, (fun typeName args -> 
+       let filePath = args.[0] :?> string |> OpenAPITypeProvider.IO.getFilename cfg 
+       let dirToWatch = filePath |> Path.GetDirectoryName
+       let createTypesFn = (fun _ -> createTypes typeName filePath |> ignore)
+
+       use watcher = new FileSystemWatcher()
+       watcher.Path <- dirToWatch
+       watcher.EnableRaisingEvents <- true
+       watcher.IncludeSubdirectories <- true
+       watcher.Changed.Add createTypesFn
+       watcher.Created.Add createTypesFn
+       watcher.Deleted.Add createTypesFn
+       
+       createTypes typeName filePath
+   ))
    do this.AddNamespace(ns, [tp])
 
 [<assembly:TypeProviderAssembly()>]
