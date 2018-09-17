@@ -164,8 +164,6 @@ In case you have any doubts, you can always have a look [at unit tests](https://
 
 ## Known issues & Limitations
 1. No support for `OneOf` and `ManyOf` since they are basically union types which is quite difficult (or maybe impossible) to generate from type provider
-2. No filewatcher on source file - I'll probably need help with this. Anyone? :)
-
 
 ## Contribution
 

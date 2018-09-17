@@ -1,3 +1,6 @@
+### 1.2 - September 14 2018
+* Added filewatcher
+
 ### 1.1.5 - August 27 2018
 * Used ConcurrentDictionary on Document level
 * Removed unnecessary mutable values
