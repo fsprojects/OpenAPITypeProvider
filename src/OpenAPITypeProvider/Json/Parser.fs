@@ -14,6 +14,11 @@ let private checkRequiredProperties (req:string list) (jObject:JObject) =
 
 let defaultDateFormat = "yyyy-MM-ddTHH:mm:ss.FFFFFFFK"
 
+let private isOneOfAllowed (allowedValues:string list) (value:string) =
+    match allowedValues |> List.tryFind ((=) value) with
+    | Some v -> value
+    | None -> FormatException (sprintf "Invalid value %s - Enum must contain one of allowed values: %A" value allowedValues) |> raise
+
 let rec parseForSchema createObj defaultTyp (schema:Schema) (json:JToken) =
     match schema with
     | Boolean -> json.Value<bool>() |> box
@@ -28,6 +33,7 @@ let rec parseForSchema createObj defaultTyp (schema:Schema) (json:JToken) =
     | String StringFormat.DateTime
     | String StringFormat.Date -> json.Value<DateTime>() |> box
     | String StringFormat.UUID -> json.Value<string>() |> Guid |> box
+    | String (StringFormat.Enum values) -> json.Value<string>() |> isOneOfAllowed values |> box
     | Array itemsSchema ->
         let jArray = json :?> JArray
         let items = [ for x in jArray do yield parseForSchema createObj defaultTyp itemsSchema x ]

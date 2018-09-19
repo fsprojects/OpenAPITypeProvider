@@ -217,6 +217,15 @@ components:
     WithUUID:
       $ref: 'ExternalSchemas.yaml#WithUUID'
     
+    WithEnum:
+      properties:
+        id:
+          type: string
+        myEnum:
+          type: string
+          enum: [a, b, c]
+      required: [id, myEnum]
+
     Error:
       required:
         - code

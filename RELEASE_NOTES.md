@@ -1,3 +1,6 @@
+### 1.3 - September 19 2018
+* Enum values are checked when parsing
+
 ### 1.2 - September 14 2018
 * Added filewatcher
 

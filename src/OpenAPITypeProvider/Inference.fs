@@ -16,6 +16,7 @@ let private getStringType = function
     | StringFormat.Byte -> typeof<byte>
     | StringFormat.Date | StringFormat.DateTime -> typeof<DateTime>
     | StringFormat.UUID -> typeof<Guid>
+    | StringFormat.Enum _ -> typeof<string>
 
 let rec getComplexType (getSchemaFun: Schema -> Type) schema = 
     match schema with
