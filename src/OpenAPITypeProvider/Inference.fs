@@ -3,27 +3,21 @@
 open System
 open OpenAPIParser.Version3.Specification
 
-let private getIntType = function
-    | IntFormat.Int32 -> typeof<int>
-    | IntFormat.Int64 -> typeof<int64>
-
-let private getNumberType = function
-    | NumberFormat.Float -> typeof<float32>
-    | NumberFormat.Double -> typeof<double>
-
-let private getStringType = function
-    | StringFormat.String | StringFormat.Password | StringFormat.Binary -> typeof<string>
-    | StringFormat.Byte -> typeof<byte>
-    | StringFormat.Date | StringFormat.DateTime -> typeof<DateTime>
-    | StringFormat.UUID -> typeof<Guid>
-    | StringFormat.Enum _ -> typeof<string>
-
 let rec getComplexType (getSchemaFun: Schema -> Type) schema = 
     match schema with
     | Boolean -> typeof<bool>
-    | Integer format -> format |> getIntType
-    | Number format -> format |> getNumberType
-    | String format -> format |> getStringType
+    | Integer IntFormat.Int32 -> typeof<int>
+    | Integer IntFormat.Int64 -> typeof<int64>
+    | Number NumberFormat.Float -> typeof<float32>
+    | Number NumberFormat.Double -> typeof<double>
+    | String StringFormat.String 
+    | String StringFormat.Password 
+    | String StringFormat.Binary -> typeof<string>
+    | String StringFormat.Byte -> typeof<byte>
+    | String StringFormat.Date 
+    | String StringFormat.DateTime -> typeof<DateTime>
+    | String StringFormat.UUID -> typeof<Guid>
+    | String (StringFormat.Enum _) -> schema |> getSchemaFun
     | Array schema -> 
         let typ = schema |> getComplexType getSchemaFun
         typedefof<List<_>>.MakeGenericType([|typ|])

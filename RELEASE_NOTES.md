@@ -1,3 +1,6 @@
+### 1.4 - September 26 2018
+* Breaking Change: Enum values are real-ish enums
+
 ### 1.3 - September 19 2018
 * Enum values are checked when parsing
 

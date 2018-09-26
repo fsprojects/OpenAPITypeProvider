@@ -4,9 +4,9 @@ open ProviderImplementation.ProvidedTypes
 open OpenAPIParser.Version3
 open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types.Helpers
-
 open System
 open System.Collections.Concurrent
+open OpenAPITypeProvider
 
 let allSchemas = new ConcurrentDictionary<Schema,SchemaType>()
 
@@ -61,14 +61,26 @@ let createType ctx typeName (filePath:string) =
         | Some x -> x.Schemas |> Map.tryFindKey (fun k v -> v = schema)
         | None -> None
 
+    let knownAndUnique (schema:Schema) (name:string) =
+        defaultArg (checkForKnownName schema) name 
+        |> uniqueName
+
     let rec findOrCreateSchema name (schema:Schema) =
         match allSchemas.TryGetValue schema with
         | true, t -> t
         | false, _ ->
-            let name = defaultArg (checkForKnownName schema) name |> uniqueName
+            let name = name |> knownAndUnique schema
             let newType =
                 match schema with
                 | Object _ -> Schema.Object.createTypes ctx findOrCreateSchema name schema
+                | String (StringFormat.Enum values) ->
+                    let enumType = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, None)
+                    enumType.SetEnumUnderlyingType(typeof<string>)
+                    values |> List.iter (fun x ->
+                        let n = x |> Names.pascalName |> knownAndUnique schema
+                        enumType.AddMember(ProvidedField.Literal(n, enumType, x))
+                    )
+                    enumType
                 | _ -> Schema.NonObject.createTypes ctx findOrCreateSchema name schema
             newType |> schemas.AddMember
             let schemaType = { Name = name; Type = newType }
