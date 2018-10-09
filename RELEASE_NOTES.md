@@ -1,3 +1,6 @@
+### 1.5 - October 09 2018
+* Removed improper implementation of file watcher
+
 ### 1.4 - September 26 2018
 * Breaking Change: Enum values are real-ish enums
 
