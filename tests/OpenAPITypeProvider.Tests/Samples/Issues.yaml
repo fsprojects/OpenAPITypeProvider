@@ -75,4 +75,13 @@ components:
         name:
           type: string
 
+    RiskSeverity:
+      type: string
+      enum:
+        - NEGLIGIBLE
+        - MINOR
+        - MODERATE
+        - MAJOR
+        - SEVERE
+
     Empty: {}

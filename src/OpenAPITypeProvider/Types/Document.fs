@@ -77,7 +77,7 @@ let createType ctx typeName (filePath:string) =
                     let enumType = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, None)
                     enumType.SetEnumUnderlyingType(typeof<string>)
                     values |> List.iter (fun x ->
-                        let n = x |> Names.pascalName |> knownAndUnique schema
+                        let n = x |> Names.pascalName
                         enumType.AddMember(ProvidedField.Literal(n, enumType, x))
                     )
                     enumType

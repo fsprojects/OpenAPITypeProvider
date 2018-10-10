@@ -1,3 +1,6 @@
+### 1.5.1 - October 10 2018
+* Fixing issue #5
+
 ### 1.5 - October 09 2018
 * Removed improper implementation of file watcher
 
