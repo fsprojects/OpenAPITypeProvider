@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\netfx.props" />
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.1;net45</TargetFrameworks>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fsi">
+      <Paket>True</Paket>
+      <Link>paket-files/ProvidedTypes.fsi</Link>
+    </Compile>
+    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/ProvidedTypes.fs</Link>
+    </Compile>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="..\OpenAPITypeProvider.Runtime\OpenAPITypeProvider.Runtime.fs" />
+    
+    <Compile Include="IO.fs" />
+    <Compile Include="Names.fs" />
+    <Compile Include="Types\Types.fs" />
+    <Compile Include="Types\Helpers.fs" />
+    <Compile Include="Types\Contact.fs" />
+    <Compile Include="Types\License.fs" />
+    <Compile Include="Types\Info.fs" />
+    <Compile Include="Types\Schema.Object.fs" />
+    <Compile Include="Types\Schema.NonObject.fs" />
+    <Compile Include="Types\MediaType.fs" />
+    <Compile Include="Types\Response.fs" />
+    <Compile Include="Types\Parameter.fs" />
+    <Compile Include="Types\RequestBody.fs" />
+    <Compile Include="Types\Operation.fs" />
+    <Compile Include="Types\Path.fs" />
+    <Compile Include="Types\Document.fs" />
+
+
+    <Compile Include="OpenAPITypeProvider.DesignTime.fs" />
+
+    <None Include="paket.references" />
+    <None Include="..\..\packages\NETStandard.Library.NETFramework\build\net461\lib\netstandard.dll" Condition="'$(TargetFramework)' == 'net45'">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

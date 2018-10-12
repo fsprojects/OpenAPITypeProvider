@@ -1,3 +1,6 @@
+### 1.6.0-beta1 - October 12 2018
+* Fixing issue #6
+
 ### 1.5.1 - October 10 2018
 * Fixing issue #5
 

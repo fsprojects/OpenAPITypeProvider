@@ -5,16 +5,15 @@
 
 open Fake
 open System.IO
-
-let appSrc = "src/OpenAPITypeProvider"
+let appSrc = "src/OpenAPITypeProvider.Runtime"
 let testsSrc = "tests/OpenAPITypeProvider.Tests"
 
 Target "BuildApp" (fun _ ->
-    Fake.DotNetCli.Build (fun p -> { p with Project = appSrc; Configuration = "Debug";})
+    Fake.DotNetCli.Build (fun p -> { p with Configuration = "Release";})
 )
 
 Target "RunTests" (fun _ ->
-    Fake.DotNetCli.Test (fun p -> { p with Project = testsSrc; Configuration = "Debug"; })
+    Fake.DotNetCli.Test (fun p -> { p with Configuration = "Release"; })
 )
 
 // Read release notes & version info from RELEASE_NOTES.md
@@ -22,23 +21,12 @@ let release = File.ReadLines "RELEASE_NOTES.md" |> ReleaseNotesHelper.parseRelea
 
 Target "Nuget" <| fun () ->
     let toNotes = List.map (fun x -> x + System.Environment.NewLine) >> List.fold (+) ""
-    let args = 
-        [
-            "PackageId=\"OpenAPITypeProvider\""
-            "Title=\"OpenAPITypeProvider\""
-            "Description=\"F# Type Provider for Open API Specification\""
-            "Summary=\"F# Type Provider for Open API Specification\""
-            sprintf "PackageVersion=\"%s\"" release.NugetVersion
-            sprintf "PackageReleaseNotes=\"%s\"" (release.Notes |> toNotes)
-            "PackageLicenseUrl=\"http://github.com/fsprojects/OpenAPITypeProvider/blob/master/LICENSE.md\""
-            "PackageProjectUrl=\"http://github.com/fsprojects/OpenAPITypeProvider\""
-            "PackageIconUrl=\"https://raw.githubusercontent.com/fsprojects/OpenAPITypeProvider/master/logo.jpg\""
-            "PackageTags=\"F# FSharp OpenAPI Swagger TypeProvider\""
-            "Copyright=\"Roman Provazník - 2018\""
-            "Authors=\"Roman Provazník\""
-        ] |> List.map (fun x -> "/p:" + x)
-
-    Fake.DotNetCli.Pack (fun p -> { p with Project = appSrc; OutputPath = "../../nuget"; AdditionalArgs = args })
+    Fake.DotNet.Paket.pack (fun p -> 
+        { p with 
+            Version = release.NugetVersion
+            OutputPath = appSrc
+            ReleaseNotes = (release.Notes |> toNotes)
+        })
 
 Target "Clean" (fun _ -> 
     !! "src/*/bin"
@@ -48,7 +36,7 @@ Target "Clean" (fun _ ->
     |> DeleteDirs
 )
 
-"Clean" ==> "RunTests" ==> "Nuget"
+"Clean" ==> "BuildApp" ==> "RunTests" ==> "Nuget"
 
 // start build
 RunTargetOrDefault "BuildApp"

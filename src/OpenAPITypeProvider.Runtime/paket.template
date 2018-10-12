@@ -1,0 +1,34 @@
+type file
+id OpenAPITypeProvider
+authors
+    Roman Provaznik
+owners
+    Roman Provaznik
+projectUrl
+    http://github.com/fsprojects/OpenAPITypeProvider
+iconUrl
+    https://raw.githubusercontent.com/fsprojects/OpenAPITypeProvider/master/logo.jpg
+licenseUrl
+    http://github.com/fsprojects/OpenAPITypeProvider/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+tags
+    F# FSharp OpenAPI Swagger TypeProvider
+summary
+    F# Type Provider for Open API Specification
+description
+    F# Type Provider for Open API Specification
+files
+    bin/Release/net45/OpenAPITypeProvider.Runtime.* ==> lib/net45
+    bin/Release/netstandard2.0/OpenAPITypeProvider.Runtime.* ==> lib/netstandard2.0
+    bin/Release/typeproviders/fsharp41/netstandard2.0/*.dll ==> typeproviders/fsharp41/netstandard2.0
+    bin/Release/typeproviders/fsharp41/netcoreapp2.1/*.dll ==> typeproviders/fsharp41/netcoreapp2.1
+    bin/Release/typeproviders/fsharp41/net45/*.dll ==> typeproviders/fsharp41/net45
+references
+    OpenAPITypeProvider.Runtime.dll
+dependencies
+  FSharp.Core >= LOCKEDVERSION
+  framework: .NETFramework4.5
+    OpenAPIParser >= LOCKEDVERSION
+  framework: netstandard2.0
+    OpenAPIParser >= LOCKEDVERSION
