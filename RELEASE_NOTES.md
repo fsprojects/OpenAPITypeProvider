@@ -1,3 +1,7 @@
+### 1.6.0 - October 15 2018
+* Fixing issue #6
+* Setting dependencies for OpenAPIParser
+
 ### 1.6.0-beta1 - October 12 2018
 * Fixing issue #6
 
