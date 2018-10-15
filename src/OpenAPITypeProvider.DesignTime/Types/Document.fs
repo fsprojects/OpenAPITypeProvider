@@ -28,6 +28,10 @@ let rec private uniqueName (name:string) =
         newName |> uniqueName
     | false -> name
 
+let private log txt =
+    //System.IO.File.AppendAllText(@"c:\temp\log.txt", txt)
+    ()
+
 let createType ctx typeName (filePath:string) =
     
     allSchemas.Clear()// <- Map.empty
@@ -60,9 +64,10 @@ let createType ctx typeName (filePath:string) =
         let def = schema |> Extract.getSchemaDefinition
         match def with
         | Object _ -> 
-            System.IO.File.AppendAllText(@"c:\temp\schemas.txt", sprintf "Creating object %s - %A\n\n" name schema)
+            sprintf "Creating object %s - %A\n\n" name schema |> log
             Schema.Object.createTypes ctx findOrCreateSchema name schema
         | String (StringFormat.Enum values) ->
+            sprintf "Creating enum %s - %A\n\n" name schema |> log
             let enumType = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, None)
             enumType.SetEnumUnderlyingType(typeof<string>)
             values |> List.iter (fun x ->
@@ -71,15 +76,17 @@ let createType ctx typeName (filePath:string) =
             )
             enumType
         | _ -> 
-            System.IO.File.AppendAllText(@"c:\temp\schemas.txt", sprintf "Creating NON object %s - %A\n\n" name schema)
+            sprintf "Creating NON object %s - %A\n\n" name schema |> log
             Schema.NonObject.createTypes ctx findOrCreateSchema name schema
 
     let rec findOrCreateSchema name (schema:Schema) =
-        System.IO.File.AppendAllText(@"c:\temp\schemas.txt", sprintf "%s - %A\n\n" name schema)
+        sprintf "FINDorCREATE %s - %A\n\n" name schema |> log
+        
         let n = name |> uniqueName
         match schema with
         // always create inline schemas
         | Schema.Inline _ ->
+            "INLINE" |> log
             let newType = createSchema findOrCreateSchema n schema
             newType |> schemas.AddMember
             let schemaType = { Name = name; Type = newType }
@@ -87,6 +94,7 @@ let createType ctx typeName (filePath:string) =
             schemaType
         // try find 
         | Schema.Reference(ref,d) ->
+            "REF" |> log
             match allSchemas.TryGetValue schema with
             | true, t -> t
             | false, _ -> 

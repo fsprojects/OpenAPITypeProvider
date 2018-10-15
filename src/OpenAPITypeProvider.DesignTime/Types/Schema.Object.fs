@@ -26,16 +26,19 @@ let rec private createType ctx (findOrCreateSchema:string -> Schema -> SchemaTyp
         let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<ObjectValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         // create properties & sub-objects
-        props
-        |> Map.map (fun n s -> 
-            let newPropTypeName = sprintf "%s_%s" name (Names.pascalName n)
-            createProperty (isOptional n) n s (findOrCreateSchema newPropTypeName)
-        )
-        |> Map.iter (fun _ v -> typ.AddMember(v))
+        let properties =
+            props
+            |> Map.map (fun n s -> 
+                let newPropTypeName = sprintf "%s_%s" name (Names.pascalName n)
+                createProperty (isOptional n) n s (findOrCreateSchema newPropTypeName)
+            )
+        
+        // add properties to type
+        properties |> Map.iter (fun _ v -> typ.AddMember(v))
         
         // constructor
-        let getCtorParam (name,typ) =
-            if name |> isOptional then ProvidedParameter(name, asOption typ, false, None) else ProvidedParameter(name, typ)
+        let getCtorParam (name,typ:ProvidedProperty) =
+            if name |> isOptional then ProvidedParameter(name, typ.PropertyType, false, None) else ProvidedParameter(name, typ.PropertyType)
 
         let sortFn (x:string,_) (y:string,_) = 
             match x |> isOptional, y |> isOptional with
@@ -44,9 +47,8 @@ let rec private createType ctx (findOrCreateSchema:string -> Schema -> SchemaTyp
             | false, true -> -1
 
         let ctorParams = 
-            props 
+            properties 
             |> Map.toList 
-            |> List.map (fun (n,s) -> n, s |> Inference.getComplexType (findOrCreateSchema n >> SchemaType.GetType))
             |> List.sortWith sortFn
             |> List.map getCtorParam 
         
