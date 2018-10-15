@@ -29,7 +29,7 @@ let rec private uniqueName (name:string) =
     | false -> name
 
 let private log txt =
-    //System.IO.File.AppendAllText(@"c:\temp\log.txt", txt)
+    System.IO.File.AppendAllText(@"c:\temp\log.txt", txt)
     ()
 
 let createType ctx typeName (filePath:string) =
@@ -95,14 +95,19 @@ let createType ctx typeName (filePath:string) =
         // try find 
         | Schema.Reference(ref,d) ->
             "REF" |> log
-            match allSchemas.TryGetValue schema with
-            | true, t -> t
-            | false, _ -> 
-                let newType = createSchema findOrCreateSchema n schema
-                newType |> schemas.AddMember
-                let schemaType = { Name = name; Type = newType }
-                allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
-                schemaType
+            //match allSchemas.TryGetValue schema with
+            //| true, t -> t
+            //| false, _ -> 
+            //    let newType = createSchema findOrCreateSchema n schema
+            //    newType |> schemas.AddMember
+            //    let schemaType = { Name = name; Type = newType }
+            //    allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
+            //    schemaType
+            let newType = createSchema findOrCreateSchema n schema
+            newType |> schemas.AddMember
+            let schemaType = { Name = name; Type = newType }
+            allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
+            schemaType
       
     // components object
     if api.Components.IsSome then

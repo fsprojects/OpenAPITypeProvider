@@ -6,10 +6,21 @@ open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types
 open Microsoft.FSharp.Quotations
 
+let getName name schema = 
+    let def = schema |> Extract.getSchemaDefinition
+    match def with
+    | Array subS ->
+        let subDef = subS |> Extract.getSchemaDefinition
+        match subDef with
+        | Object _ -> name + "_Items"
+        | _ -> name
+    | _ -> name
+
 let private createNonObjectType ctx (findOrCreateSchema:string -> Schema -> SchemaType) name (schema:Schema) =
     let def = schema |> Extract.getSchemaDefinition
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<SimpleValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let schemaType = schema |> Inference.getComplexType (findOrCreateSchema name >> SchemaType.GetType)
+    let itemsName = getName name schema
+    let schemaType = schema |> Inference.getComplexType (findOrCreateSchema itemsName >> SchemaType.GetType)
     let strSchema = def |> Serialization.serialize
     
     // constructor

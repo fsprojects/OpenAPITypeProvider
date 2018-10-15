@@ -202,7 +202,7 @@ let ``Parses and converts simple value schema (obj array)``() =
 [<Test>]
 let ``Parses and converts basic schema with array``() =
     let json = """{"items":[{"name":"A","surname":"B"}]}"""
-    let ob = PetStore.Schemas.Items("A","B")
+    let ob = PetStore.Schemas.WithArrayOfObjects_Items("A","B")
     let instance = PetStore.Schemas.WithArrayOfObjects([ob])
     let parsed = PetStore.Schemas.WithArrayOfObjects.Parse json
     Assert.AreEqual(json, instance.ToJson(Formatting.None))
@@ -213,7 +213,7 @@ let ``Parses and converts basic schema with array``() =
 [<Test>]
 let ``Parses and converts basic schema with array (optional)``() =
     let json = """{"items":[{"name":"A","surname":"B"}]}"""
-    let ob = PetStore.Schemas.Items("A","B")
+    let ob = PetStore.Schemas.WithArrayOfObjectsOptional_Items("A","B")
     let instance = PetStore.Schemas.WithArrayOfObjectsOptional(Some [ob])
     let parsed = PetStore.Schemas.WithArrayOfObjectsOptional.Parse json
     Assert.AreEqual(json, instance.ToJson(Formatting.None))
