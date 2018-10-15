@@ -29,6 +29,6 @@ references
 dependencies
   FSharp.Core >= LOCKEDVERSION
   framework: .NETFramework4.5
-    OpenAPIParser ~> 1
+    OpenAPIParser ~> 2
   framework: netstandard2.0
-    OpenAPIParser ~> 1
+    OpenAPIParser ~> 2

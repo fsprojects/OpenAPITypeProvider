@@ -56,37 +56,46 @@ let createType ctx typeName (filePath:string) =
     // Request bodies
     let requestBodies = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, "RequestBodies", None, hideObjectMethods = true, nonNullable = true, isErased = true)
 
-    let checkForKnownName (schema:Schema) =
-        match api.Components with
-        | Some x -> x.Schemas |> Map.tryFindKey (fun k v -> v = schema)
-        | None -> None
-
-    let knownAndUnique (schema:Schema) (name:string) =
-        defaultArg (checkForKnownName schema) name 
-        |> uniqueName
+    let createSchema findOrCreateSchema name (schema:Schema) =
+        let def = schema |> Extract.getSchemaDefinition
+        match def with
+        | Object _ -> 
+            System.IO.File.AppendAllText(@"c:\temp\schemas.txt", sprintf "Creating object %s - %A\n\n" name schema)
+            Schema.Object.createTypes ctx findOrCreateSchema name schema
+        | String (StringFormat.Enum values) ->
+            let enumType = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, None)
+            enumType.SetEnumUnderlyingType(typeof<string>)
+            values |> List.iter (fun x ->
+                let n = x |> Names.pascalName
+                enumType.AddMember(ProvidedField.Literal(n, enumType, x))
+            )
+            enumType
+        | _ -> 
+            System.IO.File.AppendAllText(@"c:\temp\schemas.txt", sprintf "Creating NON object %s - %A\n\n" name schema)
+            Schema.NonObject.createTypes ctx findOrCreateSchema name schema
 
     let rec findOrCreateSchema name (schema:Schema) =
-        match allSchemas.TryGetValue schema with
-        | true, t -> t
-        | false, _ ->
-            let name = name |> knownAndUnique schema
-            let newType =
-                match schema with
-                | Object _ -> Schema.Object.createTypes ctx findOrCreateSchema name schema
-                | String (StringFormat.Enum values) ->
-                    let enumType = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, None)
-                    enumType.SetEnumUnderlyingType(typeof<string>)
-                    values |> List.iter (fun x ->
-                        let n = x |> Names.pascalName
-                        enumType.AddMember(ProvidedField.Literal(n, enumType, x))
-                    )
-                    enumType
-                | _ -> Schema.NonObject.createTypes ctx findOrCreateSchema name schema
+        System.IO.File.AppendAllText(@"c:\temp\schemas.txt", sprintf "%s - %A\n\n" name schema)
+        let n = name |> uniqueName
+        match schema with
+        // always create inline schemas
+        | Schema.Inline _ ->
+            let newType = createSchema findOrCreateSchema n schema
             newType |> schemas.AddMember
             let schemaType = { Name = name; Type = newType }
             allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
             schemaType
-
+        // try find 
+        | Schema.Reference(ref,d) ->
+            match allSchemas.TryGetValue schema with
+            | true, t -> t
+            | false, _ -> 
+                let newType = createSchema findOrCreateSchema n schema
+                newType |> schemas.AddMember
+                let schemaType = { Name = name; Type = newType }
+                allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
+                schemaType
+      
     // components object
     if api.Components.IsSome then
         

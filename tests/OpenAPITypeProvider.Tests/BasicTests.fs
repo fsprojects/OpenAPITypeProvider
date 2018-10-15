@@ -188,38 +188,38 @@ let ``Parses and converts simple value schema (int array)``() =
     Assert.AreEqual([1;2], instance.Values)
     Assert.AreEqual(1, instance.Values.Head)
 
-[<Test>]
-let ``Parses and converts simple value schema (obj array)``() =
-    let json = """[{"code":123,"message":"Roman"}]"""
-    let ob = PetStore.Schemas.Error(123, "Roman")
-    let instance = PetStore.Schemas.SimpleArray3([ob])
-    let parsed = PetStore.Schemas.SimpleArray3.Parse json
-    Assert.AreEqual(json, instance.ToJson(Formatting.None))
-    Assert.AreEqual(json, parsed.ToJson(Formatting.None))
-    Assert.AreEqual([ob], instance.Values)
-    Assert.AreEqual("Roman", instance.Values.[0].Message)
+//[<Test>]
+//let ``Parses and converts simple value schema (obj array)``() =
+//    let json = """[{"code":123,"message":"Roman"}]"""
+//    let ob = PetStore.Schemas.Error(123, "Roman")
+//    let instance = PetStore.Schemas.SimpleArray3([ob])
+//    let parsed = PetStore.Schemas.SimpleArray3.Parse json
+//    Assert.AreEqual(json, instance.ToJson(Formatting.None))
+//    Assert.AreEqual(json, parsed.ToJson(Formatting.None))
+//    Assert.AreEqual([ob], instance.Values)
+//    Assert.AreEqual("Roman", instance.Values.[0].Message)
 
-[<Test>]
-let ``Parses and converts basic schema with array``() =
-    let json = """{"items":[{"name":"A","surname":"B"}]}"""
-    let ob = PetStore.Schemas.Items("A","B")
-    let instance = PetStore.Schemas.WithArrayOfObjects([ob])
-    let parsed = PetStore.Schemas.WithArrayOfObjects.Parse json
-    Assert.AreEqual(json, instance.ToJson(Formatting.None))
-    Assert.AreEqual(json, parsed.ToJson(Formatting.None))
-    Assert.AreEqual([ob], instance.Items)
-    Assert.AreEqual("B", instance.Items.[0].Surname)
+//[<Test>]
+//let ``Parses and converts basic schema with array``() =
+//    let json = """{"items":[{"name":"A","surname":"B"}]}"""
+//    let ob = PetStore.Schemas.Items("A","B")
+//    let instance = PetStore.Schemas.WithArrayOfObjects([ob])
+//    let parsed = PetStore.Schemas.WithArrayOfObjects.Parse json
+//    Assert.AreEqual(json, instance.ToJson(Formatting.None))
+//    Assert.AreEqual(json, parsed.ToJson(Formatting.None))
+//    Assert.AreEqual([ob], instance.Items)
+//    Assert.AreEqual("B", instance.Items.[0].Surname)
 
-[<Test>]
-let ``Parses and converts basic schema with array (optional)``() =
-    let json = """{"items":[{"name":"A","surname":"B"}]}"""
-    let ob = PetStore.Schemas.Items("A","B")
-    let instance = PetStore.Schemas.WithArrayOfObjectsOptional(Some [ob])
-    let parsed = PetStore.Schemas.WithArrayOfObjectsOptional.Parse json
-    Assert.AreEqual(json, instance.ToJson(Formatting.None))
-    Assert.AreEqual(json, parsed.ToJson(Formatting.None))
-    Assert.AreEqual([ob], instance.Items.Value)
-    Assert.AreEqual("B", instance.Items.Value.[0].Surname)
+//[<Test>]
+//let ``Parses and converts basic schema with array (optional)``() =
+//    let json = """{"items":[{"name":"A","surname":"B"}]}"""
+//    let ob = PetStore.Schemas.Items("A","B")
+//    let instance = PetStore.Schemas.WithArrayOfObjectsOptional(Some [ob])
+//    let parsed = PetStore.Schemas.WithArrayOfObjectsOptional.Parse json
+//    Assert.AreEqual(json, instance.ToJson(Formatting.None))
+//    Assert.AreEqual(json, parsed.ToJson(Formatting.None))
+//    Assert.AreEqual([ob], instance.Items.Value)
+//    Assert.AreEqual("B", instance.Items.Value.[0].Surname)
 
 [<Test>]
 let ``Parses and converts simple value schema (date)``() =

@@ -6,18 +6,12 @@ open OpenAPIParser.Version3.Specification
 open OpenAPITypeProvider.Types
 open Microsoft.FSharp.Quotations
 
-let getName name = function
-    | Array subS ->
-        match subS with
-        | Object _ -> name + "Item"
-        | _ -> name
-    | _ -> name
-
-let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
-    
+let private createNonObjectType ctx (findOrCreateSchema:string -> Schema -> SchemaType) name (schema:Schema) =
+    let def = schema |> Extract.getSchemaDefinition
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<SimpleValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
-    let schemaType = schema |> Inference.getComplexType (getSchemaFun (getName name schema) >> SchemaType.GetType)
-    let strSchema = schema |> Serialization.serialize
+    let schemaType = schema |> Inference.getComplexType (findOrCreateSchema name >> SchemaType.GetType)
+    let strSchema = def |> Serialization.serialize
+    
     // constructor
     ProvidedConstructor([ProvidedParameter("value", schemaType)], (fun args ->
         let value = Expr.Coerce(args.Head, typeof<obj>)
@@ -48,8 +42,8 @@ let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
         
     // Value(s) property
     let valueMethodName = 
-        match schema with
-        | Schema.Array _ -> "Values"
+        match def with
+        | SchemaDefinition.Array _ -> "Values"
         | _ -> "Value"
 
     ProvidedProperty(valueMethodName, schemaType, (fun args -> 
@@ -62,10 +56,11 @@ let private createNonObjectType ctx getSchemaFun name (schema:Schema) =
     typ
 
 let createTypes ctx getSchemaFun name schema =
-    match schema with
-    | Schema.Object _ -> failwith "This function should be called only for non-Object schema"
-    | Schema.Boolean 
-    | Schema.Array _
-    | Schema.Integer _
-    | Schema.Number _
-    | Schema.String _ -> schema |> createNonObjectType ctx getSchemaFun name
+    let def = schema |> Extract.getSchemaDefinition
+    match def with
+    | SchemaDefinition.Object _ -> failwith "This function should be called only for non-Object schema"
+    | SchemaDefinition.Boolean 
+    | SchemaDefinition.Array _
+    | SchemaDefinition.Integer _
+    | SchemaDefinition.Number _
+    | SchemaDefinition.String _ -> createNonObjectType ctx getSchemaFun name schema

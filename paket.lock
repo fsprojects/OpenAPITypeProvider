@@ -5,7 +5,7 @@ NUGET
     FSharp.Core (4.3.4)
     NETStandard.Library.NETFramework (2.0.0-preview2-25405-01)
     Newtonsoft.Json (11.0.2)
-    OpenAPIParser (1.3)
+    OpenAPIParser (2.0)
       FSharp.Core (>= 4.3.4)
       Newtonsoft.Json (>= 10.0.1)
       YamlDotNet (>= 4.3.1)

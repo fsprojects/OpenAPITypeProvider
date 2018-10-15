@@ -9,9 +9,9 @@ open Microsoft.FSharp.Quotations
 
 let private asOption (typ:#Type) = typedefof<option<_>>.MakeGenericType typ
 
-let private createProperty isOptional originalName (schema:Schema) (getSchemaFun:string -> Schema -> SchemaType) =
-    let name = Names.pascalName originalName
-    let typ = schema |> Inference.getComplexType (getSchemaFun name >> SchemaType.GetType) |> (fun x -> if isOptional then x |> asOption else x)
+let private createProperty isOptional originalName (schema:Schema) (findOrCreateSchema:Schema -> SchemaType) =
+    let typ = schema |> Inference.getComplexType (findOrCreateSchema >> SchemaType.GetType) |> (fun x -> if isOptional then x |> asOption else x)
+    let name = originalName |> Names.pascalName
     ProvidedProperty(name, typ, (fun args -> 
         let t = args.[0]
         <@@  
@@ -19,15 +19,18 @@ let private createProperty isOptional originalName (schema:Schema) (getSchemaFun
             objectValue.GetValue(originalName)
         @@>))
 
-let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) name schema =
-    match schema with
-    | Schema.Object (props, required) ->
+let rec private createType ctx (findOrCreateSchema:string -> Schema -> SchemaType) name def =
+    match def with
+    | SchemaDefinition.Object (props, required) ->
         let isOptional n = required |> List.contains n |> not
         let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<ObjectValue>, hideObjectMethods = true, nonNullable = true, isErased = true)
         
         // create properties & sub-objects
         props
-        |> Map.map (fun n s -> createProperty (isOptional n) n s getSchemaFun)
+        |> Map.map (fun n s -> 
+            let newPropTypeName = sprintf "%s_%s" name (Names.pascalName n)
+            createProperty (isOptional n) n s (findOrCreateSchema newPropTypeName)
+        )
         |> Map.iter (fun _ v -> typ.AddMember(v))
         
         // constructor
@@ -43,7 +46,7 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
         let ctorParams = 
             props 
             |> Map.toList 
-            |> List.map (fun (n,s) -> n, s |> Inference.getComplexType (getSchemaFun n >> SchemaType.GetType))
+            |> List.map (fun (n,s) -> n, s |> Inference.getComplexType (findOrCreateSchema n >> SchemaType.GetType))
             |> List.sortWith sortFn
             |> List.map getCtorParam 
         
@@ -59,7 +62,7 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
             @@>)) |> typ.AddMember
 
         // static method Parse
-        let strSchema = schema |> Serialization.serialize
+        let strSchema = def |> Serialization.serialize
         ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
             let format = Parser.defaultDateFormat
             <@@ 
@@ -84,6 +87,7 @@ let rec private createType ctx (getSchemaFun:string -> Schema -> SchemaType) nam
     | _ -> failwith "Please, report this error as Github issue - this should not happen!"
 
 let rec createTypes ctx getSchemaFun name schema = 
-    match schema with
-    | Object _ -> createType ctx getSchemaFun name schema
+    let def = schema |> Extract.getSchemaDefinition
+    match def with
+    | Object _ -> createType ctx getSchemaFun name def
     | _ -> failwith "This function should be called only for Object schema"

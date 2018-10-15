@@ -6,15 +6,15 @@ open OpenAPIParser.Version3.Specification
 open Newtonsoft.Json
 
 let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
-    
+    let def = media.Schema |> Extract.getSchemaDefinition
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     let schemaType = findOrCreateSchemaFn name media.Schema
-    let strSchema = media.Schema |> Serialization.serialize
+    let strSchema = def |> Serialization.serialize
 
     // Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], schemaType.Type, (fun args -> 
         let format = Parser.defaultDateFormat
-        match media.Schema with
+        match def with
         | Object _ ->
             <@@ 
                 let json = %%args.[1] : string
@@ -31,7 +31,7 @@ let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     // Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>);ProvidedParameter("dateFormatString", typeof<string>)], schemaType.Type, (fun args -> 
-        match media.Schema with
+        match def with
         | Object _ ->
             <@@ 
                 let json = %%args.[1] : string
@@ -50,13 +50,13 @@ let createRequestType ctx findOrCreateSchemaFn name (media:MediaType) =
     typ
 
 let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
-    
+    let def = media.Schema |> Extract.getSchemaDefinition
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     let schemaTyp = findOrCreateSchemaFn name media.Schema
 
     // ToJson
     ProvidedMethod("ToJson", [ProvidedParameter(name, schemaTyp.Type)], typeof<string>, (fun args -> 
-        match media.Schema with
+        match def with
         | Object _ ->
             <@@ 
                 let o = %%args.[1] : ObjectValue
@@ -73,7 +73,7 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     // ToJson
     ProvidedMethod("ToJson", [ProvidedParameter(name, schemaTyp.Type);ProvidedParameter("formatting", typeof<Formatting>)], typeof<string>, (fun args -> 
-        match media.Schema with
+        match def with
         | Object _ ->
             <@@ 
                 let o = %%args.[1] : ObjectValue
@@ -92,7 +92,7 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     // ToJson
     ProvidedMethod("ToJson", [ProvidedParameter(name, schemaTyp.Type);ProvidedParameter("settings", typeof<JsonSerializerSettings>);ProvidedParameter("formatting", typeof<Formatting>)], typeof<string>, (fun args -> 
-        match media.Schema with
+        match def with
         | Object _ ->
             <@@ 
                 let o = %%args.[1] : ObjectValue
@@ -113,7 +113,7 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
     
     // ToJToken
     ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp.Type)], typeof<Linq.JToken>, (fun args -> 
-        match media.Schema with
+        match def with
         | Object _ ->
             <@@ 
                 let o = %%args.[1] : ObjectValue
@@ -128,7 +128,7 @@ let createResponseType ctx findOrCreateSchemaFn name (media:MediaType) =
         |> (fun x -> x.AddXmlDoc "Converts strongly typed value to Newtonsoft JToken"; x)
         |> typ.AddMember
     
-    match media.Schema with
+    match def with
     | Object _ ->
         // ToJToken
         ProvidedMethod("ToJToken", [ProvidedParameter(name, schemaTyp.Type);ProvidedParameter("nullValueHandling", typeof<NullValueHandling>)], typeof<Linq.JToken>, (fun args -> 
