@@ -6,3 +6,8 @@ WithUUID:
       type: string
       format: uuid
   required: [name, id]
+
+MyExternalObject:
+  properties:
+    name:
+      type: string

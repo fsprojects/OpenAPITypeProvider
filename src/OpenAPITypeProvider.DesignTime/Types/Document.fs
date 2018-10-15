@@ -28,9 +28,17 @@ let rec private uniqueName (name:string) =
         newName |> uniqueName
     | false -> name
 
-let private log txt =
-    System.IO.File.AppendAllText(@"c:\temp\log.txt", txt)
-    ()
+let log txt =
+    System.IO.File.AppendAllText("c:\\temp\\search.txt", txt)
+
+let private tryFindByRefAndDef (ref:string, def:SchemaDefinition) =
+    sprintf "Finding %s in %A\n\n" ref allSchemas |> log
+    let isSame (kvp:System.Collections.Generic.KeyValuePair<Schema,SchemaType>) =
+        let d = kvp.Key |> Extract.getSchemaDefinition
+        def = d && kvp.Value.Ref = Some ref
+    allSchemas 
+    |> Seq.tryFind isSame
+    |> Option.map (fun x -> x.Value)
 
 let createType ctx typeName (filePath:string) =
     
@@ -63,11 +71,8 @@ let createType ctx typeName (filePath:string) =
     let createSchema findOrCreateSchema name (schema:Schema) =
         let def = schema |> Extract.getSchemaDefinition
         match def with
-        | Object _ -> 
-            sprintf "Creating object %s - %A\n\n" name schema |> log
-            Schema.Object.createTypes ctx findOrCreateSchema name schema
+        | Object _ -> Schema.Object.createTypes ctx findOrCreateSchema name schema
         | String (StringFormat.Enum values) ->
-            sprintf "Creating enum %s - %A\n\n" name schema |> log
             let enumType = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, None)
             enumType.SetEnumUnderlyingType(typeof<string>)
             values |> List.iter (fun x ->
@@ -75,53 +80,67 @@ let createType ctx typeName (filePath:string) =
                 enumType.AddMember(ProvidedField.Literal(n, enumType, x))
             )
             enumType
-        | _ -> 
-            sprintf "Creating NON object %s - %A\n\n" name schema |> log
-            Schema.NonObject.createTypes ctx findOrCreateSchema name schema
+        | _ -> Schema.NonObject.createTypes ctx findOrCreateSchema name schema
 
-    let rec findOrCreateSchema name (schema:Schema) =
-        sprintf "FINDorCREATE %s - %A\n\n" name schema |> log
-        
-        let n = name |> uniqueName
+    let getLocalRefPart (ref:string) =
+        ref.Replace("#","/").Split([|'/'|], StringSplitOptions.RemoveEmptyEntries) 
+        |> Array.last
+
+    let rec findOrCreateSchema isRoot name (schema:Schema) =
+        let name = if isRoot then name else name |> uniqueName
         match schema with
-        // always create inline schemas
         | Schema.Inline _ ->
-            "INLINE" |> log
-            let newType = createSchema findOrCreateSchema n schema
+            let refValue = if isRoot then sprintf "#/components/schemas/%s" name |> Some else None
+            let newType = createSchema (findOrCreateSchema false) name schema
             newType |> schemas.AddMember
-            let schemaType = { Name = name; Type = newType }
+            let schemaType = { Name = name; Type = newType; Ref = refValue }
             allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
             schemaType
-        // try find 
-        | Schema.Reference(ref,d) ->
-            "REF" |> log
-            //match allSchemas.TryGetValue schema with
-            //| true, t -> t
-            //| false, _ -> 
-            //    let newType = createSchema findOrCreateSchema n schema
-            //    newType |> schemas.AddMember
-            //    let schemaType = { Name = name; Type = newType }
-            //    allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
-            //    schemaType
-            let newType = createSchema findOrCreateSchema n schema
-            newType |> schemas.AddMember
-            let schemaType = { Name = name; Type = newType }
-            allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
-            schemaType
-      
+        | Schema.Reference(ref,def) ->
+            let localRefPart = ref |> getLocalRefPart
+            match isRoot with
+            | true ->
+                // always create roots
+                let refValue = sprintf "#/components/schemas/%s" name |> Some
+                let newType = createSchema (findOrCreateSchema false) localRefPart schema
+                newType |> schemas.AddMember
+                let schemaType = { Name = name; Type = newType; Ref = refValue }
+                allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
+                schemaType
+            | false ->
+                match tryFindByRefAndDef(ref, def) with
+                | Some t -> t
+                | None ->
+                    let name =
+                        if isRoot then name
+                        else (getLocalRefPart ref)
+                    
+                    //let remote,local = 
+                    //    match ref.Split([|'#'|], StringSplitOptions.RemoveEmptyEntries) with
+                    //    | [|remote;local|] -> Some remote, (getLocalRefPart local)
+                    //    | [|local|] -> None, (getLocalRefPart local)
+                    //    | _ -> failwithf "%s contains more than one '#' character" ref
+                    //let isRoot = remote.IsNone 
+                    let refValue = if isRoot then sprintf "#/components/schemas/%s" name |> Some else None 
+                    let newType = createSchema (findOrCreateSchema false) name schema
+                    newType |> schemas.AddMember
+                    let schemaType = { Name = name; Type = newType; Ref = refValue }
+                    allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
+                    schemaType
+    
     // components object
     if api.Components.IsSome then
         
             // Add object root types
-            api.Components.Value.Schemas 
-            |> Map.map findOrCreateSchema
+            api.Components.Value.Schemas
+            |> Map.map (findOrCreateSchema true)
             |> ignore
     
             // add responses
             if api.Components.Value.Responses.Count > 0 then
                 api.Components.Value.Responses
                 |> Map.iter (fun n p -> 
-                    let resp = Response.createType ctx findOrCreateSchema n p
+                    let resp = Response.createType ctx (findOrCreateSchema false) n p
                     resp |> responses.AddMember
                     ProvidedProperty(n, resp, (fun _ -> <@@ obj() @@>), isStatic = true) 
                     |?> Some p.Description
@@ -135,7 +154,7 @@ let createType ctx typeName (filePath:string) =
             if api.Components.Value.RequestBodies.Count > 0 then
                 api.Components.Value.RequestBodies
                 |> Map.iter (fun n p -> 
-                    let resp = RequestBody.createType ctx findOrCreateSchema n p
+                    let resp = RequestBody.createType ctx (findOrCreateSchema false) n p
                     resp |> requestBodies.AddMember
                     ProvidedProperty(n, resp, (fun _ -> <@@ obj() @@>), isStatic = true) 
                     |?> p.Description
@@ -146,7 +165,7 @@ let createType ctx typeName (filePath:string) =
 
 
     // paths
-    let paths = api.Paths |> Path.createTypes ctx findOrCreateSchema
+    let paths = api.Paths |> Path.createTypes ctx (findOrCreateSchema false)
     paths |> typ.AddMember
     ProvidedProperty("Paths", paths, fun _ -> <@@ obj() @@>) |> typ.AddMember
             
