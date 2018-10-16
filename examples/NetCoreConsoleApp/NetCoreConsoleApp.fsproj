@@ -13,7 +13,7 @@
   <ItemGroup />
 
   <ItemGroup>
-    <PackageReference Include="OpenAPITypeProvider" Version="1.6.0-beta1" />
+    <PackageReference Include="OpenAPITypeProvider" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

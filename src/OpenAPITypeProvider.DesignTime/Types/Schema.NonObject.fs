@@ -12,7 +12,7 @@ let getName name schema =
     | Array subS ->
         let subDef = subS |> Extract.getSchemaDefinition
         match subDef with
-        | Object _ -> name + "_Items"
+        | Object _ -> name + "_Item"
         | _ -> name
     | _ -> name
 

@@ -1,3 +1,6 @@
+### 2.0.1 - October 16 2018
+* Fixing issue with subnaming of array items #9
+
 ### 2.0.0 - October 16 2018
 * Breaking change: Rebuilt Schema creation logic
 

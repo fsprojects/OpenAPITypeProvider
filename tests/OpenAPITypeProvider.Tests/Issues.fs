@@ -17,3 +17,8 @@ let ``Issue #2 - Parses and converts object schema with optional sub schema``() 
 let ``Issue #3 - Use name of known Schema if exists``() =
     let _ = Issues.Schemas.ObjectB(Some "Name")
     Assert.Pass("Testing just schema is created")
+
+[<Test>]
+let ``Issue #9 - Use _Item instead of _Items suffix``() =
+    let instance = Issues.Schemas.ArrayOfInlineObject_Item(Some "abc")
+    Assert.AreEqual("abc", instance.Name.Value)

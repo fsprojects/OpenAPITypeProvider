@@ -75,6 +75,14 @@ components:
         name:
           type: string
 
+    ArrayOfInlineObject:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+
     RiskSeverity:
       type: string
       enum:
