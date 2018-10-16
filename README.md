@@ -20,6 +20,14 @@ When I started to think about writing this type provider, I set few goals:
 3. Tightly connected to Newtonsoft.Json
 4. Based on the latest OpenAPI specification (no support for Swagger)
 
+## Version 2.0.0 change
+In versions < 2.0, the Schemas were created based on simplified logic: If the schema is the same (having same structure), it is considered to be the same schema no matter name you use (actually the first parsed named is used for all others). This approach had good intentions - to minimize amount of created Schemas - however shown to be wrong for complex scenarios. This could easily lead to situation where change in one Schema breaks your other Schema, even if they were not directly linked using `$ref`.
+
+Since version **2.0.0** the Schemas are created based on logic:
+1. Root inline schemas are always created as separated one
+2. Root `$ref` schemas are created as separated one but with structure "copied" from referenced schema
+3. Nested inline schemas are created as separated one
+4. Nested `$ref` schemas are linked to referenced schema
 
 ## Instalation
 

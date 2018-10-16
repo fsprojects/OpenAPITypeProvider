@@ -28,16 +28,9 @@ let rec private uniqueName (name:string) =
         newName |> uniqueName
     | false -> name
 
-let log txt =
-    System.IO.File.AppendAllText("c:\\temp\\search.txt", txt)
-
-let private tryFindByRefAndDef (ref:string, def:SchemaDefinition) =
-    sprintf "Finding %s in %A\n\n" ref allSchemas |> log
-    let isSame (kvp:System.Collections.Generic.KeyValuePair<Schema,SchemaType>) =
-        let d = kvp.Key |> Extract.getSchemaDefinition
-        def = d && kvp.Value.Ref = Some ref
+let private tryFindByRef (ref:string) =
     allSchemas 
-    |> Seq.tryFind isSame
+    |> Seq.tryFind (fun kvp -> kvp.Value.Ref = Some ref)
     |> Option.map (fun x -> x.Value)
 
 let createType ctx typeName (filePath:string) =
@@ -82,49 +75,56 @@ let createType ctx typeName (filePath:string) =
             enumType
         | _ -> Schema.NonObject.createTypes ctx findOrCreateSchema name schema
 
-    let getLocalRefPart (ref:string) =
-        ref.Replace("#","/").Split([|'/'|], StringSplitOptions.RemoveEmptyEntries) 
-        |> Array.last
+    
+    let toLocalRef (name:string) = sprintf "#/components/schemas/%s" name
+    let getRefParts (ref:string) = 
+       match ref.Split([|'#'|], StringSplitOptions.RemoveEmptyEntries) with
+       | [|remote;local|] -> Some remote, ("#" + local)
+       | [|local|] -> None, ("#" + local)
+       | _ -> failwithf "%s contains more than one '#' character" ref
+    let getNameFromLocalRef (ref:string) = 
+        ref.Replace("#","/").Split([|'/'|], StringSplitOptions.RemoveEmptyEntries) |> Array.last
+    
 
     let rec findOrCreateSchema isRoot name (schema:Schema) =
-        let name = if isRoot then name else name |> uniqueName
-        match schema with
-        | Schema.Inline _ ->
-            let refValue = if isRoot then sprintf "#/components/schemas/%s" name |> Some else None
-            let newType = createSchema (findOrCreateSchema false) name schema
-            newType |> schemas.AddMember
-            let schemaType = { Name = name; Type = newType; Ref = refValue }
-            allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
-            schemaType
-        | Schema.Reference(ref,def) ->
-            let localRefPart = ref |> getLocalRefPart
-            match isRoot with
-            | true ->
-                // always create roots
-                let refValue = sprintf "#/components/schemas/%s" name |> Some
-                let newType = createSchema (findOrCreateSchema false) localRefPart schema
+        match isRoot with
+        // always create root items
+        | true ->
+            let refValue = name |> toLocalRef
+            match refValue |> tryFindByRef with
+            | Some t -> t
+            | None ->
+                let newType = createSchema (findOrCreateSchema false) name schema
                 newType |> schemas.AddMember
-                let schemaType = { Name = name; Type = newType; Ref = refValue }
+                let schemaType = { Name = name; Type = newType; Ref = Some refValue }
                 allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
                 schemaType
-            | false ->
-                match tryFindByRefAndDef(ref, def) with
-                | Some t -> t
-                | None ->
-                    let name =
-                        if isRoot then name
-                        else (getLocalRefPart ref)
-                    
-                    //let remote,local = 
-                    //    match ref.Split([|'#'|], StringSplitOptions.RemoveEmptyEntries) with
-                    //    | [|remote;local|] -> Some remote, (getLocalRefPart local)
-                    //    | [|local|] -> None, (getLocalRefPart local)
-                    //    | _ -> failwithf "%s contains more than one '#' character" ref
-                    //let isRoot = remote.IsNone 
-                    let refValue = if isRoot then sprintf "#/components/schemas/%s" name |> Some else None 
+        | false ->
+            match schema with
+            | Schema.Inline _ ->
+                let name = name |> uniqueName
+                let newType = createSchema (findOrCreateSchema false) name schema
+                newType |> schemas.AddMember
+                let schemaType = { Name = name; Type = newType; Ref = None }
+                allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
+                schemaType
+            | Schema.Reference (ref, _) ->
+                match ref |> getRefParts with
+                | None, local ->
+                    match local |> tryFindByRef with
+                    | Some t -> t
+                    | None ->
+                        let name = local |> getNameFromLocalRef 
+                        let newType = createSchema (findOrCreateSchema false) name schema
+                        newType |> schemas.AddMember
+                        let schemaType = { Name = name; Type = newType; Ref = Some local }
+                        allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
+                        schemaType
+                | Some _, _ ->
+                    let name = name |> uniqueName
                     let newType = createSchema (findOrCreateSchema false) name schema
                     newType |> schemas.AddMember
-                    let schemaType = { Name = name; Type = newType; Ref = refValue }
+                    let schemaType = { Name = name; Type = newType; Ref = None }
                     allSchemas.AddOrUpdate (schema, schemaType, (fun _ _ -> schemaType)) |> ignore
                     schemaType
     

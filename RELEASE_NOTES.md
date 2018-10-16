@@ -1,3 +1,6 @@
+### 2.0.0 - October 16 2018
+* Breaking change: Rebuilt Schema creation logic
+
 ### 1.6.0 - October 15 2018
 * Fixing issue #6
 * Setting dependencies for OpenAPIParser
