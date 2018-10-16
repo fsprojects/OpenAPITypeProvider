@@ -12,6 +12,7 @@ type internal Context = {
 type internal SchemaType = {
     Name : string
     Type : ProvidedTypeDefinition
+    Ref : string option
 }
 with
     static member GetType schema = schema.Type :> Type

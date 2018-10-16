@@ -216,6 +216,14 @@ components:
     
     WithUUID:
       $ref: 'ExternalSchemas.yaml#WithUUID'
+
+    MyExternal:
+      $ref: 'ExternalSchemas.yaml#MyExternalObject'
+
+    ContainingExternal:
+      properties:
+        subSchema:
+          $ref: '#/components/schemas/MyExternal'
     
     WithEnum:
       properties:

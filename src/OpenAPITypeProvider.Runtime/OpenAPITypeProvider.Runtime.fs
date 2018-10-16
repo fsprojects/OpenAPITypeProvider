@@ -5,10 +5,16 @@ open Newtonsoft.Json.Linq
 open Newtonsoft.Json
 open OpenAPIParser.Version3.Specification
 
+module Extract =
+    let getSchemaDefinition = function
+        | Schema.Inline d -> d
+        | Schema.Reference(_,d) -> d
+
 module Inference =
 
     let rec getComplexType (getSchemaFun: Schema -> Type) schema = 
-        match schema with
+        let definition = schema |> Extract.getSchemaDefinition
+        match definition with
         | Boolean -> typeof<bool>
         | Integer IntFormat.Int32 -> typeof<int>
         | Integer IntFormat.Int64 -> typeof<int64>
@@ -72,8 +78,8 @@ module Parser =
         | Some v -> value
         | None -> FormatException (sprintf "Invalid value %s - Enum must contain one of allowed values: %A" value allowedValues) |> raise
 
-    let rec parseForSchema createObj defaultTyp (schema:Schema) (json:JToken) =
-        match schema with
+    let rec parseForSchema createObj defaultTyp (definition:SchemaDefinition) (json:JToken) =
+        match definition with
         | Boolean -> json.Value<bool>() |> box
         | Integer Int32 -> json.Value<int32>() |> box
         | Integer Int64 -> json.Value<int64>() |> box
@@ -88,8 +94,9 @@ module Parser =
         | String StringFormat.UUID -> json.Value<string>() |> Guid |> box
         | String (StringFormat.Enum values) -> json.Value<string>() |> isOneOfAllowed values |> box
         | Array itemsSchema ->
+            let def = itemsSchema |> Extract.getSchemaDefinition
             let jArray = json :?> JArray
-            let items = [ for x in jArray do yield parseForSchema createObj defaultTyp itemsSchema x ]
+            let items = [ for x in jArray do yield parseForSchema createObj defaultTyp def x ]
             let typ = itemsSchema |> Inference.getComplexType (fun _ -> defaultTyp)
             Reflection.ReflectiveListBuilder.BuildTypedList typ items |> box
         | Object (props, required) ->
@@ -97,13 +104,14 @@ module Parser =
             jObject |> checkRequiredProperties required
             props 
             |> Map.map (fun name schema -> 
+                let def = schema |> Extract.getSchemaDefinition
                 if required |> List.contains name then
-                    parseForSchema createObj defaultTyp schema (jObject.[name]) |> Some
+                    parseForSchema createObj defaultTyp def (jObject.[name]) |> Some
                 else if jObject.ContainsKey name then
                     let typ = schema |> Inference.getComplexType (fun _ -> defaultTyp)
                     if jObject.[name].Type = JTokenType.Null then None
                     else
-                        parseForSchema createObj defaultTyp schema (jObject.[name]) 
+                        parseForSchema createObj defaultTyp def (jObject.[name]) 
                         |> Reflection.some typ
                         |> Some
                 else None
@@ -183,7 +191,7 @@ type ObjectValue(d:(string * obj) list) =
         arr :> JToken
 
     static member Parse(json, strSchema, dateFormat) =
-        let schema = strSchema |> Serialization.deserialize<Schema>
+        let schema = strSchema |> Serialization.deserialize<SchemaDefinition>
         json |> Serialization.parseToJToken dateFormat |> Parser.parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
 
     member  __.GetValue x = if data.ContainsKey x then data.[x] else null
@@ -239,7 +247,7 @@ type ObjectValue(d:(string * obj) list) =
 
 type SimpleValue(value:obj) =
     static member Parse(json, strSchema, dateFormat) =
-        let schema = strSchema |> Serialization.deserialize<Schema>
+        let schema = strSchema |> Serialization.deserialize<SchemaDefinition>
         let v = json |> Serialization.parseToJToken dateFormat |> Parser.parseForSchema ObjectValue typeof<ObjectValue> schema
         SimpleValue(v)
 
