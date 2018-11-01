@@ -92,7 +92,6 @@ paths:
           $ref: '#/components/responses/Error'
     delete:
       description: deletes a single pet based on the ID supplied
-      operationId: deletePet
       parameters:
         - name: id
           in: path

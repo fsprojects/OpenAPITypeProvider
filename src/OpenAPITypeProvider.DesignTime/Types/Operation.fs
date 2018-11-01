@@ -9,6 +9,11 @@ let createType ctx findOrCreateSchemaFn name (operation:Operation) =
     
     let typ = ProvidedTypeDefinition(ctx.Assembly, ctx.Namespace, name, Some typeof<obj>, hideObjectMethods = true, nonNullable = true, isErased = true)
     
+    // Operation Id
+    if operation.OperationId.IsSome then
+        let opId = operation.OperationId.Value
+        ProvidedProperty("OperationId", typeof<string>, (fun _ -> <@@ opId @@>)) |> typ.AddMember
+
     // RequestBody
     if operation.RequestBody.IsSome then
         let rb = operation.RequestBody.Value |> RequestBody.createType ctx findOrCreateSchemaFn "RequestBody"

@@ -313,3 +313,10 @@ let ``Fails with parsing in unallowed enum value``() =
 //    let instance = PetStore.Schemas.Pet(1L, "A")
 //    let json = """{"id":1,"name":"A"}"""
 //    Assert.AreEqual(json, petStoreAPI.Paths.``/pets/{id}``.Get.Responses.``200``.``application/json``.ToJson(instance, Formatting.None))
+
+// [<Test>]
+// let ``Operation methods is available``() =
+//     let petStoreAPI = new PetStore()
+//     Assert.AreEqual("findPets", petStoreAPI.Paths.``/pets``.Get.OperationId)
+//     Assert.AreEqual("find pet by id", petStoreAPI.Paths.``/pets/{id}``.Get.OperationId)
+//     //Assert.AreEqual("find pet by id", petStoreAPI.Paths.``/pets/{id}``.Delete.OperationId) // does not exist type at all

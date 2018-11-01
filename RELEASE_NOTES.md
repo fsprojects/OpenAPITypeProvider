@@ -1,3 +1,6 @@
+### 2.1.0 - November 01 2018
+* Adding OperationId on Operations #7
+
 ### 2.0.1 - October 16 2018
 * Fixing issue with subnaming of array items #9
 

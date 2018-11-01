@@ -12,8 +12,8 @@ NUGET
     YamlDotNet (5.2.1)
 GITHUB
   remote: fsprojects/FSharp.TypeProviders.SDK
-    src/ProvidedTypes.fs (7d57cd409d7299592822713195924e42b2b7acde)
-    src/ProvidedTypes.fsi (7d57cd409d7299592822713195924e42b2b7acde)
+    src/ProvidedTypes.fs (28a24a69ada68ebd1ad25226634f4608e4875493)
+    src/ProvidedTypes.fsi (28a24a69ada68ebd1ad25226634f4608e4875493)
 GROUP Test
 RESTRICTION: || (== net461) (== netcoreapp2.0)
 NUGET
