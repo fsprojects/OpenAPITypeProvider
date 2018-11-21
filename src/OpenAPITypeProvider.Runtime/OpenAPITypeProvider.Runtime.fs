@@ -169,7 +169,16 @@ module internal Serialization =
         settings.DateFormatString <- dateFormat
         JsonConvert.DeserializeObject<JToken>(json, settings)
 
+[<AbstractClass>]
+type JsonValue() =
+   abstract member ToJson: JsonSerializerSettings * Formatting -> string
+   abstract member ToJson: Formatting -> string
+   abstract member ToJson: unit -> string
+   abstract member ToJToken: NullValueHandling -> JToken
+   abstract member ToJToken: unit -> JToken
+
 type ObjectValue(d:(string * obj) list) =
+    inherit JsonValue()
     let data = d |> Map |> System.Collections.Generic.Dictionary
 
     let toJToken nullHandling (o:obj) =
@@ -197,20 +206,20 @@ type ObjectValue(d:(string * obj) list) =
     member  __.GetValue x = if data.ContainsKey x then data.[x] else null
 
     /// Converts strongly typed value to JSON string
-    member this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
+    override this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
         let jToken = this.ToJToken(settings.NullValueHandling)
         JsonConvert.SerializeObject(jToken, formatting, settings)
 
     /// Converts strongly typed value to JSON string        
-    member this.ToJson formatting = 
+    override this.ToJson formatting = 
         let settings = Serialization.getDefaultSettings()
         this.ToJson(settings, formatting)
 
     /// Converts strongly typed value to JSON string
-    member this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
+    override this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
     
     /// Converts strongly typed value to Newtonsoft JToken
-    member __.ToJToken (nullValueHandling:NullValueHandling) =
+    override __.ToJToken (nullValueHandling:NullValueHandling) =
         let obj = JObject()
         let setEmpty (o:JObject) key =
             match nullValueHandling with
@@ -243,16 +252,17 @@ type ObjectValue(d:(string * obj) list) =
         obj :> JToken
 
     /// Converts strongly typed value to Newtonsoft JToken    
-    member this.ToJToken () = this.ToJToken(NullValueHandling.Ignore)
+    override this.ToJToken () = this.ToJToken(NullValueHandling.Ignore)
 
 type SimpleValue(value:obj) =
+    inherit JsonValue()
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<SchemaDefinition>
         let v = json |> Serialization.parseToJToken dateFormat |> Parser.parseForSchema ObjectValue typeof<ObjectValue> schema
         SimpleValue(v)
 
     /// Converts strongly typed value to Newtonsoft JToken    
-    member __.ToJToken () = 
+    override __.ToJToken (nullValueHandling:NullValueHandling) = 
         let valueType = value.GetType()
         if valueType = typeof<List<ObjectValue>> then
             let values = value :?> List<ObjectValue>
@@ -267,18 +277,20 @@ type SimpleValue(value:obj) =
         else
             JToken.FromObject(value, Serialization.getSerializer())
     
+    override this.ToJToken () = this.ToJToken(NullValueHandling.Ignore)
+
     /// Converts strongly typed value to JSON string
-    member this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
+    override this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
         let jToken = this.ToJToken()
         JsonConvert.SerializeObject(jToken, formatting, settings)
 
     /// Converts strongly typed value to JSON string
-    member this.ToJson formatting = 
+    override this.ToJson formatting = 
         let settings = Serialization.getDefaultSettings()
         this.ToJson(settings, formatting)
 
     /// Converts strongly typed value to JSON string
-    member this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
+    override this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
     member __.GetValue = value
 
 

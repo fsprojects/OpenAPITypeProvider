@@ -269,6 +269,17 @@ let ``Parses and converts basic schema with UUID property (from JSON)``() =
     Assert.AreEqual("Name", parsed.Name)
     Assert.AreEqual(guid, parsed.Id)
 
+let private genericToJson (anyType:#OpenAPITypeProvider.JsonValue) = anyType.ToJson()
+
+[<Test>]
+let ``Converts to JSON based on abstract class JsonValue``() =
+    let guid = Guid("3ca191ae-6d5b-45a5-9767-0d610dd47497")
+    let json = """{"id":"3ca191ae-6d5b-45a5-9767-0d610dd47497","name":"Name"}"""
+    let instance = new PetStoreJson.Schemas.WithUUID(name = "Name", id = guid)
+    let parsed = PetStoreJson.Schemas.WithUUID.Parse json
+    Assert.AreEqual(json, instance |> genericToJson)
+    Assert.AreEqual(json, parsed |> genericToJson)
+
 // [<Test>]
 // let ``Parses and converts basic schema with enum``() =
 //     let json = """{"id":"123","myEnum":"b"}"""
