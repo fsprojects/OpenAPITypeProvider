@@ -1,5 +1,5 @@
 ### 2.2.0 - November 21 2018
-* Added abstract base class for ObjectValue & SimpleValue
+* Added abstract base class for ObjectValue and SimpleValue
 
 ### 2.1.0 - November 01 2018
 * Adding OperationId on Operations #7
