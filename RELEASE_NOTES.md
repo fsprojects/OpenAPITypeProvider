@@ -1,3 +1,6 @@
+### 2.3.0 - December 20 2018
+* New overload of ToJson with serializer as parameter
+
 ### 2.2.0 - November 21 2018
 * Added abstract base class for ObjectValue and SimpleValue
 

@@ -108,6 +108,38 @@ let ``Parses and converts basic schema with two dates properties (custom format)
     Assert.AreEqual(json, parsed.ToJson(customSettings, Formatting.None))
 
 [<Test>]
+let ``Parses and converts basic schema with custom serializer function``() =
+    let customSettingsFn = 
+        fun (settings:JsonSerializerSettings) ->
+            settings.DateFormatString <- customDateFormat
+            settings
+
+    let json = """{"date1":"31. 12. 2018 12:34:56","date2":"31. 12. 2017 12:34:56"}"""
+    let json2 = """{"date1":"2018-12-31T12:34:56+01:00","date2":"2017-12-31T12:34:56+01:00"}"""
+
+    let d1 = DateTime(2018,12,31,12,34,56, DateTimeKind.Local)
+    let d2 = DateTime(2017,12,31,12,34,56, DateTimeKind.Local)
+    let instance = new PetStore.Schemas.TwoDates(d1, d2)
+    Assert.AreEqual(json, instance.ToJson(customSettingsFn, Formatting.None))
+    Assert.AreEqual(json2, instance.ToJson(Formatting.None))
+
+[<Test>]
+let ``Parses and converts basic schema with custom serializer function (another test)``() =
+    let customSettingsFn = 
+        fun (settings:JsonSerializerSettings) ->
+            settings.DateTimeZoneHandling <- DateTimeZoneHandling.Utc
+            settings
+
+    let json = """{"date1":"2018-12-31T11:34:56Z","date2":"2017-12-31T11:34:56Z"}"""
+    let json2 = """{"date1":"2018-12-31T12:34:56+01:00","date2":"2017-12-31T12:34:56+01:00"}"""
+
+    let d1 = DateTime(2018,12,31,12,34,56, DateTimeKind.Local)
+    let d2 = DateTime(2017,12,31,12,34,56, DateTimeKind.Local)
+    let instance = new PetStore.Schemas.TwoDates(d1, d2)
+    Assert.AreEqual(json, instance.ToJson(customSettingsFn, Formatting.None))
+    Assert.AreEqual(json2, instance.ToJson(Formatting.None))
+
+[<Test>]
 let ``Parses and converts basic schema with two dates properties (custom format with time zone transform)``() =
     let customSettings = new JsonSerializerSettings()
     customSettings.DateTimeZoneHandling <- DateTimeZoneHandling.Utc

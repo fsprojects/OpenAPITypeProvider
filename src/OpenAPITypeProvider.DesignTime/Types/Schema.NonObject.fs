@@ -32,10 +32,9 @@ let private createNonObjectType ctx (findOrCreateSchema:string -> Schema -> Sche
 
     // static method Parse
     ProvidedMethod("Parse", [ProvidedParameter("json", typeof<string>)], typ, (fun args -> 
-        let format = Parser.defaultDateFormat
         <@@ 
             let json = %%args.Head : string
-            SimpleValue.Parse(json, strSchema, format)
+            SimpleValue.Parse(json, strSchema)
         @@>), isStatic = true)
         |> (fun x -> x.AddXmlDoc "Parses JSON string to strongly typed schema"; x)
         |> typ.AddMember

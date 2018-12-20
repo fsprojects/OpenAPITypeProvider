@@ -5,12 +5,12 @@ open Newtonsoft.Json.Linq
 open Newtonsoft.Json
 open OpenAPIParser.Version3.Specification
 
-module Extract =
+module internal Extract =
     let getSchemaDefinition = function
         | Schema.Inline d -> d
         | Schema.Reference(_,d) -> d
 
-module Inference =
+module internal Inference =
 
     let rec getComplexType (getSchemaFun: Schema -> Type) schema = 
         let definition = schema |> Extract.getSchemaDefinition
@@ -62,7 +62,7 @@ module Reflection =
         | null -> false
         | v -> v.GetType() = typeof<'a>
 
-module Parser =
+module internal Parser =
 
     let private checkRequiredProperties (req:string list) (jObject:JObject) =
         let props = jObject.Properties() |> Seq.toList
@@ -152,25 +152,26 @@ module internal Serialization =
             if isNull value then FSharpValue.MakeUnion(cases.[0], [||])
             else FSharpValue.MakeUnion(cases.[1], [|value|])
 
-
     let getDefaultSettings() =
         let settings = JsonSerializerSettings()
         settings.Converters.Add(OptionConverter())
         settings.NullValueHandling <- NullValueHandling.Ignore
         settings
+    
+    let defaultSettings = getDefaultSettings()
+    let defaultSerializer = JsonSerializer.Create(defaultSettings)
 
-    let private settings = getDefaultSettings()
-
-    let getSerializer() = JsonSerializer.Create(settings)
-    let serialize obj = JsonConvert.SerializeObject(obj, settings)
-    let deserialize<'a> json = JsonConvert.DeserializeObject<'a>(json, settings)
+    let serialize obj = JsonConvert.SerializeObject(obj, defaultSettings)
+    let deserialize<'a> json = JsonConvert.DeserializeObject<'a>(json, defaultSettings)
 
     let parseToJToken dateFormat json =
+        let settings = getDefaultSettings()
         settings.DateFormatString <- dateFormat
         JsonConvert.DeserializeObject<JToken>(json, settings)
 
 [<AbstractClass>]
 type JsonValue() =
+   abstract member ToJson: (JsonSerializerSettings -> JsonSerializerSettings) * Formatting -> string
    abstract member ToJson: JsonSerializerSettings * Formatting -> string
    abstract member ToJson: Formatting -> string
    abstract member ToJson: unit -> string
@@ -185,7 +186,7 @@ type ObjectValue(d:(string * obj) list) =
         if o.GetType() = typeof<ObjectValue> then
             (o :?> ObjectValue).ToJToken(nullHandling)
         else
-            JToken.FromObject(o, Serialization.getSerializer())
+            JToken.FromObject(o, Serialization.defaultSerializer)
 
     let arrayToJToken nullHandling (o:obj) =
         let values = o :?> List<obj>
@@ -199,11 +200,20 @@ type ObjectValue(d:(string * obj) list) =
         values |> List.iter (toJToken nullHandling >> arr.Add)
         arr :> JToken
 
+    static member Parse(json, strSchema) =
+        let schema = strSchema |> Serialization.deserialize<SchemaDefinition>
+        json |> Serialization.parseToJToken Parser.defaultDateFormat |> Parser.parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
+    
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<SchemaDefinition>
         json |> Serialization.parseToJToken dateFormat |> Parser.parseForSchema ObjectValue typeof<ObjectValue> schema :?> ObjectValue
 
     member  __.GetValue x = if data.ContainsKey x then data.[x] else null
+
+    /// Converts strongly typed value to JSON string        
+    override this.ToJson (fn:JsonSerializerSettings -> JsonSerializerSettings, formatting) = 
+        let settings = Serialization.getDefaultSettings() |> fn
+        this.ToJson(settings, formatting)
 
     /// Converts strongly typed value to JSON string
     override this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
@@ -212,8 +222,7 @@ type ObjectValue(d:(string * obj) list) =
 
     /// Converts strongly typed value to JSON string        
     override this.ToJson formatting = 
-        let settings = Serialization.getDefaultSettings()
-        this.ToJson(settings, formatting)
+        this.ToJson(Serialization.defaultSettings, formatting)
 
     /// Converts strongly typed value to JSON string
     override this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
@@ -256,9 +265,15 @@ type ObjectValue(d:(string * obj) list) =
 
 type SimpleValue(value:obj) =
     inherit JsonValue()
+    
     static member Parse(json, strSchema, dateFormat) =
         let schema = strSchema |> Serialization.deserialize<SchemaDefinition>
         let v = json |> Serialization.parseToJToken dateFormat |> Parser.parseForSchema ObjectValue typeof<ObjectValue> schema
+        SimpleValue(v)
+
+    static member Parse(json, strSchema) =
+        let schema = strSchema |> Serialization.deserialize<SchemaDefinition>
+        let v = json |> Serialization.parseToJToken Parser.defaultDateFormat |> Parser.parseForSchema ObjectValue typeof<ObjectValue> schema
         SimpleValue(v)
 
     /// Converts strongly typed value to Newtonsoft JToken    
@@ -275,9 +290,14 @@ type SimpleValue(value:obj) =
             values |> List.iter (fun x -> (x :?> ObjectValue).ToJToken() |> arr.Add)
             arr :> JToken
         else
-            JToken.FromObject(value, Serialization.getSerializer())
+            JToken.FromObject(value, Serialization.defaultSerializer)
     
     override this.ToJToken () = this.ToJToken(NullValueHandling.Ignore)
+
+    /// Converts strongly typed value to JSON string
+    override this.ToJson (fn:JsonSerializerSettings -> JsonSerializerSettings, formatting) = 
+        let settings = Serialization.getDefaultSettings() |> fn
+        this.ToJson(settings, formatting)
 
     /// Converts strongly typed value to JSON string
     override this.ToJson((settings:JsonSerializerSettings), (formatting:Formatting)) = 
@@ -286,13 +306,11 @@ type SimpleValue(value:obj) =
 
     /// Converts strongly typed value to JSON string
     override this.ToJson formatting = 
-        let settings = Serialization.getDefaultSettings()
-        this.ToJson(settings, formatting)
+        this.ToJson(Serialization.defaultSettings, formatting)
 
     /// Converts strongly typed value to JSON string
     override this.ToJson () = this.ToJson(Newtonsoft.Json.Formatting.None)
     member __.GetValue = value
-
 
 // Put the TypeProviderAssemblyAttribute in the runtime DLL, pointing to the design-time DLL
 [<assembly:CompilerServices.TypeProviderAssembly("OpenAPITypeProvider.DesignTime.dll")>]
