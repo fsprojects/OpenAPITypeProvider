@@ -1,7 +1,7 @@
 source https://nuget.org/api/v2
 frameworks: net45, netcoreapp2.1, netstandard2.0
+storage: none
 
-nuget FAKE
 nuget FSharp.Core 4.3.4
 nuget OpenAPIParser >= 2.0.1 < 3.0.0
 nuget NETStandard.Library.NETFramework
@@ -14,8 +14,10 @@ github fsprojects/FSharp.TypeProviders.SDK src/ProvidedTypes.fs
 group Test
   source https://nuget.org/api/v2
   frameworks: net461, netcoreapp2.0
+  storage: none
 
+  nuget FSharp.Core 4.3.4
+  nuget Microsoft.NET.Test.Sdk 15.8.0
   nuget NUnit 3.6.1
   nuget NUnit.Console 3.6.1
   nuget NUnit3TestAdapter 3.7.0 version_in_path: true
-  nuget FSharp.Core 4.3.4
