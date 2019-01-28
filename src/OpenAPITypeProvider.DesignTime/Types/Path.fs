@@ -20,9 +20,12 @@ let private createType ctx findOrCreateSchemaFn name (path:Path) =
             path.Patch, "Patch"
             path.Trace, "Trace"
         ] 
-        |> List.filter (fun (x,_) -> x.IsSome)
-        |> List.map (fun (x,y) -> x.Value, y)
-    
+        |> List.choose (function Some x, y -> Some(x, y) | _ -> None)
+
+    ProvidedProperty("Template", typeof<string>, (fun _ -> <@@ name @@>))
+    |?> Some "Path URL template"
+    |> typ.AddMember
+
     paths |> List.iter (fun (path, name) -> 
         let p = path |> Operation.createType ctx findOrCreateSchemaFn name
         p |> typ.AddMember
