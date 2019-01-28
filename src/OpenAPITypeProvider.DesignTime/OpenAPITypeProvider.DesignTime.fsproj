@@ -11,17 +11,16 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fsi">
+    <Compile Include="..\..\paket-files\library\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fsi">
       <Paket>True</Paket>
       <Link>paket-files/ProvidedTypes.fsi</Link>
     </Compile>
-    <Compile Include="..\..\paket-files\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fs">
+    <Compile Include="..\..\paket-files\library\fsprojects\FSharp.TypeProviders.SDK\src\ProvidedTypes.fs">
       <Paket>True</Paket>
       <Link>paket-files/ProvidedTypes.fs</Link>
     </Compile>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="..\OpenAPITypeProvider.Runtime\OpenAPITypeProvider.Runtime.fs" />
-    
     <Compile Include="IO.fs" />
     <Compile Include="Names.fs" />
     <Compile Include="Types\Types.fs" />
@@ -38,13 +37,10 @@
     <Compile Include="Types\Operation.fs" />
     <Compile Include="Types\Path.fs" />
     <Compile Include="Types\Document.fs" />
-
-
     <Compile Include="OpenAPITypeProvider.DesignTime.fs" />
-
     <None Include="paket.references" />
     <None Include="..\..\packages\NETStandard.Library.NETFramework\build\net461\lib\netstandard.dll" Condition="'$(TargetFramework)' == 'net45'">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

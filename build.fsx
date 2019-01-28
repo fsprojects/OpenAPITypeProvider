@@ -1,25 +1,32 @@
-﻿// include Fake lib
-#I "packages/FAKE/tools/"
+﻿#r "paket: groupref FakeBuild //"
+#load "./.fake/build.fsx/intellisense.fsx"
 
-#r "FakeLib.dll"
-
+open Fake.DotNet
+open Fake.Core
+open Fake.IO
+open Fake.IO.Globbing.Operators
 open Fake
-open System.IO
+open Fake.Core.TargetOperators
+
 let appSrc = "src/OpenAPITypeProvider.Runtime"
 let testsSrc = "tests/OpenAPITypeProvider.Tests"
 
-Target "BuildApp" (fun _ ->
-    Fake.DotNetCli.Build (fun p -> { p with Configuration = "Release";})
+Target.create "BuildApp" (fun _ ->
+    appSrc |> DotNet.build (fun p -> { p with Configuration = DotNet.Custom "Release"})
 )
 
-Target "RunTests" (fun _ ->
-    Fake.DotNetCli.Test (fun p -> { p with Configuration = "Release"; })
+Target.create "RunTests" (fun _ ->
+    testsSrc
+    |> DotNet.test (fun p -> 
+        { p with 
+            Configuration = DotNet.Custom "Debug"; 
+            Common = {p.Common with CustomParams = Some  "--logger trx;logfilename=../../../results.trx" }})
 )
 
 // Read release notes & version info from RELEASE_NOTES.md
-let release = File.ReadLines "RELEASE_NOTES.md" |> ReleaseNotesHelper.parseReleaseNotes
+let release = ReleaseNotes.load "RELEASE_NOTES.md"
 
-Target "Nuget" <| fun () ->
+Target.create "Nuget" <| fun _ ->
     let toNotes = List.map (fun x -> x + System.Environment.NewLine) >> List.fold (+) ""
     Fake.DotNet.Paket.pack (fun p -> 
         { p with 
@@ -28,15 +35,15 @@ Target "Nuget" <| fun () ->
             ReleaseNotes = (release.Notes |> toNotes)
         })
 
-Target "Clean" (fun _ -> 
+Target.create "Clean" (fun _ -> 
     !! "src/*/bin"
     ++ "src/*/obj"
     ++ "tests/*/bin"
     ++ "tests/*/obj"
-    |> DeleteDirs
+    |> Fake.IO.Shell.deleteDirs
 )
 
 "Clean" ==> "BuildApp" ==> "RunTests" ==> "Nuget"
 
 // start build
-RunTargetOrDefault "BuildApp"
+Fake.Core.Target.runOrDefault "BuildApp"

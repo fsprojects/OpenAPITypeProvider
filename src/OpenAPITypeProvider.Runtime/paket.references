@@ -1,7 +1,8 @@
-File:ProvidedTypes.fsi
-File:ProvidedTypes.fs
+group Library
+    File:ProvidedTypes.fsi
+    File:ProvidedTypes.fs
+    FSharp.Core
+    OpenAPIParser
 
-FSharp.Core
 # put any package references here
-OpenAPIParser
 # System.Text.Encoding.CodePages framework: netstandard2.0,netcoreapp2.1
