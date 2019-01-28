@@ -21,5 +21,6 @@ bower_components
 node_modules
 .fake
 deploy/*
+paket.exe
 */**/AssemblyInfo.fs
 /.ionide/*

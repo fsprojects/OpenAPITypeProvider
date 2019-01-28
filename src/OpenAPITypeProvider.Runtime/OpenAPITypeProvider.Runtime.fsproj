@@ -18,6 +18,7 @@
       <Paket>True</Paket>
       <Link>paket-files/ProvidedTypes.fs</Link>
     </Compile>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="OpenAPITypeProvider.Runtime.fs" />
     <None Include="paket.references" />
   </ItemGroup>
